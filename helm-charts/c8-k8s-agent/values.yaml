@@ -1,0 +1,77 @@
+# -- replica count
+replicaCount: 1
+
+
+image:
+  # -- c8 k8s-agent repo
+  repository: public.ecr.aws/c8-public/c8-k8s-agent
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the latest.
+  tag: "latest"
+
+# -- image pull secrets
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+
+# -- pod annotations
+podAnnotations: {}
+
+# -- pod pod security context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# -- key/value pairs to add as variables to the pod
+envs:
+  data:
+    # - key: ENV
+    #   value: "qa"
+
+# -- If you do want to specify resources, uncomment the following
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- node selector
+nodeSelector: {}
+
+# -- tolerations
+tolerations: []
+
+# -- affinity
+affinity: {}
+
+# -- liveness probe
+livenessProbe: {}
+#   httpGet:
+#     path: /
+#     port: http
+
+# -- readiness probe
+readinessProbe: {}
+#   httpGet:
+#     path: /
+#     port: http
