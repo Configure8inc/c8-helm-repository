@@ -65,13 +65,13 @@ tolerations: []
 affinity: {}
 
 # -- liveness probe
-livenessProbe: {}
+#livenessProbe: {}
 #   httpGet:
 #     path: /
 #     port: http
 
 # -- readiness probe
-readinessProbe: {}
+#readinessProbe: {}
 #   httpGet:
 #     path: /
 #     port: http
