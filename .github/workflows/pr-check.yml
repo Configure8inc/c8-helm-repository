@@ -1,0 +1,54 @@
+name: 'Build c8 charts'
+
+on:
+  workflow_dispatch: 
+  pull_request:
+    branches: [main, production]
+      
+env:
+  HELM_VERSION    : "v3.12.0"
+  HELM_REPO_URL   : "https://helm.configure8.io/store/"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Install Helm
+      uses: ./.github/actions/install-kubectl-helm
+      with:
+        helm_version: ${{ env.HELM_VERSION }}
+
+    - name: Lint helm charts
+      run: |
+        helm lint helm-charts/*
+
+    - name: Helm package new version
+      run: |
+        for item in ./helm-charts/*; do helm package $item -d ./store; done
+
+    - name: Upgrade index.yaml
+      run: |
+        helm repo index --url ${{ env.HELM_REPO_URL }} --merge index.yaml ./store
+
+    - name: Commit files
+      run: |
+        git config --local user.email "github-actions[bot]@configure8.io"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git commit -m "[skip ci] Upgraded charts version"
+
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ env.GITHUB_HEAD_REF }}

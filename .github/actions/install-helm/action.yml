@@ -1,0 +1,20 @@
+name: "Install Helm"
+description: "Install Helm"
+
+inputs:
+  helm_version:
+    description: "Helm version to install"
+    required: true
+  
+runs:
+  using: composite
+  steps:
+    - name: Install Helm 
+      run: |
+        curl https://get.helm.sh/helm-${{ inputs.helm_version }}-linux-amd64.tar.gz --output helm-${{ inputs.helm_version }}-linux-amd64.tar.gz \
+          --progress-bar \
+          --location \
+          --remote-name
+        tar -zxvf helm-${{ inputs.helm_version }}-linux-amd64.tar.gz
+        mv linux-amd64/helm /usr/local/bin/helm
+      shell: bash
