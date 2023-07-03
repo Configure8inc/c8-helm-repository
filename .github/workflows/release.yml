@@ -27,7 +27,7 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
-        uses: ./.github/actions/install-kubectl-helm
+        uses: ./.github/actions/install-helm
         with:
           helm_version: ${{ env.HELM_VERSION }}
 
