@@ -57,7 +57,7 @@ CLUSTER_RESOURCE_KEY: ""
 # -- Provider resource key for the cluster you want to associate discovered resources to. If the cluster exists in the catalog, it will be associated with namespaces and pods as a parent. Otherwise, this value will be ignored once and checked on the next data sync in case the cluster appears in catalog.
 CONFIGURE8_API_TOKEN: ""
 # -- Url to configure8 public API
-CONFIGURE8_URL: "https://qa.configure8.io/public/v1"
+CONFIGURE8_URL: "https://app.configure8.io/public/v1"
 
 # -- If you do want to specify resources, uncomment the following
 resources: {}
