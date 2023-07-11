@@ -43,13 +43,13 @@ spec:
           - name: CONFIGURE8_URL
             value: {{ .Values.CONFIGURE8_URL }}
           {{- end -}}
-          {{- if .Values.CONFIGURE8_API_TOKEN }}
+          {{- if .Values.CONFIGURE8_API_TOKEN | quote }}
           - name: CONFIGURE8_API_TOKEN
             value: {{ .Values.CONFIGURE8_API_TOKEN }}
           {{- end -}}
           {{- if .Values.CLUSTER_RESOURCE_KEY }}
           - name: CLUSTER_RESOURCE_KEY
-            value: {{ .Values.CLUSTER_RESOURCE_KEY }}
+            value: {{ .Values.CLUSTER_RESOURCE_KEY | quote }}
           {{- end -}}
           {{- if .Values.LOGGING_LEVEL }}
           - name: LOGGING_LEVEL
@@ -57,11 +57,11 @@ spec:
           {{- end -}}
           {{- if .Values.PROVIDER_ACCOUNT_ID }}
           - name: PROVIDER_ACCOUNT_ID
-            value: {{ .Values.PROVIDER_ACCOUNT_ID }}
+            value: {{ .Values.PROVIDER_ACCOUNT_ID | quote }}
           {{- end -}}
           {{- if .Values.FREQUENCY_HOURS }}
           - name: FREQUENCY_HOURS
-            value: {{ .Values.FREQUENCY_HOURS }}
+            value: {{ .Values.FREQUENCY_HOURS | quote }}
           {{- end -}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
