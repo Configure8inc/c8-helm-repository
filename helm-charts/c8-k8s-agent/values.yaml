@@ -46,27 +46,36 @@ envs:
     # - key: ENV
     #   value: "qa"
 
-# -- Data sync frequency. The number of hours for discovery schedule. Cannot be less than 1.
-FREQUENCY_HOURS: "24"
-# -- Provider account id for the cluster and its resources. If provided, resources will be created with the specified provider account id.
-PROVIDER_ACCOUNT_ID: ""
-# -- Agent logging level. Possible options - 'fatal', 'error', 'warn', 'info', 'debug', 'trace' or 'silent'. Be aware - trace log level will be quite verbose, since it will also print cluster changes.
-LOGGING_LEVEL: "info"
-# -- key/value pairs to add as variables to the pod
-CLUSTER_RESOURCE_KEY: ""
-# -- Provider resource key for the cluster you want to associate discovered resources to. If the cluster exists in the catalog, it will be associated with namespaces and pods as a parent. Otherwise, this value will be ignored once and checked on the next data sync in case the cluster appears in catalog.
-CONFIGURE8_API_TOKEN: ""
-# -- Url to configure8 public API
-CONFIGURE8_URL: "https://app.configure8.io/public/v1"
+variables:
+  # -- Data sync frequency. The number of hours for discovery schedule. Cannot be less than 1.
+  FREQUENCY_HOURS: "24"
+  # -- Provider account id for the cluster and its resources. If provided, resources will be created with the specified provider account id.
+  PROVIDER_ACCOUNT_ID: ""
+  # -- Agent logging level. Possible options - 'fatal', 'error', 'warn', 'info', 'debug', 'trace' or 'silent'. Be aware - trace log level will be quite verbose, since it will also print cluster changes.
+  LOGGING_LEVEL: "info"
+  # -- key/value pairs to add as variables to the pod
+  CLUSTER_RESOURCE_KEY: ""
+  # -- Url to configure8 public API
+  CONFIGURE8_URL: "https://app.configure8.io/public/v1"
+  # -- variables from configmaps
+  variables_from_configmaps:
+    configmap_names: []
+    # - db_config
+    # - app_config
+  # -- variables from secrets
+  variables_from_secrets:
+    secrets_names: []
+    # - c8-k8s-agent
+    # - app_secrets
 
-# -- If you do want to specify resources, uncomment the following
-resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+# -- Specify resources
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 512Mi
 
 # -- node selector
 nodeSelector: {}
