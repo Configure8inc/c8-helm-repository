@@ -68,5 +68,25 @@ Envs
 {{- range $key  := .Values.envs.data }}
 - name: "{{ $key.key }}"
   value: "{{ $key.value }}"
+{{- end }}
+{{- end }}
+
+{{/*
+Envs from configMap
+*/}}
+{{- define "helpers.variables_from_configmaps"}}
+{{- range $key  := .Values.variables.variables_from_configmaps.configmap_names }}
+- configMapRef:
+    name: {{ $key }}
 {{- end}}
+{{- end }}
+
+{{/*
+Envs from secrets
+*/}}
+{{- define "helpers.variables_from_secrets" }}
+{{- range $key  := .Values.variables.variables_from_secrets.secrets_names }}
+- secretRef:
+    name: {{ $key }}
+{{- end }}
 {{- end }}
