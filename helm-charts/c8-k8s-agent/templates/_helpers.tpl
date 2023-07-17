@@ -61,15 +61,6 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{/*
-Envs
-*/}}
-{{- define "helpers.list-env-variables"}}
-{{- range $key  := .Values.envs.data }}
-- name: "{{ $key.key }}"
-  value: "{{ $key.value }}"
-{{- end }}
-{{- end }}
 
 {{/*
 Envs from configMap

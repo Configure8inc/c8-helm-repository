@@ -40,12 +40,6 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-# -- key/value pairs to add as variables to the pod
-envs:
-  data:
-    # - key: ENV
-    #   value: "qa"
-
 variables:
   # -- Data sync frequency. The number of hours for discovery schedule. Cannot be less than 1.
   FREQUENCY_HOURS: "24"
