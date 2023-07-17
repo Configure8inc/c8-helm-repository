@@ -3,7 +3,17 @@ entries:
   c8-k8s-agent:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.172159+02:00"
+    created: "2023-07-17T18:47:11.104538+02:00"
+    description: A Helm chart for c8 k8s-agent
+    digest: ebae3b87169c113b280bab43df33fc012ff72dc364c5a4d74f576daaadc891ab
+    name: c8-k8s-agent
+    type: application
+    urls:
+    - https://helm.configure8.io/store/c8-k8s-agent-0.0.9.tgz
+    version: 0.0.9
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2023-07-17T18:47:11.104303+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: edb308f14743e437aca5abc4ecfc16377d1a7ce5d55c1986217b4c5cdb0825bd
     name: c8-k8s-agent
@@ -13,7 +23,7 @@ entries:
     version: 0.0.8
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.171844+02:00"
+    created: "2023-07-17T18:47:11.103948+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: aa50562fb32953a8d0586cef92bfe40b4d8ba5c097fc95427d76b5f55d4d3b95
     name: c8-k8s-agent
@@ -23,7 +33,7 @@ entries:
     version: 0.0.7
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.171515+02:00"
+    created: "2023-07-17T18:47:11.103534+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: 46bb8ba7a78e300b62c74d686addec322e4c7ddc034fb2a2b0a087a0e6258807
     name: c8-k8s-agent
@@ -33,7 +43,7 @@ entries:
     version: 0.0.6
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.171124+02:00"
+    created: "2023-07-17T18:47:11.103191+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: 5b794e864ddba151139d7bc20fbd9df1943902d751c7844c99a39e490ed3f664
     name: c8-k8s-agent
@@ -43,7 +53,7 @@ entries:
     version: 0.0.5
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.170654+02:00"
+    created: "2023-07-17T18:47:11.102855+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: be80f0ff5227d8cb24c43c631d5e46b5bd73472f8859e9540fded6ba5b93d626
     name: c8-k8s-agent
@@ -53,7 +63,7 @@ entries:
     version: 0.0.4
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.170258+02:00"
+    created: "2023-07-17T18:47:11.102424+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: 082df52bab77d849d85f01f1ad0cfbbb50902cfdceb6f2a9df8823e43ebfd48c
     name: c8-k8s-agent
@@ -63,7 +73,7 @@ entries:
     version: 0.0.3
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.169827+02:00"
+    created: "2023-07-17T18:47:11.102116+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: 2d18c097e5e81676dcae3dca533d06d4f1fa459ac80c837d9d3f8ea480014d39
     name: c8-k8s-agent
@@ -73,7 +83,7 @@ entries:
     version: 0.0.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-17T17:57:07.16941+02:00"
+    created: "2023-07-17T18:47:11.101639+02:00"
     description: A Helm chart for c8 k8s-agent
     digest: a393e7e355caa723ebff0f328407c947fa05401aa6fad91dd828b2d45a8222d0
     name: c8-k8s-agent
@@ -81,4 +91,4 @@ entries:
     urls:
     - https://helm.configure8.io/store/c8-k8s-agent-0.0.1.tgz
     version: 0.0.1
-generated: "2023-07-17T17:57:07.168522+02:00"
+generated: "2023-07-17T18:47:11.100484+02:00"
