@@ -41,7 +41,6 @@ spec:
           {{- include "helpers.variables_from_secrets" . | indent 10 }}
           {{- include "helpers.variables_from_configmaps" . | indent 10 }}
           env:
-          {{- include "helpers.list-env-variables" . | indent 10 }}
           {{- if .Values.CONFIGURE8_URL }}
           - name: CONFIGURE8_URL
             value: {{ .Values.CONFIGURE8_URL }}
