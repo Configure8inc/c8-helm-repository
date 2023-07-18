@@ -61,7 +61,6 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-
 {{/*
 Envs from configMap
 */}}
@@ -81,3 +80,14 @@ Envs from secrets
     name: {{ $key }}
 {{- end }}
 {{- end }}
+
+{{/*
+Envs CONFIGURE8_API_TOKEN
+*/}}
+{{- define "addConfigure8APIToken" -}}
+{{- if ne .Values.variables.CONFIGURE8_API_TOKEN "" -}}
+- name: CONFIGURE8_API_TOKEN
+  value: {{ .Values.variables.CONFIGURE8_API_TOKEN | quote }}
+{{- end -}}
+{{- end -}}
+
