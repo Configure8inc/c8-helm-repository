@@ -45,10 +45,6 @@ spec:
           - name: CONFIGURE8_URL
             value: {{ .Values.variables.CONFIGURE8_URL }}
           {{- end -}}
-          {{- if .Values.variables.CONFIGURE8_API_TOKEN | quote }}
-          - name: CONFIGURE8_API_TOKEN
-            value: {{ .Values.variables.CONFIGURE8_API_TOKEN }}
-          {{- end -}}
           {{- if .Values.variables.CLUSTER_RESOURCE_KEY }}
           - name: CLUSTER_RESOURCE_KEY
             value: {{ .Values.variables.CLUSTER_RESOURCE_KEY | quote }}
@@ -65,6 +61,7 @@ spec:
           - name: FREQUENCY_HOURS
             value: {{ .Values.variables.FREQUENCY_HOURS | quote }}
           {{- end -}}
+          {{- include "addConfigure8APIToken" . | nindent 10 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

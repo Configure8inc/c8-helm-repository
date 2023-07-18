@@ -1,6 +1,6 @@
 # c8-k8s-agent
 
-![Version: 0.0.9](https://img.shields.io/badge/Version-0.0.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.0.10](https://img.shields.io/badge/Version-0.0.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 A Helm chart for c8 k8s-agent
 
@@ -26,6 +26,7 @@ A Helm chart for c8 k8s-agent
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` | tolerations |
 | variables.CLUSTER_RESOURCE_KEY | string | `""` | key/value pairs to add as variables to the pod |
+| variables.CONFIGURE8_API_TOKEN | string | `""` | API token for accessing public API. The agent will fail on start if this parameter is not specified. We kindly recommend you don't specify this environment as a simple variable. Please use the example above on how to create and put this value as a Kubernetes secret. |
 | variables.CONFIGURE8_URL | string | `"https://app.configure8.io/public/v1"` | Url to configure8 public API |
 | variables.FREQUENCY_HOURS | string | `"24"` | Data sync frequency. The number of hours for discovery schedule. Cannot be less than 1. |
 | variables.LOGGING_LEVEL | string | `"info"` | Agent logging level. Possible options - 'fatal', 'error', 'warn', 'info', 'debug', 'trace' or 'silent'. Be aware - trace log level will be quite verbose, since it will also print cluster changes. |
