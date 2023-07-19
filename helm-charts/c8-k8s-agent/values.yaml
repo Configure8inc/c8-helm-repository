@@ -38,7 +38,7 @@ securityContext: {}
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
+  # runAsUser: 1008
 
 variables:
   # -- API token for accessing public API. The agent will fail on start if this parameter is not specified. We kindly recommend you don't specify this environment as a simple variable. Please use the example above on how to create and put this value as a Kubernetes secret.
