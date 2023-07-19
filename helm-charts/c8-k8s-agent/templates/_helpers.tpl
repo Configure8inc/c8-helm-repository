@@ -85,9 +85,9 @@ Envs from secrets
 Envs CONFIGURE8_API_TOKEN
 */}}
 {{- define "addConfigure8APIToken" -}}
-{{- if ne .Values.variables.CONFIGURE8_API_TOKEN "" -}}
+{{- $configure8APIToken := default .Values.variables.CONFIGURE8_API_TOKEN "" -}}
+{{- if $configure8APIToken -}}
 - name: CONFIGURE8_API_TOKEN
-  value: {{ .Values.variables.CONFIGURE8_API_TOKEN | quote }}
+  value: {{ quote $configure8APIToken }}
 {{- end -}}
 {{- end -}}
-
