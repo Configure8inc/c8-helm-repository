@@ -1,0 +1,184 @@
+nameOverride: ""
+fullnameOverride: ""
+
+commonLabels: {}
+
+ingress:
+  enabled: false
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  # Values can be templated
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 5m
+  labels: {}
+  path: /
+
+  # pathType is only for k8s >= 1.1=
+  pathType: Prefix
+
+  hosts:
+    - example.com
+  ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  extraPaths: []
+  # - path: /*
+  #   backend:
+  #     serviceName: ssl-redirect
+  #     servicePort: use-annotation
+  ## Or for k8s > 1.19
+  # - path: /*
+  #   pathType: Prefix
+  #   backend:
+  #     service:
+  #       name: ssl-redirect
+  #       port:
+  #         name: use-annotation
+
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+updateStrategy:
+   rollingUpdate:
+     maxUnavailable: 0
+   type: RollingUpdate
+
+
+service:
+  enabled: false
+  type: ClusterIP
+  port: ""
+
+
+replicaCount: 1
+
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+
+image:
+  repository: "699577016021.dkr.ecr.us-east-2.amazonaws.com/c8"
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+
+container:
+  port: "5000"
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# --
+variables:
+  ENV: "production"
+  VERSION: "1"
+  NODE_PORT: "5000"
+# variables:
+#   ENV: "production"
+#   VERSION: "1"
+#   NODE_PORT: "5000"
+#   NODE_ENV: "5000"
+#   SERVICE: ""
+#   STAGE: ""
+#   TZ: ""
+#   LOGGING_LEVEL: ""
+#   MONGO_DRIVER_TYPE: ""
+#   MAINTENANCE_MODE: ""
+#   OPENSEARCH_NODE: ""
+#   SSA_URL: ""
+#   DB_DATABASE: ""
+#   AWS_REGION: ""
+#   SQS_NOTIFICATION_QUEUE_URL: ""
+#   SEGMENT_KEY: ""
+#   HOOKS_CALLBACK_URL: ""
+#   DEEPLINK_URL: ""
+#   DB_AUTH_MECHANISM: ""
+#   SSA_TIMEOUT: ""
+#   JWT_SECRET: ""
+#   CRYPTO_IV: ""
+#   CRYPTO_SECRET: ""
+#   SESSION_SECRET: ""
+#   GITHUB_APP_INSTALL_URL: ""
+#   GITHUB_APP_CLIENT_SECRET: ""
+#   GITHUB_APP_CLIENT_ID: ""
+#   GOOGLE_SECRET: ""
+#   GOOGLE_KEY: ""
+#   SWAGGER_DESCRIPTION: ""
+#   SWAGGER_TITLE: ""
+#   SWAGGER_PREFIX: ""
+#   SWAGGER_ENABLED: ""
+#   API_PREFIX: ""
+
+
+# -- variables from configmaps
+variables_from_configmaps:
+  configmap_names: []
+  # - db_config
+  # - app_config
+# -- variables from secrets
+variables_from_secrets:
+  secrets_names: []
+  # - c8-k8s-agent
+  # - app_secrets
+
+
+
+# -- Getting params from AWS Systems Manager Parameter Store (External Secrets Operator should be installed to the cluster) 
+aws_parameter_store:
+  enabled: false
+  refreshInterval: 1h
+  # The kube secret name that will be created
+  secret_name: #qa-use2-djm-params
+  data:
+
+# -- Getting params from AWS Secrets Manager  (External Secrets Operator should be installed to the cluster) 
+aws_secrets_manager:
+  enabled: false
+  refreshInterval: 0
+  secret_name: #qa-use2-djm-secrets
+  data:
