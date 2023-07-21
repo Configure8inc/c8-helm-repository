@@ -115,45 +115,40 @@ serviceAccount:
 
 # --
 variables:
-  ENV: "production"
-  VERSION: "1"
-  NODE_PORT: "5000"
-# variables:
-#   ENV: "production"
-#   VERSION: "1"
-#   NODE_PORT: "5000"
-#   NODE_ENV: "5000"
-#   SERVICE: ""
-#   STAGE: ""
-#   TZ: ""
-#   LOGGING_LEVEL: ""
-#   MONGO_DRIVER_TYPE: ""
-#   MAINTENANCE_MODE: ""
-#   OPENSEARCH_NODE: ""
-#   SSA_URL: ""
-#   DB_DATABASE: ""
-#   AWS_REGION: ""
-#   SQS_NOTIFICATION_QUEUE_URL: ""
-#   SEGMENT_KEY: ""
-#   HOOKS_CALLBACK_URL: ""
-#   DEEPLINK_URL: ""
-#   DB_AUTH_MECHANISM: ""
-#   SSA_TIMEOUT: ""
-#   JWT_SECRET: ""
-#   CRYPTO_IV: ""
-#   CRYPTO_SECRET: ""
-#   SESSION_SECRET: ""
-#   GITHUB_APP_INSTALL_URL: ""
-#   GITHUB_APP_CLIENT_SECRET: ""
-#   GITHUB_APP_CLIENT_ID: ""
-#   GOOGLE_SECRET: ""
-#   GOOGLE_KEY: ""
-#   SWAGGER_DESCRIPTION: ""
-#   SWAGGER_TITLE: ""
-#   SWAGGER_PREFIX: ""
-#   SWAGGER_ENABLED: ""
-#   API_PREFIX: ""
-
+  ENV:                        "production"
+  VERSION:                    "1"
+  NODE_PORT:                  "5000"
+  NODE_ENV:                   "5000"
+  SERVICE:                    ""
+  STAGE:                      ""
+  TZ:                         ""
+  LOGGING_LEVEL:              ""
+  MONGO_DRIVER_TYPE:          ""
+  MAINTENANCE_MODE:           ""
+  OPENSEARCH_NODE:            ""
+  SSA_URL:                    ""
+  DB_DATABASE:                ""
+  AWS_REGION:                 ""
+  SQS_NOTIFICATION_QUEUE_URL: ""
+  SEGMENT_KEY:                ""
+  HOOKS_CALLBACK_URL:         ""
+  DEEPLINK_URL:               ""
+  DB_AUTH_MECHANISM:          ""
+  SSA_TIMEOUT:                ""
+  JWT_SECRET:                 ""
+  CRYPTO_IV:                  ""
+  CRYPTO_SECRET:              ""
+  SESSION_SECRET:             ""
+  GITHUB_APP_INSTALL_URL:     ""
+  GITHUB_APP_CLIENT_SECRET:   ""
+  GITHUB_APP_CLIENT_ID:       ""
+  GOOGLE_SECRET:              ""
+  GOOGLE_KEY:                 ""
+  SWAGGER_DESCRIPTION:        ""
+  SWAGGER_TITLE:              ""
+  SWAGGER_PREFIX:             ""
+  SWAGGER_ENABLED:            ""
+  API_PREFIX:                 "/api"
 
 # -- variables from configmaps
 variables_from_configmaps:
@@ -167,8 +162,7 @@ variables_from_secrets:
   # - app_secrets
 
 
-
-# -- Getting params from AWS Systems Manager Parameter Store (External Secrets Operator should be installed to the cluster) 
+# -- Getting params from AWS Systems Manager Parameter Store (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
 aws_parameter_store:
   enabled: false
   refreshInterval: 1h
@@ -176,7 +170,7 @@ aws_parameter_store:
   secret_name: #qa-use2-djm-params
   data:
 
-# -- Getting params from AWS Secrets Manager  (External Secrets Operator should be installed to the cluster) 
+# -- Getting params from AWS Secrets Manager  (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
 aws_secrets_manager:
   enabled: false
   refreshInterval: 0

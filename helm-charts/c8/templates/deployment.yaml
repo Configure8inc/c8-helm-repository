@@ -59,9 +59,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          # {{- include "addEnvironmentVariables" . | indent 10 }}
+          {{- include "addEnvironmentVariables" . | indent 10 }}
           {{- include "helpers.list-env-variables-aws-parameter-store" . | indent 10 }}
           {{- include "helpers.list-env-variables-aws-secrets-manager" . | indent 10 }}
+          envFrom:
+          {{- include "helpers.variables_from_secrets" . | indent 10 }}
+          {{- include "helpers.variables_from_configmaps" . | indent 10 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

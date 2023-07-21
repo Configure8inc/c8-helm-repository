@@ -128,38 +128,34 @@ Params from the AWS Secret Manager
 {{- end }}
 {{- end }}
 
+{{/*
+Envs from configMap
+*/}}
+{{- define "helpers.variables_from_configmaps"}}
+{{- range $key  := .Values.variables_from_configmaps.configmap_names }}
+- configMapRef:
+    name: {{ $key }}
+{{- end}}
+{{- end }}
 
+{{/*
+Envs from secrets
+*/}}
+{{- define "helpers.variables_from_secrets" }}
+{{- range $key  := .Values.variables_from_secrets.secrets_names }}
+- secretRef:
+    name: {{ $key }}
+{{- end }}
+{{- end }}
 
-# {{- define "addEnvironmentVariables1" -}}
-# {{- $vars := .Values.variables -}}
-# {{- $envVariables := "" -}}
-# {{- range $key, $value := $vars -}}
-# {{- if $value -}}
-# {{- $envVariables = printf "%s\n- name: %s\n  value: %s" $envVariables $key (quote $value) -}}
-# {{- end -}}
-# {{- end -}}
-# {{- if $envVariables -}}
-# {{ trimPrefix $envVariables "\n" }}
-# {{- end -}}
-# {{- end -}}
-
-# {{- define "addEnvironmentVariables" -}}
-# {{- $vars := .Values.variables -}}
-# {{- $envVariables := "" -}}
-# {{- range $key, $value := $vars -}}
-# {{- if $value -}}
-# - name: $key
-#   value: $value 
-# {{- end -}}
-# {{- end -}}
-# {{- end -}}
-
-
-
-
-
-
-
-
-
-
+{{/*
+Envs
+*/}}
+{{- define "addEnvironmentVariables" -}}
+{{- range $key, $value := .Values.variables }}
+{{- if ne $value "" }}
+- name: {{ $key }}
+  value: {{ $value }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
