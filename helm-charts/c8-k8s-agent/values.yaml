@@ -8,7 +8,7 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the latest.
-  tag: "latest"
+  tag: "1.1.0"
 
 # -- image pull secrets
 imagePullSecrets: []
