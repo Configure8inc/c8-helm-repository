@@ -9,8 +9,9 @@ ingress:
   # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
   # ingressClassName: nginx
   # Values can be templated
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 5m
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
   labels: {}
   path: /
 
@@ -39,20 +40,18 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-updateStrategy:
-   rollingUpdate:
-     maxUnavailable: 0
-   type: RollingUpdate
-
 
 service:
   enabled: false
   type: ClusterIP
   port: ""
 
-
 replicaCount: 1
 
+updateStrategy:
+  #  rollingUpdate:
+  #    maxUnavailable: 0
+   type: Recreate
 
 autoscaling:
   enabled: false
@@ -61,28 +60,29 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-
 image:
-  repository: "699577016021.dkr.ecr.us-east-2.amazonaws.com/c8"
+  repository: nginx
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
+#Image for tge DISCOVERY_JOB_WORKER
+DJW_IMAGE:
 
 container:
   port: "5000"
 
 resources:
   limits:
-    cpu: 2
-    memory: 2Gi
+    cpu: 500m
+    memory: 512Mi
   requests:
-    cpu: 1
-    memory: 2Gi
+    cpu: 100m
+    memory: 512Mi
 
 livenessProbe:
   httpGet:
-    path: /api/v1/ping
+    path: /api/v1/health
     port: http
   failureThreshold: 5
   initialDelaySeconds: 90
@@ -92,7 +92,7 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /api/v1/ping
+    path: /api/v1/health
     port: http
   failureThreshold: 5
   initialDelaySeconds: 60
@@ -123,77 +123,67 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+  job_worker:
+    name:
+    annotations: {}
+
 # --
 variables:
-  # -- 
+  # --
   API_PREFIX: "/api/v1"
   # --
-  AWS_REGION: ""
+  DB_CONFIG: ""
   # --
-  CRYPTO_IV: ""
+  DB_NAME: ""
   # --
-  CRYPTO_SECRET: ""
+  DISCOVERY_CONTAINER_NAME: "c8-discovery-job-worker"
   # --
-  DB_AUTH_MECHANISM: ""
+  DJW_AWS_REGION: ""
   # --
-  DB_DATABASE: ""
+  DJW_CRYPTO_IV: ""
   # --
-  DEEPLINK_URL: ""
+  DJW_CRYPTO_SECRET: ""
+  # --
+  DJW_EKS_NAMESPACE: ""
+  # --
+  DJW_OPENSEARCH_NODE: ""
+  # --
+  DJW_SERVICE: "discovery-job-worker"
+  # --
+  DJW_SERVICE_ACCOUNT_NAME: ""
+  # --
+  DJW_SQS_NOTIFICATION_QUEUE_URL: ""
+  # --
+  DJW_TRACK_ENTITY_LINEAGE: "true"
+  # --
+  DRYRUN: "false"
   # --
   ENV: "prod"
   # --
-  GITHUB_APP_CLIENT_ID: ""
+  JOB_ACTIVE_LOOKBACK_MIN: "15"
   # --
-  GITHUB_APP_CLIENT_SECRET: ""
+  JOB_DEAD_TIMEOUT_HOURS: "3"
   # --
-  GITHUB_APP_INSTALL_URL: ""
+  JOB_TYPES: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
   # --
-  GOOGLE_KEY: ""
+  LOOP_SLEEP_TIME: "10000"
   # --
-  GOOGLE_SECRET: ""
-  # --
-  HOOKS_CALLBACK_URL: ""
-  # --
-  JWT_SECRET: ""
-  # --
-  LOGGING_LEVEL: "info"
-  # --
-  MAINTENANCE_MODE: "false"
-  # --
-  MONGO_DRIVER_TYPE: ""
+  MAX_JOB_LIMIT: "10"
   # --
   NODE_ENV: "production"
   # --
-  NODE_PORT: "5000"
+  NODE_PORT: "3000"
   # --
-  OPENSEARCH_NODE: ""
-  # --
-  SEGMENT_KEY: ""
-  # --
-  SERVICE: "c8app"
-  # --
-  SESSION_SECRET: ""
-  # --
-  SQS_NOTIFICATION_QUEUE_URL: ""
-  # --
-  SSA_TIMEOUT: "10000"
-  # --
-  SSA_URL: ""
+  SERVICE: "c8-discovery-job-manager-prod"
   # --
   STAGE: "prod"
   # --
-  SWAGGER_DESCRIPTION: "Prod Testing"
+  TASK_GROUP: "discovery-task-group"
   # --
-  SWAGGER_ENABLED: ""
+  USE_EKS: "true"
   # --
-  SWAGGER_PREFIX: ""
-  # --
-  SWAGGER_TITLE: "C8 Backend API"
-  # --
-  TZ: "America/New_York"
-  # --
-  VERSION: "v1.0.0"
-
+  WORKER_TRIGGER_THRESHOLD: "120000"
+  
 # -- variables from configmaps
 variables_from_configmaps:
   configmap_names: []
@@ -205,7 +195,6 @@ variables_from_secrets:
   # - c8-k8s-agent
   # - app_secrets
 
-
 # -- Getting params from AWS Systems Manager Parameter Store (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
 aws_parameter_store:
   enabled: false
@@ -214,7 +203,7 @@ aws_parameter_store:
   secret_name: #qa-use2-djm-params
   data:
 
-# -- Getting params from AWS Secrets Manager  (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
+# -- Getting params from AWS Secrets Manager  (External Secrets Operator https://external-secrets.io/ should be installed to the cluster)
 aws_secrets_manager:
   enabled: false
   refreshInterval: 0

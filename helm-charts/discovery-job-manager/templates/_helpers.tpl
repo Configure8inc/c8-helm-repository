@@ -61,6 +61,7 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+
 {{/*
 Return if ingress is stable.
 */}}
@@ -94,6 +95,7 @@ Return the appropriate apiVersion for ingress.
 {{- print "extensions/v1beta1" }}
 {{- end }}
 {{- end }}
+
 
 {{/*
 Params from the AWS SSM

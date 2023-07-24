@@ -9,8 +9,9 @@ ingress:
   # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
   # ingressClassName: nginx
   # Values can be templated
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 5m
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
   labels: {}
   path: /
 
@@ -39,20 +40,18 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-updateStrategy:
-   rollingUpdate:
-     maxUnavailable: 0
-   type: RollingUpdate
-
 
 service:
   enabled: false
   type: ClusterIP
   port: ""
 
+updateStrategy:
+   rollingUpdate:
+     maxUnavailable: 0
+   type: RollingUpdate
 
 replicaCount: 1
-
 
 autoscaling:
   enabled: false
@@ -61,28 +60,29 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-
 image:
-  repository: "699577016021.dkr.ecr.us-east-2.amazonaws.com/c8"
+  repository: nginx
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
+#Image for tge DISCOVERY_JOB_WORKER
+DISCOVERY_JOB_IMAGE:
 
 container:
   port: "5000"
 
 resources:
   limits:
-    cpu: 2
-    memory: 2Gi
+    cpu: 500m
+    memory: 512Mi
   requests:
-    cpu: 1
-    memory: 2Gi
+    cpu: 100m
+    memory: 512Mi
 
 livenessProbe:
   httpGet:
-    path: /api/v1/ping
+    path: /self-service/api/health
     port: http
   failureThreshold: 5
   initialDelaySeconds: 90
@@ -92,7 +92,7 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /api/v1/ping
+    path: /self-service/api/health
     port: http
   failureThreshold: 5
   initialDelaySeconds: 60
@@ -125,74 +125,52 @@ serviceAccount:
 
 # --
 variables:
-  # -- 
-  API_PREFIX: "/api/v1"
   # --
-  AWS_REGION: ""
+  API_KEY: ""
+  # --
+  API_PREFIX: "/self-service/api"
   # --
   CRYPTO_IV: ""
   # --
   CRYPTO_SECRET: ""
   # --
-  DB_AUTH_MECHANISM: ""
+  DB_CONFIG: ""
   # --
   DB_DATABASE: ""
   # --
-  DEEPLINK_URL: ""
+  DB_WRITE_RETRIES: "false"
   # --
   ENV: "prod"
-  # --
-  GITHUB_APP_CLIENT_ID: ""
-  # --
-  GITHUB_APP_CLIENT_SECRET: ""
-  # --
-  GITHUB_APP_INSTALL_URL: ""
-  # --
-  GOOGLE_KEY: ""
-  # --
-  GOOGLE_SECRET: ""
-  # --
-  HOOKS_CALLBACK_URL: ""
   # --
   JWT_SECRET: ""
   # --
   LOGGING_LEVEL: "info"
   # --
-  MAINTENANCE_MODE: "false"
+  MAINTENANCE_MODE: ""
   # --
   MONGO_DRIVER_TYPE: ""
   # --
   NODE_ENV: "production"
   # --
-  NODE_PORT: "5000"
+  NODE_PORT: "5005"
   # --
   OPENSEARCH_NODE: ""
   # --
-  SEGMENT_KEY: ""
-  # --
   SERVICE: "c8app"
-  # --
-  SESSION_SECRET: ""
-  # --
-  SQS_NOTIFICATION_QUEUE_URL: ""
-  # --
-  SSA_TIMEOUT: "10000"
-  # --
-  SSA_URL: ""
   # --
   STAGE: "prod"
   # --
-  SWAGGER_DESCRIPTION: "Prod Testing"
+  SWAGGER_DESCRIPTION: "Poduction Self Service API documentation"
   # --
-  SWAGGER_ENABLED: ""
+  SWAGGER_ENABLED: "false"
   # --
-  SWAGGER_PREFIX: ""
+  SWAGGER_PREFIX: "/self-service/api/docs"
   # --
-  SWAGGER_TITLE: "C8 Backend API"
+  SWAGGER_TITLE: "C8 Self-Service API"
   # --
   TZ: "America/New_York"
   # --
-  VERSION: "v1.0.0"
+  VERSION: ""
 
 # -- variables from configmaps
 variables_from_configmaps:
@@ -205,7 +183,6 @@ variables_from_secrets:
   # - c8-k8s-agent
   # - app_secrets
 
-
 # -- Getting params from AWS Systems Manager Parameter Store (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
 aws_parameter_store:
   enabled: false
@@ -214,7 +191,7 @@ aws_parameter_store:
   secret_name: #qa-use2-djm-params
   data:
 
-# -- Getting params from AWS Secrets Manager  (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
+# -- Getting params from AWS Secrets Manager  (External Secrets Operator https://external-secrets.io/ should be installed to the cluster)
 aws_secrets_manager:
   enabled: false
   refreshInterval: 0
