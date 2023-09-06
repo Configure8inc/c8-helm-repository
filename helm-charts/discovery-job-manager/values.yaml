@@ -129,59 +129,73 @@ serviceAccount:
 
 # --
 variables:
-  # --
+  # -- Required for the health checks, should be by default /api/v1
   API_PREFIX: "/api/v1"
-  # --
-  DB_CONFIG: ""
-  # --
-  DB_NAME: ""
-  # --
+  # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one
+  DB_AUTH_MECHANISM: ""
+  # -- Database host
+  DB_HOST: ""
+  # -- Database name
+  DB_DATABASE: ""
+  # -- Database port
+  DB_PORT: ""
+  # -- Database username
+  DB_USERNAME: ""
+  # -- Database password
+  DB_PASSWORD: ""
+  # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
+  MONGO_DRIVER_TYPE: "" `
+  # -- Workers container names
   DISCOVERY_CONTAINER_NAME: "c8-discovery-job-worker"
-  # --
+  # -- Deprecated and not needed anymore, so will be deleted soon
   DJW_AWS_REGION: ""
-  # --
+  # -- Crypto initialization vector
   DJW_CRYPTO_IV: ""
-  # --
+  # -- Crypto password to encrypt sensitive data.
   DJW_CRYPTO_SECRET: ""
-  # --
+  # -- The namespace where the jobs will be executed
   DJW_EKS_NAMESPACE: ""
-  # --
+  # -- Elastic url
   DJW_OPENSEARCH_NODE: ""
-  # --
+  # -- The application name, should be discovery-job-worker
   DJW_SERVICE: "discovery-job-worker"
-  # --
+  # -- Worker service account. Required for the AWS integrations
   DJW_SERVICE_ACCOUNT_NAME: ""
-  # --
-  DJW_SQS_NOTIFICATION_QUEUE_URL: ""
-  # --
+  # -- RabbitMQ host
+  DJW_RABBITMQ_HOST: ""
+  # -- RabbitMQ port
+  DJW_RABBITMQ_PORT: 5672
+  # -- RabbitMQ user
+  DJW_RABBITMQ_USERNAME: ""
+  # -- RabbitMQ password
+  DJW_RABBITMQ_PASSWORD: ""
+  # -- Storing diff information for the resources
   DJW_TRACK_ENTITY_LINEAGE: "true"
-  # --
+  # -- Deprecated an should be deleted
   DRYRUN: "false"
-  # --
+  # -- Different configurations preset, by default should be prod, other only for the development.
   ENV: "prod"
-  # --
+  # -- Deprecated and should be deleted
   JOB_ACTIVE_LOOKBACK_MIN: "15"
-  # --
+  # -- Maximum hours for the job execution
   JOB_DEAD_TIMEOUT_HOURS: "3"
-  # --
+  # -- list fo the jobs are going to be executed by this discovery manager
   JOB_TYPES: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
-  # --
+  # -- Determines the time when the schedule should be checked
   LOOP_SLEEP_TIME: "10000"
-  # --
+  # -- Maximum simultaneously executed jobs
   MAX_JOB_LIMIT: "10"
-  # --
+  # -- Used only for the development, should be production
   NODE_ENV: "production"
-  # --
+  # -- Application port
   NODE_PORT: "3000"
-  # --
+  # -- The application name, should be c8-discovery-job-manager-prod
   SERVICE: "c8-discovery-job-manager-prod"
-  # --
+  # -- Application stage, beyond development should be prod
   STAGE: "prod"
-  # --
-  TASK_GROUP: "discovery-task-group"
-  # --
+  # -- For the production should be true
   USE_EKS: "true"
-  # --
+  # -- Deprecated and should be deleted
   WORKER_TRIGGER_THRESHOLD: "120000"
   
 # -- variables from configmaps

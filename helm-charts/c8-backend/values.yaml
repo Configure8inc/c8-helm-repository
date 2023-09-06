@@ -125,74 +125,86 @@ serviceAccount:
 
 # --
 variables:
-  # -- 
+  # -- Used to define the relative path to the backend API, by default should be /api.v1
   API_PREFIX: "/api/v1"
-  # --
+  # -- Deprecated and not needed anymore, so will be deleted soon
   AWS_REGION: ""
-  # --
+  # -- Crypto initialization vector
   CRYPTO_IV: ""
-  # --
+  # -- Crypto password
   CRYPTO_SECRET: ""
-  # --
+  # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one
   DB_AUTH_MECHANISM: ""
-  # --
+  # -- Database host
+  DB_HOST: ""
+  # -- Database name
   DB_DATABASE: ""
-  # --
-  DEEPLINK_URL: ""
-  # --
-  ENV: "prod"
-  # --
-  GITHUB_APP_CLIENT_ID: ""
-  # --
-  GITHUB_APP_CLIENT_SECRET: ""
-  # --
-  GITHUB_APP_INSTALL_URL: ""
-  # --
-  GOOGLE_KEY: ""
-  # --
-  GOOGLE_SECRET: ""
-  # --
-  HOOKS_CALLBACK_URL: ""
-  # --
-  JWT_SECRET: ""
-  # --
-  LOGGING_LEVEL: "info"
-  # --
-  MAINTENANCE_MODE: "false"
-  # --
+  # -- Database port
+  DB_PORT: ""
+  # -- Database username
+  DB_USERNAME: ""
+  # -- Database password
+  DB_PASSWORD: ""
+  # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
   MONGO_DRIVER_TYPE: ""
-  # --
+  # -- Url on which the application will be available. For example https://configure8.my-company.io
+  DEEPLINK_URL: ""
+  # -- Different configurations preset, by default should be prod, other only for the development.
+  ENV: "prod"
+  # -- GitHub application client id. Should be created per installation in advance
+  GITHUB_APP_CLIENT_ID: ""
+  # -- GitHub application client secret.
+  GITHUB_APP_CLIENT_SECRET: ""
+  # -- GitHub application installation url.
+  GITHUB_APP_INSTALL_URL: ""
+  # -- Google application key. Required for the sign in with google
+  GOOGLE_KEY: ""
+  # -- Google application secret. Required for the login with google
+  GOOGLE_SECRET: ""
+  # -- Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io
+  HOOKS_CALLBACK_URL: ""
+  # -- Unique secret used for sign user's JWT tokens
+  JWT_SECRET: ""
+  # -- Might be info, error, verbose, warning. By default recommended to be info 
+  LOGGING_LEVEL: "info"
+  # -- Disabling/enabling application for the maintenance
+  MAINTENANCE_MODE: "false"
+  # -- Used only for the development, should be production
   NODE_ENV: "production"
-  # --
+  # -- Application port
   NODE_PORT: "5000"
-  # --
+  # -- Elastic url
   OPENSEARCH_NODE: ""
-  # --
+  # -- Application analytics segment key
   SEGMENT_KEY: ""
-  # --
+  # -- The application name, should be c8app
   SERVICE: "c8app"
-  # --
-  SESSION_SECRET: ""
-  # --
-  SQS_NOTIFICATION_QUEUE_URL: ""
-  # --
+  # -- Maximum time for the Self serve actions
   SSA_TIMEOUT: "10000"
-  # --
+  # -- URL for the self serve actions. Should be https://configure8.my-company.io/self-service/api/v1/
   SSA_URL: ""
-  # --
+  # -- Application stage, beyond development should be prod
   STAGE: "prod"
-  # --
+  # -- Description for the swagger file, usually shouldn't be changed
   SWAGGER_DESCRIPTION: "Prod Testing"
-  # --
+  # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: ""
-  # --
+  # -- Swagger documentation relative url, by default /docs
   SWAGGER_PREFIX: ""
-  # --
+  # -- Swagger documentation title
   SWAGGER_TITLE: "C8 Backend API"
-  # --
+  # -- Application timezone
   TZ: "America/New_York"
-  # --
+  # -- Application version. Should be with the default value
   VERSION: "v1.0.0"
+  # -- RabbitMQ host
+  RABBITMQ_HOST: ""
+  # -- RabbitMQ port
+  RABBITMQ_PORT: 5672
+  # -- RabbitMQ user
+  RABBITMQ_USERNAME: ""
+  # -- RabbitMQ password
+  RABBITMQ_PASSWORD: ""
 
 # -- variables from configmaps
 variables_from_configmaps:

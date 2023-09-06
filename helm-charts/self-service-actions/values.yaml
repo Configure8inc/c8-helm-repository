@@ -125,51 +125,56 @@ serviceAccount:
 
 # --
 variables:
-  # --
+  # -- Unique secret key
   API_KEY: ""
-  # --
+  # -- Used to define the relative path to the backend API, by default should be /self-service/api
   API_PREFIX: "/self-service/api"
-  # --
+  # -- Crypto initialization vector
   CRYPTO_IV: ""
-  # --
+  # -- Crypto password
   CRYPTO_SECRET: ""
-  # --
-  DB_CONFIG: ""
-  # --
+  # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one  DB_AUTH_MECHANISM: ""
+  # -- Database host
+  DB_HOST: ""
+  # -- Database name
   DB_DATABASE: ""
-  # --
-  DB_WRITE_RETRIES: "false"
-  # --
-  ENV: "prod"
-  # --
-  JWT_SECRET: ""
-  # --
-  LOGGING_LEVEL: "info"
-  # --
-  MAINTENANCE_MODE: ""
-  # --
+  # -- Database port
+  DB_PORT: ""
+  # -- Database username
+  DB_USERNAME: ""
+  # -- Database password
+  DB_PASSWORD: ""
+  # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
   MONGO_DRIVER_TYPE: ""
-  # --
+  # -- Different configurations preset, by default should be prod, other only for the development.
+  ENV: "prod"
+  # -- Unique secret used for sign user's JWT tokens
+  JWT_SECRET: ""
+  # -- Might be info, error, verbose, warning. By default recommended to be info 
+  LOGGING_LEVEL: "info"
+  # -- Disabling/enabling application for the maintenance
+  MAINTENANCE_MODE: ""
+  # -- Used only for the development, should be production
   NODE_ENV: "production"
-  # --
+  # -- Application port
   NODE_PORT: "5005"
-  # --
+  # -- Elastic url
   OPENSEARCH_NODE: ""
-  # --
+  # -- The application name, should be c8app
   SERVICE: "c8app"
-  # --
+  # -- Application stage, beyond development should be prod
   STAGE: "prod"
-  # --
-  SWAGGER_DESCRIPTION: "Poduction Self Service API documentation"
-  # --
+  # -- Description for the swagger file, usually shouldn't be changed
+  SWAGGER_DESCRIPTION: "Production Self Service API documentation"
+  # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
-  # --
+  # -- Swagger documentation relative url, by default /self-service/api/docs
   SWAGGER_PREFIX: "/self-service/api/docs"
-  # --
+  # -- Swagger documentation title
   SWAGGER_TITLE: "C8 Self-Service API"
-  # --
+  # -- Application timezone
   TZ: "America/New_York"
-  # --
+  # -- Application version. Should be with the default value
   VERSION: ""
 
 # -- variables from configmaps
