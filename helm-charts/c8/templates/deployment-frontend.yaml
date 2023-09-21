@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "discovery-job-manager.fullname" . }}
+  name: {{ include "c8.fullname" . }}-frontend
   labels:
-    {{- include "discovery-job-manager.labels" . | nindent 4 }}
+    {{- include "c8.labels" . | nindent 4 }}
     {{- with .Values.commonLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -17,7 +17,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "discovery-job-manager.selectorLabels" . | nindent 6 }}
+      {{- include "c8.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -25,16 +25,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "discovery-job-manager.selectorLabels" . | nindent 8 }}
-        {{- with .Values.commonLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        c8app: "frontend"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "discovery-job-manager.serviceAccountName" . }}
+      serviceAccountName: {{ include "c8.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -59,12 +56,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          {{- include "addEnvironmentVariables" . | indent 10 }}
-          {{- include "helpers.list-env-variables-aws-parameter-store" . | indent 10 }}
-          {{- include "helpers.list-env-variables-aws-secrets-manager" . | indent 10 }}
-          envFrom:
-          {{- include "helpers.variables_from_secrets" . | indent 10 }}
-          {{- include "helpers.variables_from_configmaps" . | indent 10 }}
+          - name: SSA_SVC
+            value: {{ default "none" .Values.variables.SSA_SVC }}
+          - name: BACKEND_SVC
+            value: {{ include "c8.fullname" . }}-backend
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

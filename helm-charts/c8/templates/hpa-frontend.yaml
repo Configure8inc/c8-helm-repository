@@ -2,9 +2,9 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "discovery-job-manager.fullname" . }}
+  name: {{ include "c8.fullname" . }}-frontend
   labels:
-    {{- include "discovery-job-manager.labels" . | nindent 4 }}
+    {{- include "c8.labels" . | nindent 4 }}
     {{- with .Values.commonLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -12,9 +12,9 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "discovery-job-manager.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+    name: {{ include "c8.fullname" . }}-frontend
+  minReplicas: {{ .Values.autoscaling.minReplicasFrontend }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicasFrontend }}
   metrics:
     {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource

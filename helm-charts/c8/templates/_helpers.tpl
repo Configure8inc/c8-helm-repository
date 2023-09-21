@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "discovery-job-manager.name" -}}
+{{- define "c8.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "discovery-job-manager.fullname" -}}
+{{- define "c8.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "discovery-job-manager.chart" -}}
+{{- define "c8.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "discovery-job-manager.labels" -}}
-helm.sh/chart: {{ include "discovery-job-manager.chart" . }}
-{{ include "discovery-job-manager.selectorLabels" . }}
+{{- define "c8.labels" -}}
+helm.sh/chart: {{ include "c8.chart" . }}
+{{ include "c8.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,47 +45,48 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "discovery-job-manager.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "discovery-job-manager.name" . }}
+{{- define "c8.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "c8.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "discovery-job-manager.serviceAccountName" -}}
+{{- define "c8.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "discovery-job-manager.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "c8.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
+
 {{/*
 Return if ingress is stable.
 */}}
-{{- define "discovery-job-manager.ingress.isStable" -}}
-{{- eq (include "discovery-job-manager.ingress.apiVersion" .) "networking.k8s.io/v1" }}
+{{- define "c8.ingress.isStable" -}}
+{{- eq (include "c8.ingress.apiVersion" .) "networking.k8s.io/v1" }}
 {{- end }}
 
 {{/*
 Return if ingress supports ingressClassName.
 */}}
-{{- define "discovery-job-manager.ingress.supportsIngressClassName" -}}
-{{- or (eq (include "discovery-job-manager.ingress.isStable" .) "true") (and (eq (include "discovery-job-manager.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) }}
+{{- define "c8.ingress.supportsIngressClassName" -}}
+{{- or (eq (include "c8.ingress.isStable" .) "true") (and (eq (include "c8.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) }}
 {{- end }}
 
 {{/*
 Return if ingress supports pathType.
 */}}
-{{- define "discovery-job-manager.ingress.supportsPathType" -}}
-{{- or (eq (include "discovery-job-manager.ingress.isStable" .) "true") (and (eq (include "discovery-job-manager.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) }}
+{{- define "c8.ingress.supportsPathType" -}}
+{{- or (eq (include "c8.ingress.isStable" .) "true") (and (eq (include "c8.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) }}
 {{- end }}
 
 {{/*
 Return the appropriate apiVersion for ingress.
 */}}
-{{- define "discovery-job-manager.ingress.apiVersion" -}}
+{{- define "c8.ingress.apiVersion" -}}
 {{- if and ($.Capabilities.APIVersions.Has "networking.k8s.io/v1") (semverCompare ">= 1.19-0" .Capabilities.KubeVersion.Version) }}
 {{- print "networking.k8s.io/v1" }}
 {{- else if $.Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
@@ -94,6 +95,7 @@ Return the appropriate apiVersion for ingress.
 {{- print "extensions/v1beta1" }}
 {{- end }}
 {{- end }}
+
 
 {{/*
 Params from the AWS SSM
@@ -128,33 +130,11 @@ Params from the AWS Secret Manager
 {{- end }}
 
 {{/*
-Envs from configMap
-*/}}
-{{- define "helpers.variables_from_configmaps"}}
-{{- range $key  := .Values.variables_from_configmaps.configmap_names }}
-- configMapRef:
-    name: {{ $key }}
-{{- end}}
-{{- end }}
-
-{{/*
-Envs from secrets
-*/}}
-{{- define "helpers.variables_from_secrets" }}
-{{- range $key  := .Values.variables_from_secrets.secrets_names }}
-- secretRef:
-    name: {{ $key }}
-{{- end }}
-{{- end }}
-
-{{/*
 Envs
 */}}
-{{- define "addEnvironmentVariables" -}}
-{{- range $key, $value := .Values.variables }}
-{{- if ne $value "" }}
-- name: {{ $key }}
-  value: {{ $value }}
-{{- end -}}
-{{- end -}}
-{{- end -}}
+{{- define "helpers.list-env-variables"}}
+{{- range $key  := .Values.variables.data }}
+- name: "{{ $key.key }}"
+  value: "{{ $key.value }}"
+{{- end}}
+{{- end }}

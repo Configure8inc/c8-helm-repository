@@ -12,27 +12,14 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 5m
   labels: {}
-  path: /
 
   # pathType is only for k8s >= 1.1=
   pathType: Prefix
 
   hosts:
-    - example.com
-  ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
-  extraPaths: []
-  # - path: /*
-  #   backend:
-  #     serviceName: ssl-redirect
-  #     servicePort: use-annotation
-  ## Or for k8s > 1.19
-  # - path: /*
-  #   pathType: Prefix
-  #   backend:
-  #     service:
-  #       name: ssl-redirect
-  #       port:
-  #         name: use-annotation
+    - host: example.com
+      paths:
+        - /
 
   tls: []
   #  - secretName: chart-example-tls
@@ -40,27 +27,25 @@ ingress:
   #      - chart-example.local
 
 updateStrategy:
-   rollingUpdate:
-     maxUnavailable: 0
-   type: RollingUpdate
-
+  rollingUpdate:
+    maxUnavailable: 0
+  type: RollingUpdate
 
 service:
   enabled: false
   type: ClusterIP
   port: ""
 
-
 replicaCount: 1
-
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
+  minReplicasFrontend: 1
+  maxReplicasFrontend: 10
+  minReplicasBackend: 1
+  maxReplicasBackend: 10
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
+  targetMemoryUtilizationPercentage: 80
 
 image:
   repository: "699577016021.dkr.ecr.us-east-2.amazonaws.com/c8"
@@ -68,51 +53,45 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
+imagePullSecrets:
+  - c8-docker-registry-secret
 
 container:
   port: "5000"
 
 resources:
-  limits:
-    cpu: 2
-    memory: 2Gi
-  requests:
-    cpu: 1
-    memory: 2Gi
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
-livenessProbe:
-  httpGet:
-    path: /api/v1/ping
-    port: http
-  failureThreshold: 5
-  initialDelaySeconds: 90
-  periodSeconds: 60
-  timeoutSeconds: 10
-  successThreshold: 1
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
 
-readinessProbe:
-  httpGet:
-    path: /api/v1/ping
-    port: http
-  failureThreshold: 5
-  initialDelaySeconds: 60
-  periodSeconds: 5
-  timeoutSeconds: 10
-  successThreshold: 2
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
 
 podAnnotations: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
-
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -123,44 +102,49 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-# --
+podDisruptionBudget:
+  # Specifies whether pod disruption budget should be created
+  enabled: false
+  # Number or percentage of pods that must be available
+  minAvailable: 50%
+
 variables:
   # -- Used to define the relative path to the backend API, by default should be /api.v1
   API_PREFIX: "/api/v1"
   # -- Deprecated and not needed anymore, so will be deleted soon
-  AWS_REGION: ""
+  AWS_REGION: "na"
   # -- Crypto initialization vector
   CRYPTO_IV: ""
   # -- Crypto password
   CRYPTO_SECRET: ""
   # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one
-  DB_AUTH_MECHANISM: ""
+  DB_AUTH_MECHANISM: "SCRAM-SHA-1"
   # -- Database host
   DB_HOST: ""
   # -- Database name
-  DB_DATABASE: ""
+  DB_DATABASE: "c8"
   # -- Database port
-  DB_PORT: ""
+  DB_PORT: "27017"
   # -- Database username
-  DB_USERNAME: ""
+  DB_USERNAME: "c8"
   # -- Database password
   DB_PASSWORD: ""
   # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
-  MONGO_DRIVER_TYPE: ""
+  MONGO_DRIVER_TYPE: "mongoDb"
   # -- Url on which the application will be available. For example https://configure8.my-company.io
   DEEPLINK_URL: ""
   # -- Different configurations preset, by default should be prod, other only for the development.
   ENV: "prod"
   # -- GitHub application client id. Should be created per installation in advance
-  GITHUB_APP_CLIENT_ID: ""
+  GITHUB_APP_CLIENT_ID: "na"
   # -- GitHub application client secret.
-  GITHUB_APP_CLIENT_SECRET: ""
+  GITHUB_APP_CLIENT_SECRET: "na"
   # -- GitHub application installation url.
-  GITHUB_APP_INSTALL_URL: ""
+  GITHUB_APP_INSTALL_URL: "na"
   # -- Google application key. Required for the sign in with google
-  GOOGLE_KEY: ""
+  GOOGLE_KEY: "na"
   # -- Google application secret. Required for the login with google
-  GOOGLE_SECRET: ""
+  GOOGLE_SECRET: "na"
   # -- Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io
   HOOKS_CALLBACK_URL: ""
   # -- Unique secret used for sign user's JWT tokens
@@ -176,21 +160,21 @@ variables:
   # -- Elastic url
   OPENSEARCH_NODE: ""
   # -- Application analytics segment key
-  SEGMENT_KEY: ""
+  SEGMENT_KEY: "na"
   # -- The application name, should be c8app
   SERVICE: "c8app"
   # -- Maximum time for the Self serve actions
   SSA_TIMEOUT: "10000"
   # -- URL for the self serve actions. Should be https://configure8.my-company.io/self-service/api/v1/
-  SSA_URL: ""
+  SSA_URL: "placeholder"
   # -- Application stage, beyond development should be prod
   STAGE: "prod"
   # -- Description for the swagger file, usually shouldn't be changed
   SWAGGER_DESCRIPTION: "Prod Testing"
   # -- Enable or disable swagger documentation
-  SWAGGER_ENABLED: ""
+  SWAGGER_ENABLED: "false"
   # -- Swagger documentation relative url, by default /docs
-  SWAGGER_PREFIX: ""
+  SWAGGER_PREFIX: "na"
   # -- Swagger documentation title
   SWAGGER_TITLE: "C8 Backend API"
   # -- Application timezone
@@ -205,30 +189,3 @@ variables:
   RABBITMQ_USERNAME: ""
   # -- RabbitMQ password
   RABBITMQ_PASSWORD: ""
-
-# -- variables from configmaps
-variables_from_configmaps:
-  configmap_names: []
-  # - db_config
-  # - app_config
-# -- variables from secrets
-variables_from_secrets:
-  secrets_names: []
-  # - c8-k8s-agent
-  # - app_secrets
-
-
-# -- Getting params from AWS Systems Manager Parameter Store (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
-aws_parameter_store:
-  enabled: false
-  refreshInterval: 1h
-  # The kube secret name that will be created
-  secret_name: #qa-use2-djm-params
-  data:
-
-# -- Getting params from AWS Secrets Manager  (External Secrets Operator https://external-secrets.io/ should be installed to the cluster) 
-aws_secrets_manager:
-  enabled: false
-  refreshInterval: 0
-  secret_name: #qa-use2-djm-secrets
-  data:

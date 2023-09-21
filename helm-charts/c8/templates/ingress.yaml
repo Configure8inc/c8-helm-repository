@@ -1,19 +1,18 @@
 {{- if .Values.ingress.enabled -}}
 {{- if .Values.service.enabled -}}
-{{- $ingressApiIsStable := eq (include "discovery-job-manager.ingress.isStable" .) "true" -}}
-{{- $ingressSupportsIngressClassName := eq (include "discovery-job-manager.ingress.supportsIngressClassName" .) "true" -}}
-{{- $ingressSupportsPathType := eq (include "discovery-job-manager.ingress.supportsPathType" .) "true" -}}
-{{- $fullName := include "discovery-job-manager.fullname" . -}}
+{{- $ingressApiIsStable := eq (include "c8.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsIngressClassName := eq (include "c8.ingress.supportsIngressClassName" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "c8.ingress.supportsPathType" .) "true" -}}
+{{- $fullName := include "c8.fullname" . -}}
 {{- $servicePort := .Values.service.port -}}
 {{- $ingressPath := .Values.ingress.path -}}
 {{- $ingressPathType := .Values.ingress.pathType -}}
-{{- $extraPaths := .Values.ingress.extraPaths -}}
-apiVersion: {{ include "discovery-job-manager.ingress.apiVersion" . }}
+apiVersion: {{ include "c8.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "discovery-job-manager.labels" . | nindent 4 }}
+    {{- include "c8.labels" . | nindent 4 }}
     {{- with .Values.ingress.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -37,13 +36,11 @@ spec:
   rules:
   {{- if .Values.ingress.hosts  }}
   {{- range .Values.ingress.hosts }}
-    - host: {{ tpl . $ }}
+    - host: {{ .host | quote }}
       http:
         paths:
-          {{- with $extraPaths }}
-          {{- toYaml . | nindent 10 }}
-          {{- end }}
-          - path: {{ $ingressPath }}
+        {{- range .paths }}
+          - path: {{ . }}
             {{- if $ingressSupportsPathType }}
             pathType: {{ $ingressPathType }}
             {{- end }}
@@ -57,6 +54,7 @@ spec:
               serviceName: {{ $fullName }}
               servicePort: {{ $servicePort }}
               {{- end }}
+        {{- end }}
   {{- end }}
   {{- else }}
     - http:
