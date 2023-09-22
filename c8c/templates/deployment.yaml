@@ -1,23 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "c8.fullname" . }}-frontend
+  name: {{ include "c8c.fullname" . }}
   labels:
-    {{- include "c8.labels" . | nindent 4 }}
-    {{- with .Values.commonLabels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    {{- include "c8c.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
-  {{- if .Values.updateStrategy }}
-  strategy:
-    {{ toYaml .Values.updateStrategy | nindent 4 }}
-  {{- end }}
   selector:
     matchLabels:
-      c8app: "frontend"
+      {{- include "c8c.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -25,41 +18,35 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        c8app: "frontend"
+        {{- include "c8c.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "c8.serviceAccountName" . }}
+      serviceAccountName: {{ include "c8c.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.imageFrontend.repository }}:{{ .Values.imageFrontend.tag }}"
-          imagePullPolicy: {{ .Values.imageFrontend.pullPolicy }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              {{- if .Values.frontendService.enabled }}
-              containerPort: {{ .Values.frontendService.port }}
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
-              {{ else }}
-              containerPort: {{ .Values.container.port }}
-              protocol: TCP
-              {{- end }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            httpGet:
+              path: /
+              port: http
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            httpGet:
+              path: /
+              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-          - name: SSA_SVC
-            value: {{ include "c8.fullname" . }}-backend
-          - name: BACKEND_SVC
-            value: {{ include "c8.fullname" . }}-backend
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -72,4 +59,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-

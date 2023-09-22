@@ -31,10 +31,15 @@ updateStrategy:
     maxUnavailable: 0
   type: RollingUpdate
 
-service:
-  enabled: false
+backendService:
+  enabled: true
   type: ClusterIP
-  port: ""
+  port: "5000"
+
+frontendService:
+  enabled: true
+  type: ClusterIP
+  port: "80"
 
 replicaCount: 1
 
@@ -47,14 +52,22 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
-image:
-  repository: "699577016021.dkr.ecr.us-east-2.amazonaws.com/c8"
+imageBackend:
+  repository: "ghcr.io/configure8inc/c8-backend"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "0.0.1"
+
+
+imageFrontend:
+  repository: "ghcr.io/configure8inc/c8-frontend"
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.0.1"
+
 
 imagePullSecrets:
-  - c8-docker-registry-secret
+  - name: c8-docker-registry-secret
 
 container:
   port: "5000"

@@ -17,7 +17,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "c8.selectorLabels" . | nindent 6 }}
+      c8app: "backend"
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -38,12 +38,12 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.imageBackend.repository }}:{{ .Values.imageBackend.tag }}"
+          imagePullPolicy: {{ .Values.imageBackend.pullPolicy }}
           ports:
             - name: http
-              {{- if .Values.service.enabled }}
-              containerPort: {{ .Values.service.port }}
+              {{- if .Values.backendService.enabled }}
+              containerPort: {{ .Values.backendService.port }}
               protocol: TCP
               {{ else }}
               containerPort: {{ .Values.container.port }}

@@ -1,4 +1,3 @@
-{{- if .Values.service.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -9,12 +8,11 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.backendService.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.backendService.port }}
+      targetPort: {{ .Values.backendService.port }}
       protocol: TCP
       name: http
   selector:
     c8app: "backend"
-{{- end }}
