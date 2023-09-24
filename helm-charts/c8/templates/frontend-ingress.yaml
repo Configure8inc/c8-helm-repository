@@ -1,41 +1,41 @@
-{{- if .Values.ingress.enabled -}}
-{{- if .Values.service.enabled -}}
+{{- if .Values.frontend.ingress.enabled -}}
+{{- if .Values.frontend.service.enabled -}}
 {{- $ingressApiIsStable := eq (include "c8.ingress.isStable" .) "true" -}}
 {{- $ingressSupportsIngressClassName := eq (include "c8.ingress.supportsIngressClassName" .) "true" -}}
 {{- $ingressSupportsPathType := eq (include "c8.ingress.supportsPathType" .) "true" -}}
 {{- $fullName := include "c8.fullname" . -}}
-{{- $servicePort := .Values.service.port -}}
-{{- $ingressPath := .Values.ingress.path -}}
-{{- $ingressPathType := .Values.ingress.pathType -}}
+{{- $servicePort := .Values.frontend.service.port -}}
+{{- $ingressPath := .Values.frontend.ingress.path -}}
+{{- $ingressPathType := .Values.frontend.ingress.pathType -}}
 apiVersion: {{ include "c8.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
     {{- include "c8.labels" . | nindent 4 }}
-    {{- with .Values.ingress.labels }}
+    {{- with .Values.frontend.ingress.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
     {{- with .Values.commonLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.frontend.ingress.annotations }}
   annotations:
     {{- range $key, $value := . }}
     {{ $key }}: {{ tpl $value $ | quote }}
     {{- end }}
   {{- end }}
 spec:
-  {{- if and $ingressSupportsIngressClassName .Values.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- if and $ingressSupportsIngressClassName .Values.frontend.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.frontend.ingress.ingressClassName }}
   {{- end -}}
-  {{- with .Values.ingress.tls }}
+  {{- with .Values.frontend.ingress.tls }}
   tls:
     {{- tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-  {{- if .Values.ingress.hosts  }}
-  {{- range .Values.ingress.hosts }}
+  {{- if .Values.frontend.ingress.hosts  }}
+  {{- range .Values.frontend.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:

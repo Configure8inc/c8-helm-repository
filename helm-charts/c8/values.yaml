@@ -1,79 +1,47 @@
 nameOverride: ""
 fullnameOverride: ""
-
 commonLabels: {}
 
-ingress:
-  enabled: false
-  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-  # ingressClassName: nginx
-  # Values can be templated
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 5m
-  labels: {}
 
-  # pathType is only for k8s >= 1.1=
-  pathType: Prefix
+frontend:
 
-  hosts:
-    - host: example.com
-      paths:
-        - /
+  ingress:
+    enabled: false
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 5m
+    labels: {}
+    pathType: Prefix
+    hosts:
+      - host: example.com
+        paths:
+          - /
+    tls: []
+################
+  container:
+    port: "80"
+################
+  service:
+    enabled: true
+    type: ClusterIP
+    port: "80"
+################
+  image:
+    repository: "ghcr.io/configure8inc/c8-frontend"
+    pullPolicy: IfNotPresent
+    tag: "0.0.1"
 
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  replicaCount: 1
 
-updateStrategy:
-  rollingUpdate:
-    maxUnavailable: 0
-  type: RollingUpdate
+  autoscaling:
+    enabled: false
+    minReplicasFrontend: 1
+    maxReplicasFrontend: 10
+    minReplicasBackend: 1
+    maxReplicasBackend: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
 
-backendService:
-  enabled: true
-  type: ClusterIP
-  port: "5000"
-
-frontendService:
-  enabled: true
-  type: ClusterIP
-  port: "80"
-
-replicaCount: 1
-
-autoscaling:
-  enabled: false
-  minReplicasFrontend: 1
-  maxReplicasFrontend: 10
-  minReplicasBackend: 1
-  maxReplicasBackend: 10
-  targetCPUUtilizationPercentage: 80
-  targetMemoryUtilizationPercentage: 80
-
-imageBackend:
-  repository: "ghcr.io/configure8inc/c8-backend"
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.1"
-
-
-imageFrontend:
-  repository: "ghcr.io/configure8inc/c8-frontend"
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.1"
-
-
-imagePullSecrets:
-  - name: c8-docker-registry-secret
-
-container:
-  port: "5000"
-
-resources:
-  {}
+  resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
@@ -90,36 +58,119 @@ resources:
 #   httpGet:
 #     path: /
 #     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+  
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
 
-podAnnotations: {}
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
 
-podSecurityContext:
-  {}
+  podDisruptionBudget:
+    # Specifies whether pod disruption budget should be created
+    enabled: false
+    # Number or percentage of pods that must be available
+    minAvailable: 50%
+
+
+
+common:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+
+  imagePullSecrets:
+    - name: c8-docker-registry-secret
+
+
+
+backend:
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+    minReplicasFrontend: 1
+    maxReplicasFrontend: 10
+    minReplicasBackend: 1
+    maxReplicasBackend: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-backend"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.1"
+
+  container:
+    port: "5000"
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: false
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
 
-podDisruptionBudget:
-  # Specifies whether pod disruption budget should be created
-  enabled: false
-  # Number or percentage of pods that must be available
-  minAvailable: 50%
+  podDisruptionBudget:
+    # Specifies whether pod disruption budget should be created
+    enabled: false
+    # Number or percentage of pods that must be available
+    minAvailable: 50%
+
+
 
 variables:
   # -- Used to define the relative path to the backend API, by default should be /api.v1

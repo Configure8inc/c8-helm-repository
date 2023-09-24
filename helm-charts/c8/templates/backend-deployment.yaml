@@ -8,68 +8,68 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .Values.backend.autoscaling.enabled }}
+  replicas: {{ .Values.backend.replicaCount }}
   {{- end }}
-  {{- if .Values.updateStrategy }}
+  {{- if .Values.common.updateStrategy }}
   strategy:
-    {{ toYaml .Values.updateStrategy | nindent 4 }}
+    {{ toYaml .Values.common.updateStrategy | nindent 4 }}
   {{- end }}
   selector:
     matchLabels:
       c8app: "backend"
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.backend.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         c8app: "backend"
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.common.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "c8.serviceAccountName" . }}
+      serviceAccountName: {{ include "c8.serviceAccountNameBack" . }}-backend
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.imageBackend.repository }}:{{ .Values.imageBackend.tag }}"
-          imagePullPolicy: {{ .Values.imageBackend.pullPolicy }}
+            {{- toYaml .Values.backend.securityContext | nindent 12 }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           ports:
             - name: http
-              {{- if .Values.backendService.enabled }}
-              containerPort: {{ .Values.backendService.port }}
+              {{- if .Values.backend.service.enabled }}
+              containerPort: {{ .Values.backend.service.port }}
               protocol: TCP
               {{ else }}
-              containerPort: {{ .Values.container.port }}
+              containerPort: {{ .Values.backend.container.port }}
               protocol: TCP
               {{- end }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml .Values.backend.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml .Values.backend.readinessProbe | nindent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.backend.resources | nindent 12 }}
           env:
           {{- range $key, $value := .Values.variables }}
           - name: {{ $key }}
             value: {{ $value | quote }}
           {{- end }}
 
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.backend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with .Values.backend.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.backend.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

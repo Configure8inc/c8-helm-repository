@@ -51,13 +51,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Create the name of the frontend service account to use
 */}}
-{{- define "c8.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "c8.fullname" .) .Values.serviceAccount.name }}
+{{- define "c8.serviceAccountNameFront" -}}
+{{- if .Values.frontend.serviceAccount.create }}
+{{- default (include "c8.fullname" .) .Values.frontend.serviceAccount.name }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.frontend.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the backend service account to use
+*/}}
+{{- define "c8.serviceAccountNameBack" -}}
+{{- if .Values.backend.serviceAccount.create }}
+{{- default (include "c8.fullname" .) .Values.backend.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.backend.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
