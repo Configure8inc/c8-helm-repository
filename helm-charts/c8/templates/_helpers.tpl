@@ -72,6 +72,38 @@ Create the name of the backend service account to use
 {{- end }}
 {{- end }}
 
+{{/*
+Create the name of the djm service account to use
+*/}}
+{{- define "c8.serviceAccountNameDjm" -}}
+{{- if .Values.djm.serviceAccount.create }}
+{{- default (include "c8.fullname" .) .Values.djm.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.djm.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the ssa service account to use
+*/}}
+{{- define "c8.serviceAccountNameSsa" -}}
+{{- if .Values.ssa.serviceAccount.create }}
+{{- default (include "c8.fullname" .) .Values.ssa.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.ssa.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the pns service account to use
+*/}}
+{{- define "c8.serviceAccountNamePns" -}}
+{{- if .Values.pns.serviceAccount.create }}
+{{- default (include "c8.fullname" .) .Values.pns.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.pns.serviceAccount.name }}
+{{- end }}
+{{- end }}
 
 {{/*
 Return if ingress is stable.

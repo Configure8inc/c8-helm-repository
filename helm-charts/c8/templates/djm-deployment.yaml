@@ -1,0 +1,118 @@
+{{- if .Values.djm.enabled }}
+{{- $chartname := .Chart.Name }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c8.fullname" . }}-djm
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ default "1" .Values.djm.replicaCount }}
+  {{- if .Values.djm.updateStrategy }}
+  strategy:
+    {{ toYaml .Values.djm.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      c8app: "djm"
+  template:
+    metadata:
+      {{- with .Values.djm.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        c8app: "djm"
+    spec:
+      {{- with .Values.common.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNameDjm" . }}-djm
+      securityContext:
+        {{- toYaml .Values.djm.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.djm.securityContext | nindent 12 }}
+          image: "{{ .Values.djm.image.repository }}:{{ .Values.djm.image.tag }}"
+          imagePullPolicy: {{ .Values.djm.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.djm.container.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.djm.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.djm.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.djm.resources | nindent 12 }}
+          env:
+          - name: SERVICE
+            value: "c8-discovery-job-manager-prod"
+          - name: DJW_SERVICE
+            value: "discovery-job-worker"
+          - name: DJW_SERVICE_ACCOUNT_NAME
+            value: {{ include "c8.serviceAccountNameDjm" . }}-djw
+          - name: API_PREFIX
+            value: {{ .Values.variables.DJM_API_PREFIX | quote }}
+          - name: DB_AUTH_MECHANISM
+            value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
+          - name: DB_HOST
+            value: {{ .Values.variables.DB_HOST | quote }}
+          - name: DB_DATABASE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_PORT
+            value: {{ .Values.variables.DB_PORT | quote }}
+          - name: DB_USERNAME
+            value: {{ .Values.variables.DB_USERNAME | quote }}
+          - name: MONGO_DRIVER_TYPE
+            value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
+          - name: DISCOVERY_CONTAINER_NAME
+            value: {{ .Values.variables.DISCOVERY_CONTAINER_NAME | quote }}
+          - name: AWS_REGION
+            value: {{ .Values.variables.AWS_REGION | quote }}
+          - name: DJW_EKS_NAMESPACE
+            value: {{ .Values.variables.DJW_EKS_NAMESPACE | quote }}
+          - name: OPENSEARCH_NODE
+            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
+          - name: RABBITMQ_HOST
+            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
+          - name: RABBITMQ_PORT
+            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          - name: RABBITMQ_USERNAME
+            value: {{ .Values.variables.RABBITMQ_USERNAME | quote }}
+          - name: DJW_TRACK_ENTITY_LINEAGE
+            value: {{ .Values.variables.DJW_TRACK_ENTITY_LINEAGE | quote }}
+          - name: DRYRUN
+            value: {{ .Values.variables.DRYRUN | quote }}
+          - name: JOB_ACTIVE_LOOKBACK_MIN
+            value: {{ .Values.variables.JOB_ACTIVE_LOOKBACK_MIN | quote }}
+          - name: JOB_DEAD_TIMEOUT_HOURS
+            value: {{ .Values.variables.JOB_DEAD_TIMEOUT_HOURS | quote }}
+          - name: JOB_TYPES
+            value: {{ .Values.variables.JOB_TYPES | quote }}
+          - name: LOOP_SLEEP_TIME
+            value: {{ .Values.variables.LOOP_SLEEP_TIME | quote }}
+          - name: MAX_JOB_LIMIT
+            value: {{ .Values.variables.MAX_JOB_LIMIT | quote }}
+          - name: USE_EKS
+            value: {{ .Values.variables.USE_EKS | quote }}
+          - name: WORKER_TRIGGER_THRESHOLD
+            value: {{ .Values.variables.WORKER_TRIGGER_THRESHOLD | quote }}
+      {{- with .Values.djm.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.djm.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.djm.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

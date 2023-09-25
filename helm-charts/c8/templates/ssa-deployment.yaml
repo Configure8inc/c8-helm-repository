@@ -1,0 +1,94 @@
+{{- if .Values.ssa.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c8.fullname" . }}-ssa
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.ssa.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- if .Values.ssa.updateStrategy }}
+  strategy:
+    {{ toYaml .Values.ssa.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      c8app: "ssa"
+  template:
+    metadata:
+      {{- with .Values.ssa.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        c8app: "ssa"
+    spec:
+      {{- with .Values.common.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNameSsa" . }}-ssa
+      securityContext:
+        {{- toYaml .Values.ssa.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.ssa.securityContext | nindent 12 }}
+          image: "{{ .Values.ssa.image.repository }}:{{ .Values.ssa.image.tag }}"
+          imagePullPolicy: {{ .Values.ssa.image.pullPolicy }}
+          ports:
+            - name: http
+              {{- if .Values.ssa.service.enabled }}
+              containerPort: {{ .Values.ssa.service.port }}
+              protocol: TCP
+              {{ else }}
+              containerPort: {{ .Values.ssa.container.port }}
+              protocol: TCP
+              {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.ssa.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.ssa.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.ssa.resources | nindent 12 }}
+          env:
+          - name: SERVICE
+            value: "c8app"
+          - name: API_PREFIX
+            value: {{ .Values.variables.SSA_API_PREFIX | quote }}
+          - name: DB_HOST
+            value: {{ .Values.variables.DB_HOST | quote }}
+          - name: DB_DATABASE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_PORT
+            value: {{ .Values.variables.DB_PORT | quote }}
+          - name: DB_USERNAME
+            value: {{ .Values.variables.DB_USERNAME | quote }}
+          - name: MONGO_DRIVER_TYPE
+            value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
+          - name: SWAGGER_DESCRIPTION
+            value: {{ .Values.variables.SSA_SWAGGER_DESCRIPTION | quote }}
+          - name: SWAGGER_ENABLED
+            value: {{ .Values.variables.SSA_SWAGGER_ENABLED | quote }}
+          - name: SWAGGER_PREFIX
+            value: {{ .Values.variables.SSA_SWAGGER_PREFIX | quote }}
+          - name: SWAGGER_TITLE
+            value: {{ .Values.variables.SSA_SWAGGER_TITLE | quote }}
+      {{- with .Values.ssa.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ssa.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ssa.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

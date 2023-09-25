@@ -1,7 +1,0 @@
-apiVersion: v2
-name: discovery-job-manager
-description: A Helm chart for the Discovery-job-manager
-type: application
-
-version: 0.0.1
-appVersion: "1.0.0"

@@ -1,0 +1,22 @@
+{{- if .Values.ssa.enabled }}
+{{- if .Values.ssa.service.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "c8.fullname" . }}-ssa
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.ssa.service.type }}
+  ports:
+    - port: {{ .Values.ssa.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "c8.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- end }}

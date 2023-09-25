@@ -4,27 +4,23 @@ commonLabels: {}
 
 
 frontend:
+  enabled: true
 
   ingress:
-    enabled: false
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-body-size: 5m
+    enabled: true
+    ingressClassName: ""
+    annotations: {}
     labels: {}
     pathType: Prefix
-    hosts:
-      - host: example.com
-        paths:
-          - /
-    tls: []
-################
+
   container:
     port: "80"
-################
+
   service:
     enabled: true
     type: ClusterIP
     port: "80"
-################
+
   image:
     repository: "ghcr.io/configure8inc/c8-frontend"
     pullPolicy: IfNotPresent
@@ -34,20 +30,18 @@ frontend:
 
   autoscaling:
     enabled: false
-    minReplicasFrontend: 1
-    maxReplicasFrontend: 10
-    minReplicasBackend: 1
-    maxReplicasBackend: 10
+    minReplicas: 1
+    maxReplicas: 10
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
 
   resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
 # livenessProbe:
 #   httpGet:
@@ -73,7 +67,7 @@ frontend:
 
   serviceAccount:
     # Specifies whether a service account should be created
-    create: true
+    create: false
     # Annotations to add to the service account
     annotations: {}
     # The name of the service account to use.
@@ -86,28 +80,19 @@ frontend:
     # Number or percentage of pods that must be available
     minAvailable: 50%
 
-
-
 common:
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 0
-    type: RollingUpdate
-
   imagePullSecrets:
     - name: c8-docker-registry-secret
 
-
-
 backend:
+  enabled: true
+
   replicaCount: 1
 
   autoscaling:
     enabled: false
-    minReplicasFrontend: 1
-    maxReplicasFrontend: 10
-    minReplicasBackend: 1
-    maxReplicasBackend: 10
+    minReplicas: 1
+    maxReplicas: 10
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
 
@@ -172,33 +157,225 @@ backend:
 
 
 
+djm:
+  enabled: true
+
+  replicaCount: 1
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-djm"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.1"
+
+  container:
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+   
+    job_worker:
+      # The name of the djw service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name:
+      # Annotations to add to the service account
+      annotations: {}
+
+
+ssa:
+  enabled: true
+
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  ingress:
+    enabled: true
+    ingressClassName: ""
+    annotations: {}
+    labels: {}
+    pathType: Prefix
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-ssa"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.1"
+
+  container:
+    port: "5000"
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podDisruptionBudget:
+    # Specifies whether pod disruption budget should be created
+    enabled: false
+    # Number or percentage of pods that must be available
+    minAvailable: 50%
+
+
+pns:
+  enabled: true
+
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-pns"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.1"
+
+  container:
+    port: "5000"
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podDisruptionBudget:
+    # Specifies whether pod disruption budget should be created
+    enabled: false
+    # Number or percentage of pods that must be available
+    minAvailable: 50%
+
 variables:
+  ##### C8 #########
   # -- Used to define the relative path to the backend API, by default should be /api.v1
   API_PREFIX: "/api/v1"
   # -- Deprecated and not needed anymore, so will be deleted soon
   AWS_REGION: "na"
-  # -- Crypto initialization vector
-  CRYPTO_IV: ""
-  # -- Crypto password
-  CRYPTO_SECRET: ""
-  # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one
-  DB_AUTH_MECHANISM: "SCRAM-SHA-1"
-  # -- Database host
-  DB_HOST: ""
-  # -- Database name
-  DB_DATABASE: "c8"
-  # -- Database port
-  DB_PORT: "27017"
-  # -- Database username
-  DB_USERNAME: "c8"
-  # -- Database password
-  DB_PASSWORD: ""
-  # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
-  MONGO_DRIVER_TYPE: "mongoDb"
   # -- Url on which the application will be available. For example https://configure8.my-company.io
   DEEPLINK_URL: ""
-  # -- Different configurations preset, by default should be prod, other only for the development.
-  ENV: "prod"
   # -- GitHub application client id. Should be created per installation in advance
   GITHUB_APP_CLIENT_ID: "na"
   # -- GitHub application client secret.
@@ -213,34 +390,62 @@ variables:
   HOOKS_CALLBACK_URL: ""
   # -- Unique secret used for sign user's JWT tokens
   JWT_SECRET: ""
-  # -- Might be info, error, verbose, warning. By default recommended to be info 
-  LOGGING_LEVEL: "info"
-  # -- Disabling/enabling application for the maintenance
-  MAINTENANCE_MODE: "false"
-  # -- Used only for the development, should be production
-  NODE_ENV: "production"
-  # -- Application port
-  NODE_PORT: "5000"
-  # -- Elastic url
-  OPENSEARCH_NODE: ""
   # -- Application analytics segment key
   SEGMENT_KEY: "na"
-  # -- The application name, should be c8app
-  SERVICE: "c8app"
-  # -- Maximum time for the Self serve actions
-  SSA_TIMEOUT: "10000"
   # -- URL for the self serve actions. Should be https://configure8.my-company.io/self-service/api/v1/
   SSA_URL: "placeholder"
-  # -- Application stage, beyond development should be prod
-  STAGE: "prod"
   # -- Description for the swagger file, usually shouldn't be changed
-  SWAGGER_DESCRIPTION: "Prod Testing"
+  SWAGGER_DESCRIPTION: ""
   # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
   # -- Swagger documentation relative url, by default /docs
   SWAGGER_PREFIX: "na"
   # -- Swagger documentation title
   SWAGGER_TITLE: "C8 Backend API"
+
+  ##### SSA #########
+  # -- Unique secret key
+  API_KEY: ""
+  # -- Used to define the relative path to the backend API, by default should be /self-service/api
+  SSA_API_PREFIX: "/self-service/api" 
+  # -- Description for the swagger file, usually shouldn't be changed
+  SSA_SWAGGER_DESCRIPTION: "Production Self Service API documentation"
+  # -- Enable or disable swagger documentation
+  SSA_SWAGGER_ENABLED: "false"
+  # -- Swagger documentation relative url, by default /self-service/api/docs
+  SSA_SWAGGER_PREFIX: "/self-service/api/docs"
+  # -- Swagger documentation title
+  SSA_SWAGGER_TITLE: "C8 Self-Service API"
+
+  ##### DJM #########
+  # -- Required for the health checks, should be by default /api/v1
+  DJM_API_PREFIX: "/api/v1"
+  # -- Workers container names
+  DISCOVERY_CONTAINER_NAME: "c8-discovery-job-worker"
+  # -- Storing diff information for the resources
+  DJW_TRACK_ENTITY_LINEAGE: "true"
+  # -- Deprecated an should be deleted
+  DRYRUN: "false"
+  # -- Deprecated and should be deleted
+  JOB_ACTIVE_LOOKBACK_MIN: "15"
+  # -- Maximum hours for the job execution
+  JOB_DEAD_TIMEOUT_HOURS: "3"
+  # -- list fo the jobs are going to be executed by this discovery manager
+  JOB_TYPES: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
+  # -- Determines the time when the schedule should be checked
+  LOOP_SLEEP_TIME: "10000"
+  # -- Maximum simultaneously executed jobs
+  MAX_JOB_LIMIT: "10"
+  # -- For the production should be true
+  USE_EKS: "true"
+  # -- Deprecated and should be deleted
+  WORKER_TRIGGER_THRESHOLD: "120000"
+
+  ##### NPS #########
+  DEFAULT_SENDER: 
+
+  ##### COMMON #########
+
   # -- Application timezone
   TZ: "America/New_York"
   # -- Application version. Should be with the default value
@@ -253,3 +458,23 @@ variables:
   RABBITMQ_USERNAME: ""
   # -- RabbitMQ password
   RABBITMQ_PASSWORD: ""
+  # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one
+  DB_AUTH_MECHANISM: "SCRAM-SHA-1"
+  # -- Database host
+  DB_HOST: ""
+  # -- Database name
+  DB_DATABASE: "c8"
+  # -- Database port
+  DB_PORT: "27017"
+  # -- Database username
+  DB_USERNAME: "c8"
+  # -- Database password
+  DB_PASSWORD: ""
+  # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
+  MONGO_DRIVER_TYPE: "mongoDb"
+  # -- Elastic url
+  OPENSEARCH_NODE: ""
+  # -- Crypto initialization vector
+  CRYPTO_IV: ""
+  # -- Crypto password
+  CRYPTO_SECRET: ""

@@ -1,3 +1,4 @@
+{{- if .Values.frontend.enabled }}
 {{- if .Values.frontend.podDisruptionBudget.enabled }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -8,4 +9,5 @@ spec:
   selector:
     matchLabels:
       c8app: "frontend"
+{{- end }}
 {{- end }}
