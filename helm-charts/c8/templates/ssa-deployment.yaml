@@ -32,7 +32,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.ssa.serviceAccount.create }}
       serviceAccountName: {{ include "c8.serviceAccountNameSsa" . }}-ssa
+      {{- end }}
       securityContext:
         {{- toYaml .Values.ssa.podSecurityContext | nindent 8 }}
       containers:
@@ -59,16 +61,16 @@ spec:
           env:
           - name: SERVICE
             value: "c8app"
-          - name: API_PREFIX
-            value: {{ .Values.variables.SSA_API_PREFIX | quote }}
+          - name: OPENSEARCH_NODE
+            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
           - name: DB_HOST
             value: {{ .Values.variables.DB_HOST | quote }}
           - name: DB_DATABASE
             value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_PORT
             value: {{ .Values.variables.DB_PORT | quote }}
-          - name: DB_USERNAME
-            value: {{ .Values.variables.DB_USERNAME | quote }}
+          - name: DB_AUTH_MECHANISM
+            value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
           - name: MONGO_DRIVER_TYPE
             value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
           - name: SWAGGER_DESCRIPTION
@@ -79,6 +81,11 @@ spec:
             value: {{ .Values.variables.SSA_SWAGGER_PREFIX | quote }}
           - name: SWAGGER_TITLE
             value: {{ .Values.variables.SSA_SWAGGER_TITLE | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-params
+            - secretRef:
+                name: c8-secret
       {{- with .Values.ssa.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

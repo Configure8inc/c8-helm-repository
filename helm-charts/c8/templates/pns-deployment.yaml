@@ -31,7 +31,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.pns.serviceAccount.create }}
       serviceAccountName: {{ include "c8.serviceAccountNamePns" . }}-pns
+      {{- end }}
       securityContext:
         {{- toYaml .Values.pns.podSecurityContext | nindent 8 }}
       containers:
@@ -59,8 +61,11 @@ spec:
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
-          - name: RABBITMQ_USERNAME
-            value: {{ .Values.variables.RABBITMQ_USERNAME | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-params
+            - secretRef:
+                name: c8-secret
       {{- with .Values.pns.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

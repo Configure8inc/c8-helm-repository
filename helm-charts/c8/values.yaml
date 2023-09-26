@@ -8,16 +8,11 @@ frontend:
 
   ingress:
     enabled: true
-    ingressClassName: ""
     annotations: {}
     labels: {}
     pathType: Prefix
 
-  container:
-    port: "80"
-
   service:
-    enabled: true
     type: ClusterIP
     port: "80"
 
@@ -81,6 +76,8 @@ frontend:
     minAvailable: 50%
 
 common:
+  ingress:
+    ingressClassName: ""
   imagePullSecrets:
     - name: c8-docker-registry-secret
 
@@ -102,11 +99,7 @@ backend:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "0.0.1"
 
-  container:
-    port: "5000"
-
   service:
-    enabled: true
     type: ClusterIP
     port: "5000"
 
@@ -167,6 +160,7 @@ djm:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "0.0.1"
+  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.1"
 
   container:
     port: "5000"
@@ -376,26 +370,14 @@ variables:
   AWS_REGION: "na"
   # -- Url on which the application will be available. For example https://configure8.my-company.io
   DEEPLINK_URL: ""
-  # -- GitHub application client id. Should be created per installation in advance
-  GITHUB_APP_CLIENT_ID: "na"
-  # -- GitHub application client secret.
-  GITHUB_APP_CLIENT_SECRET: "na"
-  # -- GitHub application installation url.
-  GITHUB_APP_INSTALL_URL: "na"
-  # -- Google application key. Required for the sign in with google
-  GOOGLE_KEY: "na"
-  # -- Google application secret. Required for the login with google
-  GOOGLE_SECRET: "na"
   # -- Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io
   HOOKS_CALLBACK_URL: ""
-  # -- Unique secret used for sign user's JWT tokens
-  JWT_SECRET: ""
   # -- Application analytics segment key
   SEGMENT_KEY: "na"
   # -- URL for the self serve actions. Should be https://configure8.my-company.io/self-service/api/v1/
   SSA_URL: "placeholder"
   # -- Description for the swagger file, usually shouldn't be changed
-  SWAGGER_DESCRIPTION: ""
+  SWAGGER_DESCRIPTION: "C8 API"
   # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
   # -- Swagger documentation relative url, by default /docs
@@ -424,10 +406,6 @@ variables:
   DISCOVERY_CONTAINER_NAME: "c8-discovery-job-worker"
   # -- Storing diff information for the resources
   DJW_TRACK_ENTITY_LINEAGE: "true"
-  # -- Deprecated an should be deleted
-  DRYRUN: "false"
-  # -- Deprecated and should be deleted
-  JOB_ACTIVE_LOOKBACK_MIN: "15"
   # -- Maximum hours for the job execution
   JOB_DEAD_TIMEOUT_HOURS: "3"
   # -- list fo the jobs are going to be executed by this discovery manager
@@ -437,15 +415,12 @@ variables:
   # -- Maximum simultaneously executed jobs
   MAX_JOB_LIMIT: "10"
   # -- For the production should be true
-  USE_EKS: "true"
-  # -- Deprecated and should be deleted
-  WORKER_TRIGGER_THRESHOLD: "120000"
+  USE_K8: "true"
 
   ##### NPS #########
-  DEFAULT_SENDER: 
+  DEFAULT_SENDER: "notifications@configure8.io"
 
   ##### COMMON #########
-
   # -- Application timezone
   TZ: "America/New_York"
   # -- Application version. Should be with the default value
@@ -454,10 +429,6 @@ variables:
   RABBITMQ_HOST: ""
   # -- RabbitMQ port
   RABBITMQ_PORT: 5672
-  # -- RabbitMQ user
-  RABBITMQ_USERNAME: ""
-  # -- RabbitMQ password
-  RABBITMQ_PASSWORD: ""
   # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one
   DB_AUTH_MECHANISM: "SCRAM-SHA-1"
   # -- Database host
@@ -466,15 +437,7 @@ variables:
   DB_DATABASE: "c8"
   # -- Database port
   DB_PORT: "27017"
-  # -- Database username
-  DB_USERNAME: "c8"
-  # -- Database password
-  DB_PASSWORD: ""
   # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
   MONGO_DRIVER_TYPE: "mongoDb"
   # -- Elastic url
   OPENSEARCH_NODE: ""
-  # -- Crypto initialization vector
-  CRYPTO_IV: ""
-  # -- Crypto password
-  CRYPTO_SECRET: ""

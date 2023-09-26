@@ -27,8 +27,8 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
-  {{- if and $ingressSupportsIngressClassName .Values.ssa.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.ssa.ingress.ingressClassName }}
+  {{- if and $ingressSupportsIngressClassName .Values.common.ingress.ingressClassName  }}
+  ingressClassName: {{ .Values.common.ingress.ingressClassName }}
   {{- end -}}
   {{- with .Values.ssa.ingress.tls }}
   tls:

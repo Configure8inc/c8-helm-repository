@@ -31,7 +31,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.djm.serviceAccount.create }}
       serviceAccountName: {{ include "c8.serviceAccountNameDjm" . }}-djm
+      {{- end }}
       securityContext:
         {{- toYaml .Values.djm.podSecurityContext | nindent 8 }}
       containers:
@@ -67,30 +69,22 @@ spec:
             value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_PORT
             value: {{ .Values.variables.DB_PORT | quote }}
-          - name: DB_USERNAME
-            value: {{ .Values.variables.DB_USERNAME | quote }}
           - name: MONGO_DRIVER_TYPE
             value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
           - name: DISCOVERY_CONTAINER_NAME
             value: {{ .Values.variables.DISCOVERY_CONTAINER_NAME | quote }}
           - name: AWS_REGION
             value: {{ .Values.variables.AWS_REGION | quote }}
-          - name: DJW_EKS_NAMESPACE
-            value: {{ .Values.variables.DJW_EKS_NAMESPACE | quote }}
+          - name: DJW_K8_NAMESPACE
+            value: {{ .Release.Namespace }}
           - name: OPENSEARCH_NODE
             value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
           - name: RABBITMQ_HOST
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
-          - name: RABBITMQ_USERNAME
-            value: {{ .Values.variables.RABBITMQ_USERNAME | quote }}
           - name: DJW_TRACK_ENTITY_LINEAGE
             value: {{ .Values.variables.DJW_TRACK_ENTITY_LINEAGE | quote }}
-          - name: DRYRUN
-            value: {{ .Values.variables.DRYRUN | quote }}
-          - name: JOB_ACTIVE_LOOKBACK_MIN
-            value: {{ .Values.variables.JOB_ACTIVE_LOOKBACK_MIN | quote }}
           - name: JOB_DEAD_TIMEOUT_HOURS
             value: {{ .Values.variables.JOB_DEAD_TIMEOUT_HOURS | quote }}
           - name: JOB_TYPES
@@ -99,10 +93,15 @@ spec:
             value: {{ .Values.variables.LOOP_SLEEP_TIME | quote }}
           - name: MAX_JOB_LIMIT
             value: {{ .Values.variables.MAX_JOB_LIMIT | quote }}
-          - name: USE_EKS
-            value: {{ .Values.variables.USE_EKS | quote }}
-          - name: WORKER_TRIGGER_THRESHOLD
-            value: {{ .Values.variables.WORKER_TRIGGER_THRESHOLD | quote }}
+          - name: DJW_APP_URL
+            value: {{ .Values.variables.DEEPLINK_URL | quote }}
+          - name: DJW_IMAGE
+            value: {{ .Values.djm.DJW_IMAGE | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-params
+            - secretRef:
+                name: c8-secret
       {{- with .Values.djm.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

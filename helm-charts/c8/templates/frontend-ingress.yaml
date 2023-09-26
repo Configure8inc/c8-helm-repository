@@ -1,6 +1,5 @@
 {{- if .Values.frontend.enabled }}
 {{- if .Values.frontend.ingress.enabled -}}
-{{- if .Values.frontend.service.enabled -}}
 {{- $ingressApiIsStable := eq (include "c8.ingress.isStable" .) "true" -}}
 {{- $ingressSupportsIngressClassName := eq (include "c8.ingress.supportsIngressClassName" .) "true" -}}
 {{- $ingressSupportsPathType := eq (include "c8.ingress.supportsPathType" .) "true" -}}
@@ -27,8 +26,8 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
-  {{- if and $ingressSupportsIngressClassName .Values.frontend.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.frontend.ingress.ingressClassName }}
+  {{- if and $ingressSupportsIngressClassName .Values.common.ingress.ingressClassName  }}
+  ingressClassName: {{ .Values.common.ingress.ingressClassName }}
   {{- end -}}
   {{- with .Values.frontend.ingress.tls }}
   tls:
@@ -52,6 +51,5 @@ spec:
               serviceName: {{ $fullName }}-frontend
               servicePort: {{ $servicePort }}
               {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
