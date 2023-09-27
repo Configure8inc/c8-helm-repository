@@ -9,9 +9,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  {{- if not .Values.ssa.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   {{- if .Values.ssa.updateStrategy }}
   strategy:
     {{ toYaml .Values.ssa.updateStrategy | nindent 4 }}

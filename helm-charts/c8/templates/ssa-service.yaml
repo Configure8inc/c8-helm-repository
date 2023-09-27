@@ -17,6 +17,6 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "c8.selectorLabels" . | nindent 4 }}
+    c8app: "ssa"
 {{- end }}
 {{- end }}
