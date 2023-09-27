@@ -79,6 +79,7 @@ common:
     ingressClassName: ""
   imagePullSecrets:
     - name: c8-docker-registry-secret
+  C8_SECRET_NAME: c8-secret
 
 backend:
   enabled: true
@@ -363,8 +364,6 @@ variables:
   HOOKS_CALLBACK_URL: ""
   # -- Application analytics segment key
   SEGMENT_KEY: "na"
-  # -- URL for the self serve actions. Should be https://configure8.my-company.io/self-service/api/v1/
-  SSA_URL: "placeholder"
   # -- Description for the swagger file, usually shouldn't be changed
   SWAGGER_DESCRIPTION: "C8 API"
   # -- Enable or disable swagger documentation
@@ -397,7 +396,7 @@ variables:
   DJW_TRACK_ENTITY_LINEAGE: "true"
   # -- Maximum hours for the job execution
   JOB_DEAD_TIMEOUT_HOURS: "3"
-  # -- list fo the jobs are going to be executed by this discovery manager
+  # -- list of the jobs that are going to be executed by discovery manager
   JOB_TYPES: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
   # -- Determines the time when the schedule should be checked
   LOOP_SLEEP_TIME: "10000"
@@ -428,5 +427,5 @@ variables:
   DB_PORT: "27017"
   # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
   MONGO_DRIVER_TYPE: "mongoDb"
-  # -- Elastic url
+  # -- ElasticSearch url
   OPENSEARCH_NODE: ""

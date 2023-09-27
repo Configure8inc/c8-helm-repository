@@ -64,7 +64,7 @@ Create the name of the frontend service account to use
 {{/*
 Create the name of the backend service account to use
 */}}
-{{- define "c8.serviceAccountNameBack" -}}
+{{- define "c8.serviceAccountNameBackend" -}}
 {{- if .Values.backend.serviceAccount.create }}
 {{- default (include "c8.fullname" .) .Values.backend.serviceAccount.name }}
 {{- else }}
@@ -137,47 +137,4 @@ Return the appropriate apiVersion for ingress.
 {{- else }}
 {{- print "extensions/v1beta1" }}
 {{- end }}
-{{- end }}
-
-
-{{/*
-Params from the AWS SSM
-*/}}
-{{- define "helpers.list-env-variables-aws-parameter-store" }}
-{{- if .Values.aws_parameter_store.enabled -}}
-{{- $name := .Values.aws_parameter_store.secret_name }}
-{{- range $key, $value := .Values.aws_parameter_store.data }}
-- name: {{ $value.secretKey }}
-  valueFrom:
-    secretKeyRef:
-      name: "{{ $name }}"
-      key: {{ $value.secretKey }}
-{{- end }}
-{{- end }}
-{{- end }}
-
-{{/*
-Params from the AWS Secret Manager
-*/}}
-{{- define "helpers.list-env-variables-aws-secrets-manager" }}
-{{- if .Values.aws_secrets_manager.enabled -}}
-{{- $name := .Values.aws_secrets_manager.secret_name }}
-{{- range $key, $value := .Values.aws_secrets_manager.data }}
-- name: {{ $value.secretKey }}
-  valueFrom:
-    secretKeyRef:
-      name: "{{ $name }}"
-      key: {{ $value.secretKey }}
-{{- end }}
-{{- end }}
-{{- end }}
-
-{{/*
-Envs
-*/}}
-{{- define "helpers.list-env-variables"}}
-{{- range $key  := .Values.variables.data }}
-- name: "{{ $key.key }}"
-  value: "{{ $key.value }}"
-{{- end}}
 {{- end }}

@@ -34,7 +34,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.backend.serviceAccount.create }}
-      serviceAccountName: {{ include "c8.serviceAccountNameBack" . }}-backend
+      serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}-backend
       {{- end }}
       securityContext:
         {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
@@ -63,6 +63,8 @@ spec:
             value: {{ .Values.variables.AWS_REGION | quote }}
           - name: DB_AUTH_MECHANISM
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
+          # - name: DB_AUTH_SOURCE
+          #   value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_HOST
             value: {{ .Values.variables.DB_HOST | quote }}
           - name: DB_DATABASE
@@ -95,7 +97,7 @@ spec:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-params
             - secretRef:
-                name: c8-secret
+                name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
       {{- with .Values.backend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

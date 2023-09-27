@@ -61,6 +61,8 @@ spec:
             value: {{ include "c8.serviceAccountNameDjm" . }}-djw
           - name: API_PREFIX
             value: {{ .Values.variables.DJM_API_PREFIX | quote }}
+          # - name: DB_AUTH_SOURCE
+          #   value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_AUTH_MECHANISM
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
           - name: DB_HOST
@@ -101,7 +103,7 @@ spec:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-params
             - secretRef:
-                name: c8-secret
+                name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
       {{- with .Values.djm.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
