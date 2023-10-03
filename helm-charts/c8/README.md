@@ -1,13 +1,16 @@
-# Configure8 Self-Managed Helm Chart Deployment Guide
+# Configure8 Self-Hosted Helm Chart Deployment Guide
 
 This guide delineates the steps to deploy the Configure8 (C8) application on a Kubernetes cluster using a Helm chart. Please ensure that the following prerequisites are met before proceeding:
 
 ## Requirements
 
-1. A running Kubernetes cluster (version 1.22 or higher) with public internet access (to pull Docker images from GitHub).
+1. A running Kubernetes version 1.22 or above to guarantee compatibility with the C8 App. Ensure the cluster has public internet access to fetch Docker images from repositories, specifically from GitHub.
 2. A user with sufficient cluster access privileges to install the C8 app.
 3. The [Helm Package Manager](https://helm.sh/).
 4. A token provided by the C8 team for adding image pull secrets to the cluster.
+5. A __MongoDB__ database must be set up, optimized, and accessible by the Kubernetes cluster.
+6. A __RabbitMQ__ cluster must be set up for managing message queues within the C8 application.
+7. An __OpenSearch__ cluster must be set up for robust search functionality and data analytics within the C8 app.
 
 ## Step 1: Creating a Namespace
 
@@ -171,6 +174,9 @@ aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document fi
 aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy
 ```
 
+> **Note**
+> If you want to discover more aws accounts, you have to repeat all steps for each account.
+
 ## Step 6: Install the C8 Helm Chart
 
 ### Step 6.1: Add Configure8 Chart Repository
@@ -203,6 +209,7 @@ helm upgrade -i sh-use2-c8 ./helm-charts/c8 \
 ```
 
 ### Application Variables
+
 The table below lists the key application variables that can be configured during deployment:
 
 | Key | Type | Default | Description |
@@ -239,7 +246,6 @@ The table below lists the key application variables that can be configured durin
 | variables.SWAGGER_TITLE | string | `"C8 Backend API"` | Swagger documentation title |
 | variables.TZ | string | `"America/New_York"` | Application timezone |
 | variables.USE_K8 | string | `"true"` | For the production should be true |
-
 
 ### The C8 Helm Chart Parameters
 
