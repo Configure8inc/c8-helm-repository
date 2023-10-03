@@ -1,0 +1,375 @@
+# Configure8 Self-Managed Helm Chart Deployment Guide
+
+This guide delineates the steps to deploy the Configure8 (C8) application on a Kubernetes cluster using a Helm chart. Please ensure that the following prerequisites are met before proceeding:
+
+## Requirements
+
+1. A running Kubernetes cluster (version 1.22 or higher) with public internet access (to pull Docker images from GitHub).
+2. A user with sufficient cluster access privileges to install the C8 app.
+3. The [Helm Package Manager](https://helm.sh/).
+4. A token provided by the C8 team for adding image pull secrets to the cluster.
+
+## Step 1: Creating a Namespace
+
+Isolate the C8 application by creating a Kubernetes namespace named "c8":
+
+```bash
+kubectl create namespace c8
+```
+
+## Step 2: Create Docker Registry Secret
+
+Create a Kubernetes secret to access the C8 Docker registry. Replace <Token provided to you by the C8 team> and <your email> with your specific token and email address, respectively:
+
+```bash
+kubectl create secret docker-registry c8-docker-registry-secret \
+--docker-server=ghcr.io \
+--docker-username=c8-user \
+--docker-password=<Token provided to you by the C8 team> \
+--docker-email=<your email>`
+```
+
+## Step 3: Create C8 Application Secret
+
+Generate a Kubernetes secret for the C8 application, which will contain sensitive data such as API keys and database credentials. Replace 'value' with the actual values:
+
+```bash
+kubectl create secret generic c8-secret \
+    --from-literal=API_KEY='value' \
+    --from-literal=CRYPTO_IV='value' \
+    --from-literal=CRYPTO_SECRET='value' \
+    --from-literal=JWT_SECRET='value' \
+    --from-literal=DB_USERNAME='value' \
+    --from-literal=DB_PASSWORD='value' \
+    --from-literal=RABBITMQ_USERNAME='value' \
+    --from-literal=RABBITMQ_PASSWORD='value' \
+    --from-literal=SENDGRID_API_KEY='value' \
+    -n c8 --dry-run=client -o yaml | kubectl apply -f -
+```
+
+### Secrets Description
+
+| Name | Type | Default | Description |
+|-----|------|---------|-------------|
+| API_KEY | string | `""` | Unique secret key |
+| CRYPTO_IV | string | `""` | Crypto initialization vector |
+| CRYPTO_SECRET | string | `""` | Crypto password |
+| DB_PASSWORD | string | `""` | Database password |
+| DB_USERNAME | string | `""` | Database username |
+| GITHUB_APP_CLIENT_ID | string | `""` | GitHub application client id. Should be created per installation in advance (optional) |
+| GITHUB_APP_CLIENT_SECRET | string | `""` | GitHub application client secret. (optional) |
+| GITHUB_APP_INSTALL_URL | string | `""` | GitHub application installation url. (optional) |
+| GOOGLE_KEY | string | `""` | Google application key. Required for the sign in with google (optional) |
+| GOOGLE_SECRET | string | `""` | Google application secret. Required for the login with google (optional) |
+| JWT_SECRET | string | `""` | Unique secret used for sign user's JWT tokens |
+| RABBITMQ_PASSWORD | string | `""` | RabbitMQ password |
+| RABBITMQ_USERNAME | string | `""` | RabbitMQ user |
+| SENDGRID_API_KEY | string | `""` | Sendgrid api key password |
+----------------------------------------------
+
+## Step 4: Create IAM Role for C8 and DJM Service Accounts
+
+### Step 4.1: Create IAM Policy
+
+Replace the placeholders with your specific values:
+
+> *placeholders description*:
+
+| Name | Description |
+|-----|-------------|
+| $AWS_EKS_CLUSTER_NAME | The name of the AWS EKS cluster to which we will deploy the application |
+| $AWS_EKS_CLUSTER_REGION  | The AWS Region of the AWS EKS cluster to which we will deploy the application |
+| $APP_NAMESPACE  | The Kubernetes namespace of the AWS EKS cluster to which we will deploy the application |
+
+```bash
+account_id=$(aws sts get-caller-identity --query "Account" --output text)
+oidc_provider=$(aws eks describe-cluster --name $AWS_EKS_CLUSTER_NAME --region $AWS_EKS_CLUSTER_REGION --query "cluster.identity.oidc.issuer" --output text | sed -e "s/^https:\/\///")
+namespace=$APP_NAMESPACE
+service_account_c8_app=c8-backend
+service_account_c8_djw=c8-djw
+```
+
+### Step 4.2: Create Trust Relationship for IAM Role
+
+Create a trust relationship for the IAM role:
+
+```bash
+# Generate a JSON file for the trust relationship
+cat >trust-relationship-sa.json <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::$account_id:oidc-provider/$oidc_provider"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "$oidc_provider:aud": "sts.amazonaws.com",
+          "$oidc_provider:sub": [
+            "system:serviceaccount:$namespace:$service_account_c8_app",
+            "system:serviceaccount:$namespace:$service_account_c8_djw"
+          ]
+        }
+      }
+    }
+  ]
+}
+EOF
+```
+
+### Step 4.3: Create IAM Role
+
+```bash
+# Create an IAM role with a defined trust relationship and description
+aws iam create-role --role-name sh-c8-service-account --assume-role-policy-document file://trust-relationship-sa.json --description "The role for the Configure8 pods service account"
+```
+
+## Step 5: Create IAM Role to Assume by C8 and DJM Service Accounts
+
+### Step 5.1: Download IAM Policy
+
+Download the IAM policy that grants read permissions to all AWS resources:
+
+```bash
+curl -o sh-c8-discovery-policy.json https://configure8-resources.s3.us-east-2.amazonaws.com/iam/sh-c8-discovery-policy.json
+```
+
+### Step 5.2: Create IAM Policy
+
+Create the IAM policy:
+
+```bash
+aws iam create-policy --policy-name sh-c8-discovery-policy --policy-document file://sh-c8-discovery-policy.json
+```
+
+### Step 5.3: Create IAM Role
+
+Create an IAM role that can be assumed by the C8 and DJM service accounts:
+
+```bash
+# Generate a JSON file for the trust relationship
+cat >trust-relationship.json <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::$account_id:role/sh-c8-service-account"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+# Create an IAM role with a defined trust relationship and description
+aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
+# Attach the sh-c8-discovery to the policy 
+aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy
+```
+
+## Step 6: Install the C8 Helm Chart
+
+### Step 6.1: Add Configure8 Chart Repository
+
+Add the [Configure8](https://app.configure8.io) chart repository and update it:
+
+```bash
+helm repo add c8 https://helm.configure8.io/store/
+helm repo update
+```
+
+### Step 6.2: Install the Helm Chart
+
+Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
+
+```bash
+helm upgrade -i sh-use2-c8 ./helm-charts/c8 \
+    -n sh \
+    --set variables.AWS_REGION='value' \
+    --set variables.DB_HOST='value' \
+    --set variables.DB_DATABASE='value' \
+    --set variables.DEEPLINK_URL='value' \
+    --set variables.HOOKS_CALLBACK_URL='value' \
+    --set variables.OPENSEARCH_NODE='value' \
+    --set variables.RABBITMQ_HOST='value' \
+    --set common.ingress.ingressClassName='value' \
+    --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
+    --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
+
+```
+
+### Application Variables
+The table below lists the key application variables that can be configured during deployment:
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| variables.API_PREFIX | string | `"/api/v1"` | Used to define the relative path to the backend API, by default should be /api.v1 |
+| variables.AWS_REGION | string | `"na"` | Deprecated and not needed anymore, so will be deleted soon |
+| variables.DB_AUTH_MECHANISM | string | `"SCRAM-SHA-1"` | The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one |
+| variables.DB_DATABASE | string | `"c8"` | Database name |
+| variables.DB_HOST | string | `""` | Database host |
+| variables.DB_PORT | string | `"27017"` | Database port |
+| variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
+| variables.DEFAULT_SENDER | string | `"notifications@configure8.io"` |  |
+| variables.DISCOVERY_CONTAINER_NAME | string | `"c8-discovery-job-worker"` | Workers container names |
+| variables.DJM_API_PREFIX | string | `"/api/v1"` | Required for the health checks, should be by default /api/v1 |
+| variables.DJW_TRACK_ENTITY_LINEAGE | string | `"true"` | Storing diff information for the resources |
+| variables.HOOKS_CALLBACK_URL | string | `""` | Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io |
+| variables.JOB_DEAD_TIMEOUT_HOURS | string | `"3"` | Maximum hours for the job execution |
+| variables.JOB_TYPES | string | `"DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"` | list of the jobs that are going to be executed by discovery manager |
+| variables.LOOP_SLEEP_TIME | string | `"10000"` | Determines the time when the schedule should be checked |
+| variables.MAX_JOB_LIMIT | string | `"10"` | Maximum simultaneously executed jobs |
+| variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
+| variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
+| variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
+| variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
+| variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
+| variables.SSA_API_PREFIX | string | `"/self-service/api"` | Used to define the relative path to the backend API, by default should be /self-service/api |
+| variables.SSA_SWAGGER_DESCRIPTION | string | `"Self Service API documentation"` | Description for the swagger file, usually shouldn't be changed |
+| variables.SSA_SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
+| variables.SSA_SWAGGER_PREFIX | string | `"/self-service/api/docs"` | Swagger documentation relative url, by default /self-service/api/docs |
+| variables.SSA_SWAGGER_TITLE | string | `"C8 Self-Service API"` | Swagger documentation title |
+| variables.SWAGGER_DESCRIPTION | string | `"C8 API"` | Description for the swagger file, usually shouldn't be changed |
+| variables.SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
+| variables.SWAGGER_PREFIX | string | `"na"` | Swagger documentation relative url, by default /docs |
+| variables.SWAGGER_TITLE | string | `"C8 Backend API"` | Swagger documentation title |
+| variables.TZ | string | `"America/New_York"` | Application timezone |
+| variables.USE_K8 | string | `"true"` | For the production should be true |
+
+
+### The C8 Helm Chart Parameters
+
+The table below shows configurable parameters when deploying the C8 Helm chart:
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| backend.autoscaling.enabled | bool | `false` |  |
+| backend.autoscaling.maxReplicas | int | `10` |  |
+| backend.autoscaling.minReplicas | int | `1` |  |
+| backend.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| backend.autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
+| backend.enabled | bool | `true` |  |
+| backend.image.pullPolicy | string | `"Always"` |  |
+| backend.image.repository | string | `"ghcr.io/configure8inc/c8-backend"` |  |
+| backend.image.tag | string | `"0.0.3"` |  |
+| backend.podAnnotations | object | `{}` |  |
+| backend.podDisruptionBudget.enabled | bool | `false` |  |
+| backend.podDisruptionBudget.minAvailable | string | `"50%"` |  |
+| backend.podSecurityContext | object | `{}` |  |
+| backend.replicaCount | int | `1` |  |
+| backend.resources | object | `{}` |  |
+| backend.securityContext | object | `{}` |  |
+| backend.service.port | string | `"5000"` |  |
+| backend.service.type | string | `"ClusterIP"` |  |
+| backend.serviceAccount.annotations | object | `{}` |  |
+| backend.serviceAccount.create | bool | `true` |  |
+| backend.serviceAccount.name | string | `""` |  |
+| common.C8_SECRET_NAME | string | `"c8-secret"` |  |
+| common.IMAGE_PULL_SECRET | string | `"c8-docker-registry-secret"` |  |
+| common.ingress.ingressClassName | string | `""` |  |
+| commonLabels | object | `{}` |  |
+| djm.DJW_IMAGE | string | `"ghcr.io/configure8inc/c8-djw:0.0.3"` |  |
+| djm.container.port | string | `"5000"` |  |
+| djm.enabled | bool | `true` |  |
+| djm.image.pullPolicy | string | `"Always"` |  |
+| djm.image.repository | string | `"ghcr.io/configure8inc/c8-djm"` |  |
+| djm.image.tag | string | `"0.0.3"` |  |
+| djm.podAnnotations | object | `{}` |  |
+| djm.podSecurityContext | object | `{}` |  |
+| djm.replicaCount | int | `1` |  |
+| djm.resources | object | `{}` |  |
+| djm.securityContext | object | `{}` |  |
+| djm.serviceAccount.annotations | object | `{}` |  |
+| djm.serviceAccount.create | bool | `true` |  |
+| djm.serviceAccount.job_worker.annotations | object | `{}` |  |
+| djm.serviceAccount.job_worker.name | string | `nil` |  |
+| djm.serviceAccount.name | string | `""` |  |
+| frontend.autoscaling.enabled | bool | `false` |  |
+| frontend.autoscaling.maxReplicas | int | `10` |  |
+| frontend.autoscaling.minReplicas | int | `1` |  |
+| frontend.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| frontend.autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
+| frontend.enabled | bool | `true` |  |
+| frontend.image.pullPolicy | string | `"Always"` |  |
+| frontend.image.repository | string | `"ghcr.io/configure8inc/c8-frontend"` |  |
+| frontend.image.tag | string | `"0.0.3"` |  |
+| frontend.ingress.annotations | object | `{}` |  |
+| frontend.ingress.enabled | bool | `true` |  |
+| frontend.ingress.labels | object | `{}` |  |
+| frontend.ingress.pathType | string | `"Prefix"` |  |
+| frontend.limits.cpu | string | `"300m"` |  |
+| frontend.limits.memory | string | `"128Mi"` |  |
+| frontend.podAnnotations | object | `{}` |  |
+| frontend.podDisruptionBudget.enabled | bool | `false` |  |
+| frontend.podDisruptionBudget.minAvailable | string | `"50%"` |  |
+| frontend.podSecurityContext | object | `{}` |  |
+| frontend.replicaCount | int | `1` |  |
+| frontend.requests.cpu | string | `"100m"` |  |
+| frontend.requests.memory | string | `"128Mi"` |  |
+| frontend.resources | object | `{}` |  |
+| frontend.securityContext | object | `{}` |  |
+| frontend.service.port | string | `"80"` |  |
+| frontend.service.type | string | `"ClusterIP"` |  |
+| frontend.serviceAccount.annotations | object | `{}` |  |
+| frontend.serviceAccount.create | bool | `false` |  |
+| frontend.serviceAccount.name | string | `""` |  |
+| fullnameOverride | string | `""` |  |
+| migration.image.pullPolicy | string | `"Always"` |  |
+| migration.image.repository | string | `"ghcr.io/configure8inc/c8-migrations"` |  |
+| migration.image.tag | string | `"0.0.3"` |  |
+| migration.serviceAccount.annotations | object | `{}` |  |
+| migration.serviceAccount.create | bool | `false` |  |
+| migration.serviceAccount.name | string | `""` |  |
+| nameOverride | string | `""` |  |
+| pns.autoscaling.enabled | bool | `false` |  |
+| pns.autoscaling.maxReplicas | int | `10` |  |
+| pns.autoscaling.minReplicas | int | `1` |  |
+| pns.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| pns.autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
+| pns.container.port | string | `"5000"` |  |
+| pns.enabled | bool | `true` |  |
+| pns.image.pullPolicy | string | `"Always"` |  |
+| pns.image.repository | string | `"ghcr.io/configure8inc/c8-pns"` |  |
+| pns.image.tag | string | `"0.0.3"` |  |
+| pns.podAnnotations | object | `{}` |  |
+| pns.podDisruptionBudget.enabled | bool | `false` |  |
+| pns.podDisruptionBudget.minAvailable | string | `"50%"` |  |
+| pns.podSecurityContext | object | `{}` |  |
+| pns.replicaCount | int | `1` |  |
+| pns.resources | object | `{}` |  |
+| pns.securityContext | object | `{}` |  |
+| pns.service.enabled | bool | `true` |  |
+| pns.service.port | string | `"5000"` |  |
+| pns.service.type | string | `"ClusterIP"` |  |
+| pns.serviceAccount.annotations | object | `{}` |  |
+| pns.serviceAccount.create | bool | `true` |  |
+| pns.serviceAccount.name | string | `""` |  |
+| ssa.container.port | string | `"5000"` |  |
+| ssa.enabled | bool | `true` |  |
+| ssa.image.pullPolicy | string | `"Always"` |  |
+| ssa.image.repository | string | `"ghcr.io/configure8inc/c8-ssa"` |  |
+| ssa.image.tag | string | `"0.0.3"` |  |
+| ssa.ingress.annotations | object | `{}` |  |
+| ssa.ingress.enabled | bool | `true` |  |
+| ssa.ingress.ingressClassName | string | `""` |  |
+| ssa.ingress.labels | object | `{}` |  |
+| ssa.ingress.pathType | string | `"Prefix"` |  |
+| ssa.podAnnotations | object | `{}` |  |
+| ssa.podDisruptionBudget.enabled | bool | `false` |  |
+| ssa.podDisruptionBudget.minAvailable | string | `"50%"` |  |
+| ssa.podSecurityContext | object | `{}` |  |
+| ssa.replicaCount | int | `1` |  |
+| ssa.resources | object | `{}` |  |
+| ssa.securityContext | object | `{}` |  |
+| ssa.service.enabled | bool | `true` |  |
+| ssa.service.port | string | `"5000"` |  |
+| ssa.service.type | string | `"ClusterIP"` |  |
+| ssa.serviceAccount.annotations | object | `{}` |  |
+| ssa.serviceAccount.create | bool | `true` |  |
+| ssa.serviceAccount.name | string | `""` |  |
+
+----------------------------------------------
