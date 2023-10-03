@@ -27,10 +27,8 @@ spec:
       labels:
         c8app: "djm"
     spec:
-      {{- with .Values.common.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
       {{- if .Values.djm.serviceAccount.create }}
       serviceAccountName: {{ include "c8.serviceAccountNameDjm" . }}-djm
       {{- end }}
@@ -61,8 +59,8 @@ spec:
             value: {{ include "c8.serviceAccountNameDjm" . }}-djw
           - name: API_PREFIX
             value: {{ .Values.variables.DJM_API_PREFIX | quote }}
-          # - name: DB_AUTH_SOURCE
-          #   value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_AUTH_SOURCE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_AUTH_MECHANISM
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
           - name: DB_HOST
@@ -99,6 +97,8 @@ spec:
             value: {{ .Values.variables.DEEPLINK_URL | quote }}
           - name: DJW_IMAGE
             value: {{ .Values.djm.DJW_IMAGE | quote }}
+          - name: IMAGE_PULL_SECRET
+            value: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-params

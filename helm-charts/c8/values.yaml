@@ -18,7 +18,7 @@ frontend:
   image:
     repository: "ghcr.io/configure8inc/c8-frontend"
     pullPolicy: IfNotPresent
-    tag: "0.0.1"
+    tag: "0.0.3"
 
   replicaCount: 1
 
@@ -77,9 +77,24 @@ frontend:
 common:
   ingress:
     ingressClassName: ""
-  imagePullSecrets:
-    - name: c8-docker-registry-secret
+  IMAGE_PULL_SECRET: c8-docker-registry-secret
   C8_SECRET_NAME: c8-secret
+
+migration:
+  image:
+    repository: "ghcr.io/configure8inc/c8-migrations"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.3"
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
 
 backend:
   enabled: true
@@ -97,7 +112,7 @@ backend:
     repository: "ghcr.io/configure8inc/c8-backend"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.1"
+    tag: "0.0.3"
 
   service:
     type: ClusterIP
@@ -157,8 +172,8 @@ djm:
     repository: "ghcr.io/configure8inc/c8-djm"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.1"
-  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.1"
+    tag: "0.0.3"
+  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.3"
 
   container:
     port: "5000"
@@ -225,7 +240,7 @@ ssa:
     repository: "ghcr.io/configure8inc/c8-ssa"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.1"
+    tag: "0.0.3"
 
   container:
     port: "5000"
@@ -297,7 +312,7 @@ pns:
     repository: "ghcr.io/configure8inc/c8-pns"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.1"
+    tag: "0.0.3"
 
   container:
     port: "5000"
@@ -374,12 +389,10 @@ variables:
   SWAGGER_TITLE: "C8 Backend API"
 
   ##### SSA #########
-  # -- Unique secret key
-  API_KEY: ""
   # -- Used to define the relative path to the backend API, by default should be /self-service/api
   SSA_API_PREFIX: "/self-service/api" 
   # -- Description for the swagger file, usually shouldn't be changed
-  SSA_SWAGGER_DESCRIPTION: "Production Self Service API documentation"
+  SSA_SWAGGER_DESCRIPTION: "Self Service API documentation"
   # -- Enable or disable swagger documentation
   SSA_SWAGGER_ENABLED: "false"
   # -- Swagger documentation relative url, by default /self-service/api/docs
@@ -411,8 +424,6 @@ variables:
   ##### COMMON #########
   # -- Application timezone
   TZ: "America/New_York"
-  # -- Application version. Should be with the default value
-  VERSION: "v1.0.0"
   # -- RabbitMQ host
   RABBITMQ_HOST: ""
   # -- RabbitMQ port

@@ -29,10 +29,8 @@ spec:
       labels:
         c8app: "backend"
     spec:
-      {{- with .Values.common.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
       {{- if .Values.backend.serviceAccount.create }}
       serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}-backend
       {{- end }}
@@ -63,8 +61,8 @@ spec:
             value: {{ .Values.variables.AWS_REGION | quote }}
           - name: DB_AUTH_MECHANISM
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
-          # - name: DB_AUTH_SOURCE
-          #   value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_AUTH_SOURCE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_HOST
             value: {{ .Values.variables.DB_HOST | quote }}
           - name: DB_DATABASE

@@ -28,10 +28,8 @@ spec:
       labels:
         c8app: "frontend"
     spec:
-      {{- with .Values.common.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
       {{- if .Values.frontend.serviceAccount.create }}
       serviceAccountName: {{ include "c8.serviceAccountNameFront" . }}-frontend
       {{- end }}
