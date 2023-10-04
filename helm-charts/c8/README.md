@@ -33,7 +33,8 @@ kubectl create secret docker-registry c8-docker-registry-secret \
 --docker-server=ghcr.io \
 --docker-username=c8-user \
 --docker-password=<Token provided to you by the C8 team> \
---docker-email=<your email>`
+--docker-email=<your email>` \
+-n c8
 ```
 
 ## Step 3: Create C8 Application Secret
@@ -172,9 +173,17 @@ cat >trust-relationship.json <<EOF
     ]
 }
 EOF
-# Create an IAM role with a defined trust relationship and description
+```
+
+### Create an IAM role with a defined trust relationship and description
+
+```bash
 aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
-# Attach the sh-c8-discovery to the policy 
+```
+
+### Attach the sh-c8-discovery to the policy
+
+```bash
 aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy
 ```
 
@@ -198,7 +207,7 @@ Install the Helm chart with the desired configurations. Replace the placeholders
 
 ```bash
 helm upgrade -i sh-use2-c8 ./helm-charts/c8 \
-    -n sh \
+    -n c8 \
     --set variables.AWS_REGION='value' \
     --set variables.DB_HOST='value' \
     --set variables.DB_DATABASE='value' \
@@ -211,6 +220,10 @@ helm upgrade -i sh-use2-c8 ./helm-charts/c8 \
     --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
 
 ```
+
+Once you successfully install a Helm chart that includes Ingress configurations, the next vital step is to establish a CNAME record in your DNS settings. This is essential to map your domain name to the Ingress controller's service endpoint.
+
+Ensuring that the DNS propagates the new record correctly and securely linking it via TLS/SSL certificates (if applicable) will bolster both usability and security for end-users navigating to your c8 applications.
 
 ### Application Variables
 
