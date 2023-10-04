@@ -2,6 +2,8 @@
 
 This guide delineates the steps to deploy the Configure8 (C8) application on a Kubernetes cluster using a Helm chart. Please ensure that the following prerequisites are met before proceeding:
 
+![c8 helm chart](../../images/c8-app.png)
+
 ## Requirements
 
 1. A running Kubernetes version 1.22 or above to guarantee compatibility with the C8 App. Ensure the cluster has public internet access to fetch Docker images from repositories, specifically from GitHub.
