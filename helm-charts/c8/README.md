@@ -270,62 +270,69 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| backend.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | backend.autoscaling.enabled | bool | `false` |  |
 | backend.autoscaling.maxReplicas | int | `10` |  |
 | backend.autoscaling.minReplicas | int | `1` |  |
 | backend.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | backend.autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
 | backend.enabled | bool | `true` |  |
-| backend.image.pullPolicy | string | `"Always"` |  |
+| backend.image.pullPolicy | string | `"IfNotPresent"` |  |
 | backend.image.repository | string | `"ghcr.io/configure8inc/c8-backend"` |  |
 | backend.image.tag | string | `"0.0.3"` |  |
+| backend.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | backend.podAnnotations | object | `{}` |  |
-| backend.podDisruptionBudget.enabled | bool | `false` |  |
-| backend.podDisruptionBudget.minAvailable | string | `"50%"` |  |
+| backend.podDisruptionBudget.enabled | bool | `false` | Specifies whether pod disruption budget should be created |
+| backend.podDisruptionBudget.minAvailable | string | `"50%"` | Number or percentage of pods that must be available |
 | backend.podSecurityContext | object | `{}` |  |
 | backend.replicaCount | int | `1` |  |
 | backend.resources | object | `{}` |  |
 | backend.securityContext | object | `{}` |  |
-| backend.service.port | string | `"5000"` |  |
-| backend.service.type | string | `"ClusterIP"` |  |
-| backend.serviceAccount.annotations | object | `{}` |  |
-| backend.serviceAccount.create | bool | `true` |  |
-| backend.serviceAccount.name | string | `""` |  |
+| backend.service | object | `{"port":"5000","type":"ClusterIP"}` | Configuration for backend service |
+| backend.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| backend.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| backend.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| backend.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | common.C8_SECRET_NAME | string | `"c8-secret"` |  |
-| common.IMAGE_PULL_SECRET | string | `"c8-docker-registry-secret"` |  |
+| common.IMAGE_PULL_SECRET | string | `"c8-docker-registry-secret"` | image pull secrets |
+| common.ingress.annotations | object | `{}` |  |
+| common.ingress.enabled | bool | `true` | Enable ingress object for external access to the resources . Do not forget to add common.ingress.ingressClassName="" |
 | common.ingress.ingressClassName | string | `""` |  |
-| commonLabels | object | `{}` |  |
+| common.ingress.labels | object | `{}` |  |
+| common.ingress.pathType | string | `"Prefix"` |  |
+| commonLabels | object | `{}` | Labels to apply to all resources |
 | djm.DJW_IMAGE | string | `"ghcr.io/configure8inc/c8-djw:0.0.3"` |  |
+| djm.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | djm.container.port | string | `"5000"` |  |
 | djm.enabled | bool | `true` |  |
-| djm.image.pullPolicy | string | `"Always"` |  |
-| djm.image.repository | string | `"ghcr.io/configure8inc/c8-djm"` |  |
+| djm.image.pullPolicy | string | `"IfNotPresent"` |  |
+| djm.image.repository | string | `"ghcr.io/configure8inc/c8-djm"` | c8 docker image repository |
 | djm.image.tag | string | `"0.0.3"` |  |
+| djm.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | djm.podAnnotations | object | `{}` |  |
 | djm.podSecurityContext | object | `{}` |  |
 | djm.replicaCount | int | `1` |  |
 | djm.resources | object | `{}` |  |
 | djm.securityContext | object | `{}` |  |
-| djm.serviceAccount.annotations | object | `{}` |  |
-| djm.serviceAccount.create | bool | `true` |  |
-| djm.serviceAccount.job_worker.annotations | object | `{}` |  |
-| djm.serviceAccount.job_worker.name | string | `nil` |  |
-| djm.serviceAccount.name | string | `""` |  |
+| djm.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| djm.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| djm.serviceAccount.job_worker.annotations | object | `{}` | Annotations to add to the service account |
+| djm.serviceAccount.job_worker.name | string | `nil` | The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template |
+| djm.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| djm.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| frontend.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | frontend.autoscaling.enabled | bool | `false` |  |
 | frontend.autoscaling.maxReplicas | int | `10` |  |
 | frontend.autoscaling.minReplicas | int | `1` |  |
 | frontend.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | frontend.autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
 | frontend.enabled | bool | `true` |  |
-| frontend.image.pullPolicy | string | `"Always"` |  |
+| frontend.image.pullPolicy | string | `"IfNotPresent"` |  |
 | frontend.image.repository | string | `"ghcr.io/configure8inc/c8-frontend"` |  |
 | frontend.image.tag | string | `"0.0.3"` |  |
-| frontend.ingress.annotations | object | `{}` |  |
-| frontend.ingress.enabled | bool | `true` |  |
-| frontend.ingress.labels | object | `{}` |  |
-| frontend.ingress.pathType | string | `"Prefix"` |  |
 | frontend.limits.cpu | string | `"300m"` |  |
 | frontend.limits.memory | string | `"128Mi"` |  |
+| frontend.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | frontend.podAnnotations | object | `{}` |  |
 | frontend.podDisruptionBudget.enabled | bool | `false` |  |
 | frontend.podDisruptionBudget.minAvailable | string | `"50%"` |  |
@@ -335,19 +342,23 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | frontend.requests.memory | string | `"128Mi"` |  |
 | frontend.resources | object | `{}` |  |
 | frontend.securityContext | object | `{}` |  |
-| frontend.service.port | string | `"80"` |  |
-| frontend.service.type | string | `"ClusterIP"` |  |
+| frontend.service | object | `{"port":"80","type":"ClusterIP"}` | Configuration for frontend service |
 | frontend.serviceAccount.annotations | object | `{}` |  |
 | frontend.serviceAccount.create | bool | `false` |  |
 | frontend.serviceAccount.name | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| migration.image.pullPolicy | string | `"Always"` |  |
+| frontend.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources |
+| migration.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
+| migration.image.pullPolicy | string | `"IfNotPresent"` |  |
 | migration.image.repository | string | `"ghcr.io/configure8inc/c8-migrations"` |  |
 | migration.image.tag | string | `"0.0.3"` |  |
+| migration.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | migration.serviceAccount.annotations | object | `{}` |  |
 | migration.serviceAccount.create | bool | `false` |  |
 | migration.serviceAccount.name | string | `""` |  |
-| nameOverride | string | `""` |  |
+| migration.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| nameOverride | string | `""` | Provide a name in place of c8 for `app:` labels |
+| pns.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | pns.autoscaling.enabled | bool | `false` |  |
 | pns.autoscaling.maxReplicas | int | `10` |  |
 | pns.autoscaling.minReplicas | int | `1` |  |
@@ -355,9 +366,10 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
 | pns.container.port | string | `"5000"` |  |
 | pns.enabled | bool | `true` |  |
-| pns.image.pullPolicy | string | `"Always"` |  |
+| pns.image.pullPolicy | string | `"IfNotPresent"` |  |
 | pns.image.repository | string | `"ghcr.io/configure8inc/c8-pns"` |  |
 | pns.image.tag | string | `"0.0.3"` |  |
+| pns.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | pns.podAnnotations | object | `{}` |  |
 | pns.podDisruptionBudget.enabled | bool | `false` |  |
 | pns.podDisruptionBudget.minAvailable | string | `"50%"` |  |
@@ -365,15 +377,15 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.replicaCount | int | `1` |  |
 | pns.resources | object | `{}` |  |
 | pns.securityContext | object | `{}` |  |
-| pns.service.enabled | bool | `true` |  |
-| pns.service.port | string | `"5000"` |  |
-| pns.service.type | string | `"ClusterIP"` |  |
-| pns.serviceAccount.annotations | object | `{}` |  |
-| pns.serviceAccount.create | bool | `true` |  |
-| pns.serviceAccount.name | string | `""` |  |
+| pns.service | object | `{"enabled":true,"port":"5000","type":"ClusterIP"}` | Configuration for pns service |
+| pns.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| pns.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| pns.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| pns.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| ssa.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | ssa.container.port | string | `"5000"` |  |
 | ssa.enabled | bool | `true` |  |
-| ssa.image.pullPolicy | string | `"Always"` |  |
+| ssa.image.pullPolicy | string | `"IfNotPresent"` |  |
 | ssa.image.repository | string | `"ghcr.io/configure8inc/c8-ssa"` |  |
 | ssa.image.tag | string | `"0.0.3"` |  |
 | ssa.ingress.annotations | object | `{}` |  |
@@ -381,18 +393,18 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.ingress.ingressClassName | string | `""` |  |
 | ssa.ingress.labels | object | `{}` |  |
 | ssa.ingress.pathType | string | `"Prefix"` |  |
+| ssa.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | ssa.podAnnotations | object | `{}` |  |
-| ssa.podDisruptionBudget.enabled | bool | `false` |  |
-| ssa.podDisruptionBudget.minAvailable | string | `"50%"` |  |
+| ssa.podDisruptionBudget.enabled | bool | `false` | Specifies whether pod disruption budget should be created |
+| ssa.podDisruptionBudget.minAvailable | string | `"50%"` | Number or percentage of pods that must be available |
 | ssa.podSecurityContext | object | `{}` |  |
 | ssa.replicaCount | int | `1` |  |
 | ssa.resources | object | `{}` |  |
 | ssa.securityContext | object | `{}` |  |
-| ssa.service.enabled | bool | `true` |  |
-| ssa.service.port | string | `"5000"` |  |
-| ssa.service.type | string | `"ClusterIP"` |  |
-| ssa.serviceAccount.annotations | object | `{}` |  |
-| ssa.serviceAccount.create | bool | `true` |  |
-| ssa.serviceAccount.name | string | `""` |  |
+| ssa.service | object | `{"enabled":true,"port":"5000","type":"ClusterIP"}` | Configuration for ssa service |
+| ssa.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| ssa.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| ssa.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| ssa.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 
 ----------------------------------------------
