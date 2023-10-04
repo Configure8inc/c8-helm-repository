@@ -110,15 +110,15 @@ cat >trust-relationship-sa.json <<EOF
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::$account_id:oidc-provider/$oidc_provider"
+        "Federated": "arn:aws:iam::${account_id}:oidc-provider/${oidc_provider}"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "$oidc_provider:aud": "sts.amazonaws.com",
-          "$oidc_provider:sub": [
-            "system:serviceaccount:$namespace:$service_account_c8_app",
-            "system:serviceaccount:$namespace:$service_account_c8_djw"
+          "${oidc_provider}:aud": "sts.amazonaws.com",
+          "${oidc_provider}:sub": [
+            "system:serviceaccount:${namespace}:${service_account_c8_app}",
+            "system:serviceaccount:${namespace}:${service_account_c8_djw}"
           ]
         }
       }
@@ -166,7 +166,7 @@ cat >trust-relationship.json <<EOF
         {
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::$account_id:role/sh-c8-service-account"
+                "AWS": "arn:aws:iam::${account_id}:role/sh-c8-service-account"
             },
             "Action": "sts:AssumeRole"
         }
