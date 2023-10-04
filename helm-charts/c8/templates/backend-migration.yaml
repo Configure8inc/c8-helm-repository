@@ -60,15 +60,15 @@ spec:
                 name: {{ include "c8.fullname" . }}-params
             - secretRef:
                 name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.migration.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with .Values.migration.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.migration.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
