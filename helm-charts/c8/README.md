@@ -206,7 +206,7 @@ helm repo update
 Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
 
 ```bash
-helm upgrade -i sh-use2-c8 ./helm-charts/c8 \
+helm upgrade -i sh-c8 ./helm-charts/c8 \
     -n c8 \
     --set variables.AWS_REGION='value' \
     --set variables.DB_HOST='value' \
