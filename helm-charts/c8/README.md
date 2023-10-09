@@ -1,6 +1,6 @@
 # Configure8 Self-Hosted Helm Chart Deployment Guide
 
-This guide delineates the steps to deploy the Configure8 (C8) application on a Kubernetes cluster using a Helm chart. Please ensure that the following prerequisites are met before proceeding:
+This guide delineates the steps to deploy the Configure8 (C8) application on a Kubernetes cluster using a Helm chart.
 
 <p align="center">
   <img src="../../images/c8-app.png" alt="C8 helm chart" width="300" />
@@ -12,7 +12,7 @@ This guide delineates the steps to deploy the Configure8 (C8) application on a K
 2. A user with sufficient cluster access privileges to install the C8 app.
 3. The [Helm Package Manager](https://helm.sh/).
 4. A token provided by the C8 team for adding image pull secrets to the cluster.
-5. A __MongoDB__ database must be set up, optimized, and accessible by the Kubernetes cluster.
+5. A __MongoDB__ database must be set up, and accessible by the Kubernetes cluster.
 6. A __RabbitMQ__ cluster must be set up for managing message queues within the C8 application.
 7. An __OpenSearch__ cluster must be set up for robust search functionality and data analytics within the C8 app.
 
@@ -231,7 +231,7 @@ The table below lists the key application variables that can be configured durin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| variables.API_PREFIX | string | `"/api/v1"` | Used to define the relative path to the backend API, by default should be /api.v1 |
+| variables.API_PREFIX | string | `"/api/v1"` | Used to define the relative path to the backend API |
 | variables.AWS_REGION | string | `"na"` | Deprecated and not needed anymore, so will be deleted soon |
 | variables.DB_AUTH_MECHANISM | string | `"SCRAM-SHA-1"` | The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one |
 | variables.DB_DATABASE | string | `"c8"` | Database name |
