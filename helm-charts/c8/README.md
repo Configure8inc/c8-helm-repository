@@ -240,7 +240,7 @@ The table below lists the key application variables that can be configured durin
 | variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
 | variables.DEFAULT_SENDER | string | `"notifications@configure8.io"` |  |
 | variables.DISCOVERY_CONTAINER_NAME | string | `"c8-discovery-job-worker"` | Workers container names |
-| variables.DJM_API_PREFIX | string | `"/api/v1"` | Required for the health checks, should be by default /api/v1 |
+| variables.DJM_API_PREFIX | string | `"/api/v1"` | Required for the health checks |
 | variables.DJW_TRACK_ENTITY_LINEAGE | string | `"true"` | Storing diff information for the resources |
 | variables.HOOKS_CALLBACK_URL | string | `""` | Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io |
 | variables.JOB_DEAD_TIMEOUT_HOURS | string | `"3"` | Maximum hours for the job execution |
@@ -259,7 +259,7 @@ The table below lists the key application variables that can be configured durin
 | variables.SSA_SWAGGER_TITLE | string | `"C8 Self-Service API"` | Swagger documentation title |
 | variables.SWAGGER_DESCRIPTION | string | `"C8 API"` | Description for the swagger file, usually shouldn't be changed |
 | variables.SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
-| variables.SWAGGER_PREFIX | string | `"na"` | Swagger documentation relative url, by default /docs |
+| variables.SWAGGER_PREFIX | string | `"/docs"` | Swagger documentation relative url |
 | variables.SWAGGER_TITLE | string | `"C8 Backend API"` | Swagger documentation title |
 | variables.TZ | string | `"America/New_York"` | Application timezone |
 | variables.USE_K8 | string | `"true"` | For the production should be true |
@@ -291,12 +291,12 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.service | object | `{"port":"5000","type":"ClusterIP"}` | Configuration for backend service |
 | backend.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | backend.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| backend.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| backend.serviceAccount.name | string | `""` | The name of the service account to use. If not set and backend.serviceAccount.create is true, a name is generated using the fullname template |
 | backend.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | common.C8_SECRET_NAME | string | `"c8-secret"` |  |
-| common.IMAGE_PULL_SECRET | string | `"c8-docker-registry-secret"` | image pull secrets |
+| common.IMAGE_PULL_SECRET | string | `"c8-docker-registry-secret"` | Image pull secrets |
 | common.ingress.annotations | object | `{}` |  |
-| common.ingress.enabled | bool | `true` | Enable ingress object for external access to the resources . Do not forget to add common.ingress.ingressClassName="" |
+| common.ingress.enabled | bool | `true` | Enable ingress object for external access to the resources. Do not forget to add common.ingress.ingressClassName="" |
 | common.ingress.ingressClassName | string | `""` |  |
 | common.ingress.labels | object | `{}` |  |
 | common.ingress.pathType | string | `"Prefix"` |  |
@@ -317,8 +317,8 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | djm.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | djm.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | djm.serviceAccount.job_worker.annotations | object | `{}` | Annotations to add to the service account |
-| djm.serviceAccount.job_worker.name | string | `nil` | The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template |
-| djm.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| djm.serviceAccount.job_worker.name | string | `nil` | The name of the djw service account to use. If not set and djm.serviceAccount.create is true, a name is generated using the fullname template |
+| djm.serviceAccount.name | string | `""` | The name of the service account to use. If not set and djm.serviceAccount.create is true, a name is generated using the fullname template |
 | djm.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | frontend.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | frontend.autoscaling.enabled | bool | `false` |  |
@@ -380,7 +380,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.service | object | `{"enabled":true,"port":"5000","type":"ClusterIP"}` | Configuration for pns service |
 | pns.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | pns.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| pns.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| pns.serviceAccount.name | string | `""` | The name of the service account to use. If not set and pns.serviceAccount.create is true, a name is generated using the fullname template |
 | pns.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | ssa.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | ssa.container.port | string | `"5000"` |  |
@@ -404,7 +404,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.service | object | `{"enabled":true,"port":"5000","type":"ClusterIP"}` | Configuration for ssa service |
 | ssa.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | ssa.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| ssa.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| ssa.serviceAccount.name | string | `""` | The name of the service account to use. If not set and ssa.serviceAccount.create is true, a name is generated using the fullname template |
 | ssa.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 
 ----------------------------------------------
