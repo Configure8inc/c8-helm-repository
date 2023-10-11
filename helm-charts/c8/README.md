@@ -9,7 +9,7 @@ This guide delineates the steps to deploy the Configure8 (C8) application on a K
 ## Requirements
 
 1. A running Kubernetes version 1.22 or above to guarantee compatibility with the C8 App. Ensure the cluster has public internet access to fetch Docker images from repositories, specifically from GitHub.
-2. A user with sufficient cluster access privileges to install the C8 app.
+2. A Kubernetes user with sufficient cluster access privileges to install the C8 app.
 3. The [Helm Package Manager](https://helm.sh/).
 4. The [Kubectl](https://kubernetes.io/docs/tasks/tools/)
 5. The [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
