@@ -35,7 +35,7 @@ spec:
       securityContext:
         {{- toYaml .Values.pns.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "c8.fullname" . }}-pns
           securityContext:
             {{- toYaml .Values.pns.securityContext | nindent 12 }}
           image: "{{ .Values.pns.image.repository }}:{{ .Values.pns.image.tag }}"

@@ -217,7 +217,14 @@ djm:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "0.0.3"
-  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.3"
+
+  # -- Discovery job worker image
+  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.7"
+
+  # -- Discovery job worker NodeSelector key
+  DJW_NODE_SELECTOR_KEY: ""
+  # -- Discovery job worker NodeSelector value
+  DJW_NODE_SELECTOR_VALUE: ""
 
   container:
     port: "5000"

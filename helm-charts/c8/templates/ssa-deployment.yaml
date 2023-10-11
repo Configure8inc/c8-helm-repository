@@ -34,7 +34,7 @@ spec:
       securityContext:
         {{- toYaml .Values.ssa.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "c8.fullname" . }}-ssa
           securityContext:
             {{- toYaml .Values.ssa.securityContext | nindent 12 }}
           image: "{{ .Values.ssa.image.repository }}:{{ .Values.ssa.image.tag }}"

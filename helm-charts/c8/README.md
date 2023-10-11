@@ -11,10 +11,12 @@ This guide delineates the steps to deploy the Configure8 (C8) application on a K
 1. A running Kubernetes version 1.22 or above to guarantee compatibility with the C8 App. Ensure the cluster has public internet access to fetch Docker images from repositories, specifically from GitHub.
 2. A user with sufficient cluster access privileges to install the C8 app.
 3. The [Helm Package Manager](https://helm.sh/).
-4. A token provided by the C8 team for adding image pull secrets to the cluster.
-5. A __MongoDB__ database must be set up, and accessible by the Kubernetes cluster.
-6. A __RabbitMQ__ cluster must be set up for managing message queues within the C8 application.
-7. An __OpenSearch__ cluster must be set up for robust search functionality and data analytics within the C8 app.
+4. The [Kubectl](https://kubernetes.io/docs/tasks/tools/)
+5. The [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+6. A token provided by the C8 team for adding image pull secrets to the cluster.
+7. A __MongoDB__ database must be set up, and accessible by the Kubernetes cluster.
+8. A __RabbitMQ__ cluster must be set up for managing message queues within the C8 application.
+9. An __OpenSearch__ cluster must be set up for robust search functionality and data analytics within the C8 app.
 
 ## Step 1: Creating a Namespace
 

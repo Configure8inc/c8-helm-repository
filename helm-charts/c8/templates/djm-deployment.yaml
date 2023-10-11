@@ -35,7 +35,7 @@ spec:
       securityContext:
         {{- toYaml .Values.djm.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "c8.fullname" . }}-djm
           securityContext:
             {{- toYaml .Values.djm.securityContext | nindent 12 }}
           image: "{{ .Values.djm.image.repository }}:{{ .Values.djm.image.tag }}"
@@ -99,6 +99,14 @@ spec:
             value: {{ .Values.djm.DJW_IMAGE | quote }}
           - name: IMAGE_PULL_SECRET
             value: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+          {{- if .Values.djm.DJW_NODE_SELECTOR_KEY }}
+          - name: DJW_NODE_SELECTOR_KEY
+            value: {{ .Values.djm.DJW_NODE_SELECTOR_KEY | quote }}
+          {{- end }}
+          {{- if .Values.djm.DJW_NODE_SELECTOR_VALUE }}
+          - name: DJW_NODE_SELECTOR_VALUE
+            value: {{ .Values.djm.DJW_NODE_SELECTOR_VALUE | quote }}
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-params
