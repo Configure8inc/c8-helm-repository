@@ -438,8 +438,8 @@ variables:
   ##### C8 #########
   # -- Used to define the relative path to the backend API, by default should be /api.v1
   API_PREFIX: "/api/v1"
-  # -- Deprecated and not needed anymore, so will be deleted soon
-  AWS_REGION: "na"
+  # -- The region what actually we use with AWS integration
+  AWS_REGION: "us-east-1"
   # -- Url on which the application will be available. For example https://configure8.my-company.io
   DEEPLINK_URL: ""
   # -- Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io
@@ -456,7 +456,7 @@ variables:
   SWAGGER_TITLE: "C8 Backend API"
 
   ##### SSA #########
-  # -- Used to define the relative path to the backend API, by default should be /self-service/api
+  # -- Used to define the relative path to the backend API, for production should be with default value
   SSA_API_PREFIX: "/self-service/api" 
   # -- Description for the swagger file, usually shouldn't be changed
   SSA_SWAGGER_DESCRIPTION: "Self Service API documentation"
@@ -478,7 +478,7 @@ variables:
   JOB_DEAD_TIMEOUT_HOURS: "3"
   # -- list of the jobs that are going to be executed by discovery manager
   JOB_TYPES: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
-  # -- Determines the time when the schedule should be checked
+  # -- Determines the time when the schedule should be checked in MS
   LOOP_SLEEP_TIME: "10000"
   # -- Maximum simultaneously executed jobs
   MAX_JOB_LIMIT: "10"
