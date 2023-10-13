@@ -175,7 +175,7 @@ backend:
   # fsGroup: 2000
 
   securityContext:
-    {}
+    {} 
     # capabilities:
     #   drop:
     #   - ALL
@@ -472,7 +472,7 @@ variables:
   DJM_API_PREFIX: "/api/v1"
   # -- Workers container names
   DISCOVERY_CONTAINER_NAME: "c8-discovery-job-worker"
-  # -- Storing diff information for the resources
+  # -- Storing diff information for the resources when something been changed
   DJW_TRACK_ENTITY_LINEAGE: "true"
   # -- Maximum hours for the job execution
   JOB_DEAD_TIMEOUT_HOURS: "3"
@@ -482,7 +482,7 @@ variables:
   LOOP_SLEEP_TIME: "10000"
   # -- Maximum simultaneously executed jobs
   MAX_JOB_LIMIT: "10"
-  # -- For the production should be true
+  # -- For the production should be true, should be used only by qualified C8 developers
   USE_K8: "true"
 
   ##### NPS #########
@@ -495,7 +495,7 @@ variables:
   RABBITMQ_HOST: ""
   # -- RabbitMQ port
   RABBITMQ_PORT: 5672
-  # -- The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one
+  # -- The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by mongodb
   DB_AUTH_MECHANISM: "SCRAM-SHA-1"
   # -- Database host
   DB_HOST: ""
