@@ -83,16 +83,6 @@ spec:
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
-          - name: DJW_TRACK_ENTITY_LINEAGE
-            value: {{ .Values.variables.DJW_TRACK_ENTITY_LINEAGE | quote }}
-          - name: JOB_DEAD_TIMEOUT_HOURS
-            value: {{ .Values.variables.JOB_DEAD_TIMEOUT_HOURS | quote }}
-          - name: JOB_TYPES
-            value: {{ .Values.variables.JOB_TYPES | quote }}
-          - name: LOOP_SLEEP_TIME
-            value: {{ .Values.variables.LOOP_SLEEP_TIME | quote }}
-          - name: MAX_JOB_LIMIT
-            value: {{ .Values.variables.MAX_JOB_LIMIT | quote }}
           - name: DJW_APP_URL
             value: {{ .Values.variables.DEEPLINK_URL | quote }}
           - name: DJW_IMAGE
@@ -109,7 +99,9 @@ spec:
           {{- end }}
           envFrom:
             - configMapRef:
-                name: {{ include "c8.fullname" . }}-params
+                name: {{ include "c8.fullname" . }}-common-params
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-djm-params
             - secretRef:
                 name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
       {{- with .Values.djm.nodeSelector }}

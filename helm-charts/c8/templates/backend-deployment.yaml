@@ -55,8 +55,6 @@ spec:
           env:
           - name: SERVICE
             value: "c8app"
-          - name: API_PREFIX
-            value: {{ .Values.variables.API_PREFIX | quote }}
           - name: AWS_REGION
             value: {{ .Values.variables.AWS_REGION | quote }}
           - name: DB_AUTH_MECHANISM
@@ -79,21 +77,17 @@ spec:
             value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
           - name: SSA_URL
             value: {{ $ssaUrl }}
-          - name: SWAGGER_DESCRIPTION
-            value: {{ .Values.variables.SWAGGER_DESCRIPTION | quote }}
           - name: SWAGGER_ENABLED
             value: {{ .Values.variables.SWAGGER_ENABLED | quote }}
-          - name: SWAGGER_PREFIX
-            value: {{ .Values.variables.SWAGGER_PREFIX | quote }}
-          - name: SWAGGER_TITLE
-            value: {{ .Values.variables.SWAGGER_TITLE | quote }}
           - name: RABBITMQ_HOST
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
           envFrom:
             - configMapRef:
-                name: {{ include "c8.fullname" . }}-params
+                name: {{ include "c8.fullname" . }}-common-params
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-backend-params
             - secretRef:
                 name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
       {{- with .Values.backend.nodeSelector }}

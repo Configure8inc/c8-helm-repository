@@ -236,39 +236,22 @@ The table below lists the key application variables that can be configured durin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| variables.API_PREFIX | string | `"/api/v1"` | Used to define the relative path to the backend API |
-| variables.AWS_REGION | string | `"na"` | Deprecated and not needed anymore, so will be deleted soon |
-| variables.DB_AUTH_MECHANISM | string | `"SCRAM-SHA-1"` | The mechanism of how to authenticate with the database. Might be 'mqlDriver' for atlas mongodb or SCRAM-SHA-1 for regular one |
+| variables.AWS_REGION | string | `"us-east-1"` | The region what actually we use with AWS integration |
+| variables.DB_AUTH_MECHANISM | string | `"SCRAM-SHA-1"` | The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by mongodb |
 | variables.DB_DATABASE | string | `"c8"` | Database name |
 | variables.DB_HOST | string | `""` | Database host |
 | variables.DB_PORT | string | `"27017"` | Database port |
 | variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
 | variables.DEFAULT_SENDER | string | `"notifications@configure8.io"` |  |
-| variables.DISCOVERY_CONTAINER_NAME | string | `"c8-discovery-job-worker"` | Workers container names |
-| variables.DJM_API_PREFIX | string | `"/api/v1"` | Required for the health checks |
-| variables.DJW_TRACK_ENTITY_LINEAGE | string | `"true"` | Storing diff information for the resources |
 | variables.HOOKS_CALLBACK_URL | string | `""` | Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io |
-| variables.JOB_DEAD_TIMEOUT_HOURS | string | `"3"` | Maximum hours for the job execution |
-| variables.JOB_TYPES | string | `"DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"` | list of the jobs that are going to be executed by discovery manager |
-| variables.LOOP_SLEEP_TIME | string | `"10000"` | Determines the time when the schedule should be checked |
-| variables.MAX_JOB_LIMIT | string | `"10"` | Maximum simultaneously executed jobs |
 | variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
 | variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
 | variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
-| variables.SSA_API_PREFIX | string | `"/self-service/api"` | Used to define the relative path to the backend API, by default should be /self-service/api |
-| variables.SSA_SWAGGER_DESCRIPTION | string | `"Self Service API documentation"` | Description for the swagger file, usually shouldn't be changed |
 | variables.SSA_SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
-| variables.SSA_SWAGGER_PREFIX | string | `"/self-service/api/docs"` | Swagger documentation relative url, by default /self-service/api/docs |
-| variables.SSA_SWAGGER_TITLE | string | `"C8 Self-Service API"` | Swagger documentation title |
-| variables.SWAGGER_DESCRIPTION | string | `"C8 API"` | Description for the swagger file, usually shouldn't be changed |
 | variables.SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
-| variables.SWAGGER_PREFIX | string | `"/docs"` | Swagger documentation relative url |
-| variables.SWAGGER_TITLE | string | `"C8 Backend API"` | Swagger documentation title |
 | variables.TZ | string | `"America/New_York"` | Application timezone |
-| variables.USE_K8 | string | `"true"` | For the production should be true |
-
 ### The C8 Helm Chart Parameters
 
 The table below shows configurable parameters when deploying the C8 Helm chart:

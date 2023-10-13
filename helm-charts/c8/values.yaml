@@ -436,8 +436,6 @@ pns:
 
 variables:
   ##### C8 #########
-  # -- Used to define the relative path to the backend API, by default should be /api.v1
-  API_PREFIX: "/api/v1"
   # -- The region what actually we use with AWS integration
   AWS_REGION: "us-east-1"
   # -- Url on which the application will be available. For example https://configure8.my-company.io
@@ -446,45 +444,13 @@ variables:
   HOOKS_CALLBACK_URL: ""
   # -- Application analytics segment key
   SEGMENT_KEY: "na"
-  # -- Description for the swagger file, usually shouldn't be changed
-  SWAGGER_DESCRIPTION: "C8 API"
   # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
-  # -- Swagger documentation relative url, by default /docs
-  SWAGGER_PREFIX: "na"
-  # -- Swagger documentation title
-  SWAGGER_TITLE: "C8 Backend API"
 
   ##### SSA #########
-  # -- Used to define the relative path to the backend API, for production should be with default value
-  SSA_API_PREFIX: "/self-service/api" 
-  # -- Description for the swagger file, usually shouldn't be changed
-  SSA_SWAGGER_DESCRIPTION: "Self Service API documentation"
   # -- Enable or disable swagger documentation
   SSA_SWAGGER_ENABLED: "false"
-  # -- Swagger documentation relative url, by default /self-service/api/docs
-  SSA_SWAGGER_PREFIX: "/self-service/api/docs"
-  # -- Swagger documentation title
-  SSA_SWAGGER_TITLE: "C8 Self-Service API"
-
-  ##### DJM #########
-  # -- Required for the health checks, should be by default /api/v1
-  DJM_API_PREFIX: "/api/v1"
-  # -- Workers container names
-  DISCOVERY_CONTAINER_NAME: "c8-discovery-job-worker"
-  # -- Storing diff information for the resources when something been changed
-  DJW_TRACK_ENTITY_LINEAGE: "true"
-  # -- Maximum hours for the job execution
-  JOB_DEAD_TIMEOUT_HOURS: "3"
-  # -- list of the jobs that are going to be executed by discovery manager
-  JOB_TYPES: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
-  # -- Determines the time when the schedule should be checked in MS
-  LOOP_SLEEP_TIME: "10000"
-  # -- Maximum simultaneously executed jobs
-  MAX_JOB_LIMIT: "10"
-  # -- For the production should be true, should be used only by qualified C8 developers
-  USE_K8: "true"
-
+  
   ##### NPS #########
   DEFAULT_SENDER: "notifications@configure8.io"
 

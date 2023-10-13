@@ -71,17 +71,13 @@ spec:
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
           - name: MONGO_DRIVER_TYPE
             value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
-          - name: SWAGGER_DESCRIPTION
-            value: {{ .Values.variables.SSA_SWAGGER_DESCRIPTION | quote }}
           - name: SWAGGER_ENABLED
             value: {{ .Values.variables.SSA_SWAGGER_ENABLED | quote }}
-          - name: SWAGGER_PREFIX
-            value: {{ .Values.variables.SSA_SWAGGER_PREFIX | quote }}
-          - name: SWAGGER_TITLE
-            value: {{ .Values.variables.SSA_SWAGGER_TITLE | quote }}
           envFrom:
             - configMapRef:
-                name: {{ include "c8.fullname" . }}-params
+                name: {{ include "c8.fullname" . }}-common-params
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-ssa-params
             - secretRef:
                 name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
       {{- with .Values.ssa.nodeSelector }}

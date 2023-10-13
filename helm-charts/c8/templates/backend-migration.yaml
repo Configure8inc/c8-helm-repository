@@ -57,7 +57,7 @@ spec:
             value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
           envFrom:
             - configMapRef:
-                name: {{ include "c8.fullname" . }}-params
+                name: {{ include "c8.fullname" . }}-common-params
             - secretRef:
                 name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
       {{- with .Values.migration.nodeSelector }}
