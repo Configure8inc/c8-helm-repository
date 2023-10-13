@@ -61,7 +61,7 @@ spec:
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
           envFrom:
             - configMapRef:
-                name: {{ include "c8.fullname" . }}-params
+                name: {{ include "c8.fullname" . }}-common-params
             - secretRef:
                 name: c8-secret
       {{- with .Values.pns.nodeSelector }}

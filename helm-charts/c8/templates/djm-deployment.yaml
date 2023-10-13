@@ -57,8 +57,6 @@ spec:
             value: "discovery-job-worker"
           - name: DJW_SERVICE_ACCOUNT_NAME
             value: {{ include "c8.serviceAccountNameDjm" . }}-djw
-          - name: API_PREFIX
-            value: {{ .Values.variables.DJM_API_PREFIX | quote }}
           - name: DB_AUTH_SOURCE
             value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_AUTH_MECHANISM
