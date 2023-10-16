@@ -1,0 +1,68 @@
+{{- if .Values.common.ingress.enabled -}}
+{{- $ingressApiIsStable := eq (include "c8.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsIngressClassName := eq (include "c8.ingress.supportsIngressClassName" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "c8.ingress.supportsPathType" .) "true" -}}
+{{- $fullName := include "c8.fullname" . -}}
+{{- $servicePortFrontend := .Values.frontend.service.port -}}
+{{- $servicePortSsa := .Values.ssa.service.port -}}
+{{- $ingressPathType := .Values.common.ingress.pathType -}}
+{{- $ingressPathTypeSaa := .Values.ssa.ingress.pathType -}}
+apiVersion: {{ include "c8.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-common
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.common.ingress.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.common.ingress.annotations }}
+  annotations:
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  {{- if and $ingressSupportsIngressClassName .Values.common.ingress.ingressClassName  }}
+  ingressClassName: {{ .Values.common.ingress.ingressClassName }}
+  {{- end -}}
+  {{- with .Values.common.ingress.tls }}
+  tls:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.variables.DEEPLINK_URL | replace "https://" "" }}
+      http:
+        paths:
+          - path: /
+            {{- if $ingressSupportsPathType }}
+            pathType: {{ $ingressPathType }}
+            {{- end }}
+            backend:
+              {{- if $ingressApiIsStable }}
+              service:
+                name: {{ $fullName }}-frontend
+                port:
+                  number: {{ $servicePortFrontend }}
+              {{- else }}
+              serviceName: {{ $fullName }}-frontend
+              servicePort: {{ $servicePortFrontend }}
+              {{- end }}
+          - path: /self-service/api
+            {{- if $ingressSupportsPathType }}
+            pathType: {{ $ingressPathTypeSaa }}
+            {{- end }}
+            backend:
+              {{- if $ingressApiIsStable }}
+              service:
+                name: {{ $fullName }}-ssa
+                port:
+                  number: {{ $servicePortSsa }}
+              {{- else }}
+              serviceName: {{ $fullName }}-ssa
+              servicePort: {{ $servicePortSsa }}
+              {{- end }}
+{{- end }}

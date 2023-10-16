@@ -1,0 +1,13 @@
+{{- if .Values.backend.enabled }}
+{{- if .Values.frontend.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "c8.fullname" . }}-frontend-pdb
+spec:
+  minAvailable: "{{ default "50%" .Values.frontend.podDisruptionBudget.minAvailable }}"
+  selector:
+    matchLabels:
+      c8app: "frontend"
+{{- end }}
+{{- end }}

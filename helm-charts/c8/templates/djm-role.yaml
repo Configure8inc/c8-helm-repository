@@ -1,0 +1,16 @@
+{{- if .Values.djm.enabled }}
+{{- if .Values.djm.serviceAccount.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "c8.fullname" . }}-djm-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "c8.serviceAccountNameDjm" . }}-djm
+    namespace: {{ .Release.Namespace }}
+{{- end }}
+{{- end }}

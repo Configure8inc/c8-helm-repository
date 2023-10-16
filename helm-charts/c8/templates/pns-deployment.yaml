@@ -1,0 +1,79 @@
+{{- if .Values.pns.enabled -}}
+{{- $chartname := .Chart.Name }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c8.fullname" . }}-pns
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.pns.replicaCount }}
+  {{- if .Values.pns.updateStrategy }}
+  strategy:
+    {{ toYaml .Values.pns.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      c8app: "pns"
+  template:
+    metadata:
+      {{- with .Values.pns.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        c8app: "pns"
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+      {{- if .Values.pns.serviceAccount.create }}
+      serviceAccountName: {{ include "c8.serviceAccountNamePns" . }}-pns
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.pns.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "c8.fullname" . }}-pns
+          securityContext:
+            {{- toYaml .Values.pns.securityContext | nindent 12 }}
+          image: "{{ .Values.pns.image.repository }}:{{ .Values.pns.image.tag }}"
+          imagePullPolicy: {{ .Values.pns.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.pns.container.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.pns.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.pns.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.pns.resources | nindent 12 }}
+          env:
+          - name: SERVICE
+            value: "platform-notification-service"
+          - name: DEFAULT_SENDER
+            value: {{ .Values.variables.DEFAULT_SENDER | quote }}
+          - name: RABBITMQ_HOST
+            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
+          - name: RABBITMQ_PORT
+            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-common-params
+            - secretRef:
+                name: c8-secret
+      {{- with .Values.pns.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pns.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pns.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

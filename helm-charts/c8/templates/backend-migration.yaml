@@ -1,0 +1,75 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "c8.fullname" . }}-migration
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded"
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      {{- with .Values.backend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        c8app: "migration"
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+      {{- if .Values.migration.serviceAccount.create }}
+      serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}-migration
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.migration.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.migration.image.repository }}:{{ .Values.migration.image.tag }}"
+          imagePullPolicy: {{ .Values.migration.image.pullPolicy }}
+          command:
+            {{- if .Values.commandOverride }}
+            {{- toYaml .Values.commandOverride | nindent 12 }}
+            {{- else }}
+            - "yarn"
+            - "start"
+            {{- end }}
+          env:
+          - name: DB_AUTH_MECHANISM
+            value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
+          - name: DB_AUTH_SOURCE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_HOST
+            value: {{ .Values.variables.DB_HOST | quote }}
+          - name: DB_DATABASE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_PORT
+            value: {{ .Values.variables.DB_PORT | quote }}
+          - name: MONGO_DRIVER_TYPE
+            value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-common-params
+            - secretRef:
+                name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
+      {{- with .Values.migration.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migration.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migration.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: "Never"

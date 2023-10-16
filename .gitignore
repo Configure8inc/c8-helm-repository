@@ -4,3 +4,4 @@ ignore
 .DS_Store
 .AppleDouble
 .LSOverride
+ignore/**

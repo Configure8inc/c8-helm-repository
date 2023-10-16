@@ -1,0 +1,117 @@
+{{- if .Values.djm.enabled }}
+{{- $chartname := .Chart.Name }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c8.fullname" . }}-djm
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ default "1" .Values.djm.replicaCount }}
+  {{- if .Values.djm.updateStrategy }}
+  strategy:
+    {{ toYaml .Values.djm.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      c8app: "djm"
+  template:
+    metadata:
+      {{- with .Values.djm.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        c8app: "djm"
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+      {{- if .Values.djm.serviceAccount.create }}
+      serviceAccountName: {{ include "c8.serviceAccountNameDjm" . }}-djm
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.djm.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "c8.fullname" . }}-djm
+          securityContext:
+            {{- toYaml .Values.djm.securityContext | nindent 12 }}
+          image: "{{ .Values.djm.image.repository }}:{{ .Values.djm.image.tag }}"
+          imagePullPolicy: {{ .Values.djm.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.djm.container.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.djm.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.djm.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.djm.resources | nindent 12 }}
+          env:
+          - name: SERVICE
+            value: "c8-discovery-job-manager-prod"
+          - name: DJW_SERVICE
+            value: "discovery-job-worker"
+          - name: DJW_SERVICE_ACCOUNT_NAME
+            value: {{ include "c8.serviceAccountNameDjm" . }}-djw
+          - name: DB_AUTH_SOURCE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_AUTH_MECHANISM
+            value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
+          - name: DB_HOST
+            value: {{ .Values.variables.DB_HOST | quote }}
+          - name: DB_DATABASE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_PORT
+            value: {{ .Values.variables.DB_PORT | quote }}
+          - name: MONGO_DRIVER_TYPE
+            value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
+          - name: DISCOVERY_CONTAINER_NAME
+            value: {{ .Values.variables.DISCOVERY_CONTAINER_NAME | quote }}
+          - name: AWS_REGION
+            value: {{ .Values.variables.AWS_REGION | quote }}
+          - name: DJW_K8_NAMESPACE
+            value: {{ .Release.Namespace }}
+          - name: OPENSEARCH_NODE
+            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
+          - name: RABBITMQ_HOST
+            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
+          - name: RABBITMQ_PORT
+            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          - name: DJW_APP_URL
+            value: {{ .Values.variables.DEEPLINK_URL | quote }}
+          - name: DJW_IMAGE
+            value: {{ .Values.djm.DJW_IMAGE | quote }}
+          - name: IMAGE_PULL_SECRET
+            value: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+          {{- if .Values.djm.DJW_NODE_SELECTOR_KEY }}
+          - name: DJW_NODE_SELECTOR_KEY
+            value: {{ .Values.djm.DJW_NODE_SELECTOR_KEY | quote }}
+          {{- end }}
+          {{- if .Values.djm.DJW_NODE_SELECTOR_VALUE }}
+          - name: DJW_NODE_SELECTOR_VALUE
+            value: {{ .Values.djm.DJW_NODE_SELECTOR_VALUE | quote }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-common-params
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-djm-params
+            - secretRef:
+                name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
+      {{- with .Values.djm.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.djm.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.djm.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

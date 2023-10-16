@@ -1,0 +1,106 @@
+{{- $ssaUrl := printf "%s%s" .Values.variables.DEEPLINK_URL "/self-service/api/v1/" -}}
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c8.fullname" . }}-backend
+  labels:
+    {{- include "c8.labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.backend.autoscaling.enabled }}
+  replicas: {{ .Values.backend.replicaCount }}
+  {{- end }}
+  {{- if .Values.common.updateStrategy }}
+  strategy:
+    {{ toYaml .Values.common.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      c8app: "backend"
+  template:
+    metadata:
+      {{- with .Values.backend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        c8app: "backend"
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+      {{- if .Values.backend.serviceAccount.create }}
+      serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}-backend
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "c8.fullname" . }}-backend
+          securityContext:
+            {{- toYaml .Values.backend.securityContext | nindent 12 }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.backend.service.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.backend.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.backend.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          env:
+          - name: SERVICE
+            value: "c8app"
+          - name: AWS_REGION
+            value: {{ .Values.variables.AWS_REGION | quote }}
+          - name: DB_AUTH_MECHANISM
+            value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
+          - name: DB_AUTH_SOURCE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_HOST
+            value: {{ .Values.variables.DB_HOST | quote }}
+          - name: DB_DATABASE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_PORT
+            value: {{ .Values.variables.DB_PORT | quote }}
+          - name: MONGO_DRIVER_TYPE
+            value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
+          - name: DEEPLINK_URL
+            value: {{ .Values.variables.DEEPLINK_URL | quote }}
+          - name: HOOKS_CALLBACK_URL
+            value: {{ .Values.variables.HOOKS_CALLBACK_URL | quote }}
+          - name: OPENSEARCH_NODE
+            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
+          - name: SSA_URL
+            value: {{ $ssaUrl }}
+          - name: SWAGGER_ENABLED
+            value: {{ .Values.variables.SWAGGER_ENABLED | quote }}
+          - name: RABBITMQ_HOST
+            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
+          - name: RABBITMQ_PORT
+            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-common-params
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-backend-params
+            - secretRef:
+                name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
+      {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+

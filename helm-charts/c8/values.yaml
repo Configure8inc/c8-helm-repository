@@ -1,0 +1,475 @@
+# -- Provide a name in place of c8 for `app:` labels
+nameOverride: ""
+# -- Provide a name to substitute for the full names of resources
+fullnameOverride: ""
+# -- Labels to apply to all resources
+commonLabels: {}
+
+frontend:
+  enabled: true
+
+  # -- Configuration for frontend service
+  service:
+    type: ClusterIP
+    port: "80"
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-frontend"
+    pullPolicy: IfNotPresent
+    tag: "0.0.3"
+
+  replicaCount: 1
+
+  # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  resources: {}
+  limits:
+    cpu: 300m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+  
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podDisruptionBudget:
+    # Specifies whether pod disruption budget should be created
+    enabled: false
+    # Number or percentage of pods that must be available
+    minAvailable: 50%
+
+common:
+  
+  ingress:
+    # -- Enable ingress object for external access to the resources . Do not forget to add common.ingress.ingressClassName=""
+    enabled: true
+    ingressClassName: ""
+    annotations: {}
+    labels: {}
+    pathType: Prefix
+  
+  # -- image pull secrets
+  IMAGE_PULL_SECRET: c8-docker-registry-secret
+  C8_SECRET_NAME: c8-secret
+
+migration:
+
+  # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-migrations"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.3"
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+backend:
+  enabled: true
+
+  replicaCount: 1
+
+  # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-backend"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.3"
+
+  # -- Configuration for backend service
+  service:
+    type: ClusterIP
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext:
+    {} 
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    create: true
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podDisruptionBudget:
+    # -- Specifies whether pod disruption budget should be created
+    enabled: false
+    # -- Number or percentage of pods that must be available
+    minAvailable: 50%
+
+djm:
+  enabled: true
+
+  replicaCount: 1
+
+  # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  image:
+    # -- c8 docker image repository
+    repository: "ghcr.io/configure8inc/c8-djm"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.3"
+
+  # -- Discovery job worker image
+  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.7"
+
+  # -- Discovery job worker NodeSelector key
+  DJW_NODE_SELECTOR_KEY: ""
+  # -- Discovery job worker NodeSelector value
+  DJW_NODE_SELECTOR_VALUE: ""
+
+  container:
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    create: true
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+    name: ""
+   
+    job_worker:
+      # -- The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template
+      name:
+      # -- Annotations to add to the service account
+      annotations: {}
+
+ssa:
+  enabled: true
+
+  replicaCount: 1
+
+  # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  ingress:
+    enabled: true
+    ingressClassName: ""
+    annotations: {}
+    labels: {}
+    pathType: Prefix
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-ssa"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.3"
+
+  container:
+    port: "5000"
+
+  # -- Configuration for ssa service
+  service:
+    enabled: true
+    type: ClusterIP
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    create: true
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podDisruptionBudget:
+    # -- Specifies whether pod disruption budget should be created
+    enabled: false
+    # -- Number or percentage of pods that must be available
+    minAvailable: 50%
+
+
+pns:
+  enabled: true
+
+  replicaCount: 1
+
+  # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-pns"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.3"
+
+  container:
+    port: "5000"
+
+  # -- Configuration for pns service
+  service:
+    enabled: true
+    type: ClusterIP
+    port: "5000"
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+  podAnnotations: {}
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    create: true
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podDisruptionBudget:
+    # Specifies whether pod disruption budget should be created
+    enabled: false
+    # Number or percentage of pods that must be available
+    minAvailable: 50%
+
+variables:
+  ##### C8 #########
+  # -- The region what actually we use with AWS integration
+  AWS_REGION: "us-east-1"
+  # -- Url on which the application will be available. For example https://configure8.my-company.io
+  DEEPLINK_URL: ""
+  # -- Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io
+  HOOKS_CALLBACK_URL: ""
+  # -- Application analytics segment key
+  SEGMENT_KEY: "na"
+  # -- Enable or disable swagger documentation
+  SWAGGER_ENABLED: "false"
+
+  ##### SSA #########
+  # -- Enable or disable swagger documentation
+  SSA_SWAGGER_ENABLED: "false"
+  
+  ##### NPS #########
+  DEFAULT_SENDER: "notifications@configure8.io"
+
+  ##### COMMON #########
+  # -- Application timezone
+  TZ: "America/New_York"
+  # -- RabbitMQ host
+  RABBITMQ_HOST: ""
+  # -- RabbitMQ port
+  RABBITMQ_PORT: 5672
+  # -- The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by mongodb
+  DB_AUTH_MECHANISM: "SCRAM-SHA-1"
+  # -- Database host
+  DB_HOST: ""
+  # -- Database name
+  DB_DATABASE: "c8"
+  # -- Database port
+  DB_PORT: "27017"
+  # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
+  MONGO_DRIVER_TYPE: "mongoDb"
+  # -- ElasticSearch url
+  OPENSEARCH_NODE: ""
