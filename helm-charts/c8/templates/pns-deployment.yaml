@@ -55,6 +55,12 @@ spec:
             value: "platform-notification-service"
           - name: DEFAULT_SENDER
             value: {{ .Values.variables.DEFAULT_SENDER | quote }}
+          - name: USE_SMTP_STRATEGY
+            value: {{ .Values.variables.USE_SMTP_STRATEGY | quote }}
+          - name: SMTP_HOST
+            value: {{ .Values.variables.SMTP_HOST | quote }}
+          - name: SMTP_PORT
+            value: {{ .Values.variables.SMTP_PORT | quote }}
           - name: RABBITMQ_HOST
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT

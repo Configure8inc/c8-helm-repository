@@ -16,7 +16,7 @@ frontend:
   image:
     repository: "ghcr.io/configure8inc/c8-frontend"
     pullPolicy: IfNotPresent
-    tag: "0.0.3"
+    tag: "1.0.0"
 
   replicaCount: 1
 
@@ -110,7 +110,7 @@ migration:
     repository: "ghcr.io/configure8inc/c8-migrations"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.3"
+    tag: "1.0.0"
 
   serviceAccount:
     # Specifies whether a service account should be created
@@ -146,7 +146,7 @@ backend:
     repository: "ghcr.io/configure8inc/c8-backend"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.3"
+    tag: "1.0.0"
 
   # -- Configuration for backend service
   service:
@@ -216,7 +216,7 @@ djm:
     repository: "ghcr.io/configure8inc/c8-djm"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.3"
+    tag: "1.0.0"
 
   # -- Discovery job worker image
   DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.7"
@@ -298,7 +298,7 @@ ssa:
     repository: "ghcr.io/configure8inc/c8-ssa"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.3"
+    tag: "1.0.0"
 
   container:
     port: "5000"
@@ -379,7 +379,7 @@ pns:
     repository: "ghcr.io/configure8inc/c8-pns"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.3"
+    tag: "1.0.0"
 
   container:
     port: "5000"
@@ -452,7 +452,14 @@ variables:
   SSA_SWAGGER_ENABLED: "false"
   
   ##### NPS #########
-  DEFAULT_SENDER: "notifications@configure8.io"
+  # -- Default email for sending notifications.
+  DEFAULT_SENDER: "notifications@example.com"
+  # -- Flag to use SMTP for emails
+  USE_SMTP_STRATEGY: "true"
+  # -- Address of the SMTP server (e.g., SendGrid's server).
+  SMTP_HOST: "smtp.sendgrid.net"
+  # -- Port for connecting to the SMTP server
+  SMTP_PORT: "587"
 
   ##### COMMON #########
   # -- Application timezone
