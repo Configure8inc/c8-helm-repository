@@ -53,7 +53,8 @@ kubectl create secret generic c8-secret \
     --from-literal=DB_PASSWORD='value' \
     --from-literal=RABBITMQ_USERNAME='value' \
     --from-literal=RABBITMQ_PASSWORD='value' \
-    --from-literal=SENDGRID_API_KEY='value' \
+    --from-literal=SMTP_USERNAME='value' \
+    --from-literal=SMTP_PASSWORD='value' \
     -n c8 --dry-run=client -o yaml | kubectl apply -f -
 ```
 
@@ -74,7 +75,8 @@ kubectl create secret generic c8-secret \
 | JWT_SECRET | string | `""` | Unique secret used for sign user's JWT tokens |
 | RABBITMQ_PASSWORD | string | `""` | RabbitMQ password |
 | RABBITMQ_USERNAME | string | `""` | RabbitMQ user |
-| SENDGRID_API_KEY | string | `""` | Sendgrid api key password |
+| SMTP_USERNAME | string | `""` | Username for SMTP server. |
+| SMTP_PASSWORD | string | `""` | Password or token for SMTP authentication. |
 ----------------------------------------------
 
 > **Warning**
@@ -242,16 +244,20 @@ The table below lists the key application variables that can be configured durin
 | variables.DB_HOST | string | `""` | Database host |
 | variables.DB_PORT | string | `"27017"` | Database port |
 | variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
-| variables.DEFAULT_SENDER | string | `"notifications@configure8.io"` |  |
+| variables.DEFAULT_SENDER | string | `"notifications@example.com"` | Default email for sending notifications. |
 | variables.HOOKS_CALLBACK_URL | string | `""` | Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io |
 | variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
 | variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
 | variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
+| variables.USE_SMTP_STRATEGY | string | `"true"` | Flag to use SMTP for emails |
+| variables.SMTP_HOST | string | `"smtp.sendgrid.net"` | Address of the SMTP server (e.g., SendGrid's server). |
+| variables.SMTP_PORT | string | `"587"` | Port for connecting to the SMTP server |
 | variables.SSA_SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
 | variables.SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
 | variables.TZ | string | `"America/New_York"` | Application timezone |
+
 ### The C8 Helm Chart Parameters
 
 The table below shows configurable parameters when deploying the C8 Helm chart:
