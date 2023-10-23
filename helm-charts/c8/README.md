@@ -85,7 +85,7 @@ kubectl create secret generic c8-secret \
 ## Step 4: Configure AWS access for the discovery job
 
 <details>
-  <summary style="font-size: 20px;">Configure AWS access using service account (AWS EKS)</summary>
+  <summary style="font-size: 22px;">Configure AWS access using service account (AWS EKS)</summary>
 
 ### Step 1: Create IAM Role for C8 and DJM Service Accounts
 
@@ -205,7 +205,7 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 </details>
 
 <details>
-  <summary style="font-size: 20px;">Configure AWS access using IAM role for EC2</summary>
+  <summary style="font-size: 22px;">Configure AWS access using IAM role for EC2</summary>
 
 ### Step 1: Create IAM Role for EC2
 
@@ -274,7 +274,7 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 </details>
 
 <details>
-  <summary style="font-size: 20px;">Configure AWS access using access keys for IAM users</summary>
+  <summary style="font-size: 22px;">Configure AWS access using access keys for IAM users</summary>
 
 ### Step 1: Create IAM User
 
