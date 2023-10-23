@@ -36,23 +36,30 @@ frontend:
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
 
+  # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
   resources: {}
-  limits:
-    cpu: 300m
-    memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+  # limits:
+  #   cpu: 300m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
-# livenessProbe:
-#   httpGet:
-#     path: /
-#     port: http
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    failureThreshold: 2
+    periodSeconds: 10
 
-# readinessProbe:
-#   httpGet:
-#     path: /
-#     port: http
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    failureThreshold: 2
+    periodSeconds: 10
+    initialDelaySeconds: 20
+
   podAnnotations: {}
   podSecurityContext: {}
   # fsGroup: 2000
@@ -82,7 +89,6 @@ frontend:
     minAvailable: 50%
 
 common:
-  
   ingress:
     # -- Enable ingress object for external access to the resources . Do not forget to add common.ingress.ingressClassName=""
     enabled: true
@@ -153,6 +159,7 @@ backend:
     type: ClusterIP
     port: "5000"
 
+  # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
   resources: {}
   # limits:
   #   cpu: 100m
@@ -161,15 +168,31 @@ backend:
   #   cpu: 100m
   #   memory: 128Mi
 
-# livenessProbe:
-#   httpGet:
-#     path: /
-#     port: http
+  livenessProbe:
+    httpGet:
+      path: /api/v1/ping
+      port: 5000
+    timeoutSeconds: 10
+    failureThreshold: 3
+    periodSeconds: 10
 
-# readinessProbe:
-#   httpGet:
-#     path: /
-#     port: http
+  readinessProbe:
+    httpGet:
+      path: /api/v1/ping
+      port: 5000
+    timeoutSeconds: 10
+    failureThreshold: 3
+    periodSeconds: 10
+
+  startupProbe:
+    httpGet:
+      path: /api/v1/ping
+      port: 5000
+    timeoutSeconds: 10
+    failureThreshold: 5
+    periodSeconds: 10
+    initialDelaySeconds: 20
+
   podAnnotations: {}
   podSecurityContext: {}
   # fsGroup: 2000
@@ -219,7 +242,7 @@ djm:
     tag: "1.0.0"
 
   # -- Discovery job worker image
-  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:0.0.7"
+  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:1.0.0"
 
   # -- Discovery job worker NodeSelector key
   DJW_NODE_SELECTOR_KEY: ""
@@ -229,6 +252,7 @@ djm:
   container:
     port: "5000"
 
+  # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
   resources: {}
   # limits:
   #   cpu: 100m
@@ -309,6 +333,7 @@ ssa:
     type: ClusterIP
     port: "5000"
 
+  # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
   resources: {}
   # limits:
   #   cpu: 100m
@@ -317,15 +342,24 @@ ssa:
   #   cpu: 100m
   #   memory: 128Mi
 
-# livenessProbe:
-#   httpGet:
-#     path: /
-#     port: http
+  livenessProbe:
+    httpGet:
+      path: /self-service/api/health
+      port: 5000
+      scheme: HTTP
+    failureThreshold: 3
+    timeoutSeconds: 10
+    periodSeconds: 10
 
-# readinessProbe:
-#   httpGet:
-#     path: /
-#     port: http
+  readinessProbe:
+    httpGet:
+      path: /self-service/api/health
+      port: 5000
+      scheme: HTTP
+    failureThreshold: 3
+    timeoutSeconds: 10
+    periodSeconds: 10
+
   podAnnotations: {}
   podSecurityContext: {}
   # fsGroup: 2000
@@ -390,6 +424,7 @@ pns:
     type: ClusterIP
     port: "5000"
 
+  # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
   resources: {}
   # limits:
   #   cpu: 100m
@@ -407,6 +442,7 @@ pns:
 #   httpGet:
 #     path: /
 #     port: http
+
   podAnnotations: {}
   podSecurityContext: {}
   # fsGroup: 2000
