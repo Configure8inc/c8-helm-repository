@@ -87,7 +87,7 @@ kubectl create secret generic c8-secret \
 <details>
   <summary style="font-size: 20px;">Configure AWS access using service account (AWS EKS)</summary>
 
-## Step 1: Create IAM Role for C8 and DJM Service Accounts
+### Step 1: Create IAM Role for C8 and DJM Service Accounts
 
 ### Step 1.1: Create IAM Policy
 
@@ -147,7 +147,7 @@ EOF
 aws iam create-role --role-name sh-c8-service-account --assume-role-policy-document file://trust-relationship-sa.json --description "The role for the Configure8 pods service account"
 ```
 
-## Step 2: Create IAM Role to Assume by C8 and DJM Service Accounts
+### Step 2: Create IAM Role to Assume by C8 and DJM Service Accounts
 
 ### Step 2.1: Download IAM Policy
 
@@ -207,7 +207,7 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 <details>
   <summary style="font-size: 20px;">Configure AWS access using IAM role for EC2</summary>
 
-## Step 1: Create IAM Role for EC2
+### Step 1: Create IAM Role for EC2
 
 [Please refer to the official AWS documentation about creating an AWS IAM role for the EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html#create-iam-role)
 
@@ -276,14 +276,14 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 <details>
   <summary style="font-size: 20px;">Configure AWS access using access keys for IAM users</summary>
 
-## Step 1: Create IAM User
+### Step 1: Create IAM User
 
 [Please refer to the official AWS documentation about creating access keys for IAM users](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)
 
 > **Important**
 > As a [best practice](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html), use temporary security credentials (such as IAM roles) instead of creating long-term credentials like access keys.
 
-## Step 2: Create IAM Role to assume by EC2 instance role.
+### Step 2: Create IAM Role to assume by EC2 instance role.
 
 ### Step 2.1: Download IAM Policy
 
