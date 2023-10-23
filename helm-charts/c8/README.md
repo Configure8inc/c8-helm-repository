@@ -200,7 +200,7 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 ```
 
 > **Note**
-> If you want to discover more aws accounts, you have to repeat 2 all steps for each account.
+> If you want to discover more AWS accounts, please repeat the 2nd step for each account.
 
 </details>
 
@@ -269,7 +269,7 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 ```
 
 > **Note**
-> If you want to discover more aws accounts, you have to repeat all 2 steps for each account.
+> If you want to discover more AWS accounts, please repeat the 2nd step for each account.
 
 </details>
 
@@ -341,7 +341,7 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 ```
 
 > **Note**
-> If you want to discover more aws accounts, you have to repeat all 2 steps for each account.
+> If you want to discover more AWS accounts, please repeat the 2nd step for each account.
 
 </details>
 
