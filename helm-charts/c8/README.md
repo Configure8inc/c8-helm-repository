@@ -77,6 +77,8 @@ kubectl create secret generic c8-secret \
 | RABBITMQ_USERNAME | string | `""` | RabbitMQ user |
 | SMTP_USERNAME | string | `""` | Username for SMTP server. |
 | SMTP_PASSWORD | string | `""` | Password or token for SMTP authentication. |
+| AWS_ACCESS_KEY_ID | string | `""` | A unique identifier associated with an AWS User. (optional, see discovery configuration) |
+| AWS_SECRET_ACCESS_KEY | string | `""` | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role. (optional, see discovery configuration) |
 ----------------------------------------------
 
 > **Warning**
@@ -342,6 +344,9 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 
 > **Note**
 > If you want to discover more AWS accounts, please repeat the 2nd step for each account.
+
+> **Important**
+> Don't forget to add the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY variables to the c8-secret secret on the 3rd step.
 
 </details>
 
