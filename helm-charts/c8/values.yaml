@@ -62,8 +62,9 @@ frontend:
 
   podAnnotations: {}
   podSecurityContext:
-    # runAsUser: 101
-    # runAsGroup: 101
+    runAsUser: 101
+    runAsGroup: 101
+    runAsNonRoot: true
   # fsGroup: 2000
   
   securityContext:
@@ -128,6 +129,11 @@ migration:
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
+
+  podSecurityContext:
+    runAsUser: 1051
+    runAsGroup: 1051
+    runAsNonRoot: true
 
 backend:
   enabled: true
@@ -199,6 +205,7 @@ backend:
   podSecurityContext:
     runAsUser: 1051
     runAsGroup: 1051
+    runAsNonRoot: true
   # fsGroup: 2000
 
   securityContext:
@@ -252,6 +259,8 @@ djm:
   DJW_NODE_SELECTOR_KEY: ""
   # -- Discovery job worker NodeSelector value
   DJW_NODE_SELECTOR_VALUE: ""
+  # -- Discovery job worker pod security context
+  DJW_POD_SECURITY_CONTEXT: '{"runAsUser": 1052, "runAsGroup": 1052, "runAsNonRoot": true}'
 
   container:
     port: "5000"
@@ -278,6 +287,7 @@ djm:
   podSecurityContext:
     runAsUser: 1052
     runAsGroup: 1052
+    runAsNonRoot: true
   # fsGroup: 2000
 
   securityContext:
@@ -370,6 +380,7 @@ ssa:
   podSecurityContext:
     runAsUser: 1055
     runAsGroup: 1055
+    runAsNonRoot: true
   # fsGroup: 2000
 
   securityContext:
@@ -455,6 +466,7 @@ pns:
   podSecurityContext:
     runAsUser: 1057
     runAsGroup: 1057
+    runAsNonRoot: true
   # fsGroup: 2000
 
   securityContext:
