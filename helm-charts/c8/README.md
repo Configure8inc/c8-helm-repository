@@ -470,6 +470,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | djm.DJW_IMAGE | string | `"ghcr.io/configure8inc/c8-djw:1.0.0"` | Discovery job worker image |
 | djm.DJW_NODE_SELECTOR_KEY | string | `""` | Discovery job worker NodeSelector key |
 | djm.DJW_NODE_SELECTOR_VALUE | string | `""` | Discovery job worker NodeSelector value |
+| djm.DJW_POD_SECURITY_CONTEXT | string | `'{"runAsUser": 1052, "runAsGroup": 1052, "runAsNonRoot": true}'` | Discovery job worker pod security context |
 | djm.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | djm.container.port | string | `"5000"` |  |
 | djm.enabled | bool | `true` |  |

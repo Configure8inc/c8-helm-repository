@@ -95,6 +95,10 @@ spec:
           - name: DJW_NODE_SELECTOR_VALUE
             value: {{ .Values.djm.DJW_NODE_SELECTOR_VALUE | quote }}
           {{- end }}
+          {{- if .Values.djm.DJW_POD_SECURITY_CONTEXT }}
+          - name: DJW_POD_SECURITY_CONTEXT
+            value: {{ .Values.djm.DJW_POD_SECURITY_CONTEXT | quote }}
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params
