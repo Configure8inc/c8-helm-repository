@@ -38,8 +38,10 @@ spec:
         {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ include "c8.fullname" . }}-backend
+          {{- if .Values.backend.securityContext }}
           securityContext:
             {{- toYaml .Values.backend.securityContext | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           ports:
