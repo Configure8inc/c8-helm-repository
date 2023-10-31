@@ -36,8 +36,10 @@ spec:
         {{- toYaml .Values.djm.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ include "c8.fullname" . }}-djm
+          {{- if .Values.djm.securityContext }}
           securityContext:
             {{- toYaml .Values.djm.securityContext | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.djm.image.repository }}:{{ .Values.djm.image.tag }}"
           imagePullPolicy: {{ .Values.djm.image.pullPolicy }}
           ports:
