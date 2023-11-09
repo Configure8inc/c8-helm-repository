@@ -1,7 +1,6 @@
 # -- replica count
 replicaCount: 1
 
-
 image:
   # -- c8 k8s-agent repo
   repository: public.ecr.aws/c8-public/c8-k8s-agent
@@ -24,15 +23,18 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-
 # -- pod annotations
 podAnnotations: {}
 
 # -- pod pod security context
-podSecurityContext: {}
+podSecurityContext:
+  runAsUser: 1008
+  runAsGroup: 1008
+  runAsNonRoot: true
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -81,7 +83,6 @@ tolerations: []
 
 # -- affinity
 affinity: {}
-
 # -- liveness probe
 #livenessProbe: {}
 #   httpGet:
