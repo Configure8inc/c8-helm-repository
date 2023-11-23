@@ -55,6 +55,8 @@ kubectl create secret generic c8-secret \
     --from-literal=RABBITMQ_PASSWORD='value' \
     --from-literal=SMTP_USERNAME='value' \
     --from-literal=SMTP_PASSWORD='value' \
+    --from-literal=SF_USERNAME='value' \
+    --from-literal=SF_PASSWORD='value' \
     -n c8 --dry-run=client -o yaml | kubectl apply -f -
 ```
 
@@ -77,6 +79,8 @@ kubectl create secret generic c8-secret \
 | RABBITMQ_USERNAME | string | `""` | RabbitMQ user |
 | SMTP_USERNAME | string | `""` | Username for SMTP server. |
 | SMTP_PASSWORD | string | `""` | Password or token for SMTP authentication. |
+| SF_USERNAME | string | `""` | Username for Snowflake db access. |
+| SF_PASSWORD | string | `""` | Password for Snowflake db access. |
 | AWS_ACCESS_KEY_ID | string | `""` | A unique identifier associated with an AWS User. (optional, see discovery configuration) |
 | AWS_SECRET_ACCESS_KEY | string | `""` | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role. (optional, see discovery configuration) |
 ----------------------------------------------

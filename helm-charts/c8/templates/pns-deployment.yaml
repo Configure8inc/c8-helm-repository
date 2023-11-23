@@ -10,6 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  revisionHistoryLimit: {{ .Values.common.revisionHistoryLimit }}
   replicas: {{ .Values.pns.replicaCount }}
   {{- if .Values.pns.updateStrategy }}
   strategy:
@@ -29,9 +30,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-      {{- if .Values.pns.serviceAccount.create }}
-      serviceAccountName: {{ include "c8.serviceAccountNamePns" . }}-pns
-      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNamePns" . }}
       securityContext:
         {{- toYaml .Values.pns.podSecurityContext | nindent 8 }}
       containers:

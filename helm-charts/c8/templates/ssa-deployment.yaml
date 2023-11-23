@@ -9,6 +9,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  revisionHistoryLimit: {{ .Values.common.revisionHistoryLimit }}
   replicas: {{ .Values.replicaCount }}
   {{- if .Values.ssa.updateStrategy }}
   strategy:
@@ -28,9 +29,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-      {{- if .Values.ssa.serviceAccount.create }}
-      serviceAccountName: {{ include "c8.serviceAccountNameSsa" . }}-ssa
-      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNameSsa" . }}
       securityContext:
         {{- toYaml .Values.ssa.podSecurityContext | nindent 8 }}
       containers:

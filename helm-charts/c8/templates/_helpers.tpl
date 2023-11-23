@@ -84,6 +84,17 @@ Create the name of the djm service account to use
 {{- end }}
 
 {{/*
+Create the name of the djw service account to use
+*/}}
+{{- define "c8.serviceAccountNameDjw" -}}
+{{- if .Values.djm.serviceAccount.job_worker.create }}
+{{- default (include "c8.fullname" .) .Values.djm.serviceAccount.job_worker.name }}
+{{- else }}
+{{- default "default" .Values.djm.serviceAccount.job_worker.name }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create the name of the ssa service account to use
 */}}
 {{- define "c8.serviceAccountNameSsa" -}}

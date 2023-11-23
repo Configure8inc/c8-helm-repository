@@ -9,6 +9,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  revisionHistoryLimit: {{ .Values.common.revisionHistoryLimit }}
   {{- if not .Values.frontend.autoscaling.enabled }}
   replicas: {{ .Values.frontend.replicaCount }}
   {{- end }}
@@ -30,9 +31,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-      {{- if .Values.frontend.serviceAccount.create }}
-      serviceAccountName: {{ include "c8.serviceAccountNameFront" . }}-frontend
-      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNameFront" . }}
       securityContext:
         {{- toYaml .Values.frontend.podSecurityContext | nindent 8 }}
       containers:

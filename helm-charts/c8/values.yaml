@@ -64,26 +64,23 @@ frontend:
   podSecurityContext:
     runAsUser: 101
     runAsGroup: 101
+    fsGroup: 101
     runAsNonRoot: true
-  # fsGroup: 2000
 
   securityContext:
-    {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
 
   serviceAccount:
     # Specifies whether a service account should be created
-    create: false
+    create: true
     # Annotations to add to the service account
     annotations: {}
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
-    name: ""
+    name: "c8-frontend"
 
   podDisruptionBudget:
     # Specifies whether pod disruption budget should be created
@@ -92,6 +89,9 @@ frontend:
     minAvailable: 50%
 
 common:
+  revisionHistoryLimit: 3
+  ttlSecondsAfterFinished: 172800
+
   ingress:
     # -- Enable ingress object for external access to the resources . Do not forget to add common.ingress.ingressClassName=""
     enabled: true
@@ -120,21 +120,17 @@ migration:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "1.0.0"
 
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: false
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
-
   podSecurityContext:
     runAsUser: 1051
     runAsGroup: 1051
+    fsGroup: 1051
     runAsNonRoot: true
 
-  securityContext: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
 
 backend:
   enabled: true
@@ -206,17 +202,15 @@ backend:
   podSecurityContext:
     runAsUser: 1051
     runAsGroup: 1051
+    fsGroup: 1051
     runAsNonRoot: true
-  # fsGroup: 2000
 
   securityContext:
-    {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
 
   serviceAccount:
     # -- Specifies whether a service account should be created
@@ -224,7 +218,7 @@ backend:
     # -- Annotations to add to the service account
     annotations: {}
     # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
-    name: ""
+    name: "c8-backend"
 
   podDisruptionBudget:
     # -- Specifies whether pod disruption budget should be created
@@ -288,17 +282,15 @@ djm:
   podSecurityContext:
     runAsUser: 1052
     runAsGroup: 1052
+    fsGroup: 1052
     runAsNonRoot: true
-  # fsGroup: 2000
 
   securityContext:
-    {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
 
   serviceAccount:
     # -- Specifies whether a service account should be created
@@ -306,11 +298,13 @@ djm:
     # -- Annotations to add to the service account
     annotations: {}
     # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
-    name: ""
+    name: "c8-djm"
 
     job_worker:
+      # -- Specifies whether a service account should be created
+      create: true
       # -- The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template
-      name:
+      name: "c8-djw"
       # -- Annotations to add to the service account
       annotations: {}
 
@@ -381,17 +375,16 @@ ssa:
   podSecurityContext:
     runAsUser: 1055
     runAsGroup: 1055
+    fsGroup: 1055
     runAsNonRoot: true
   # fsGroup: 2000
 
   securityContext:
-    {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
 
   serviceAccount:
     # -- Specifies whether a service account should be created
@@ -399,7 +392,7 @@ ssa:
     # -- Annotations to add to the service account
     annotations: {}
     # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
-    name: ""
+    name: "c8-ssa"
 
   podDisruptionBudget:
     # -- Specifies whether pod disruption budget should be created
@@ -466,17 +459,16 @@ pns:
   podSecurityContext:
     runAsUser: 1057
     runAsGroup: 1057
+    fsGroup: 1057
     runAsNonRoot: true
   # fsGroup: 2000
 
   securityContext:
-    {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
 
   serviceAccount:
     # -- Specifies whether a service account should be created
@@ -484,7 +476,7 @@ pns:
     # -- Annotations to add to the service account
     annotations: {}
     # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
-    name: ""
+    name: "c8-pns"
 
   podDisruptionBudget:
     # Specifies whether pod disruption budget should be created
@@ -538,3 +530,15 @@ variables:
   MONGO_DRIVER_TYPE: "mongoDb"
   # -- ElasticSearch url
   OPENSEARCH_NODE: ""
+  # -- Snowflake account name
+  SF_ACCOUNT: "c8-qa"
+  # -- Snowflake db name
+  SF_DATABASE: "C8"
+  # -- Snowflake db schema
+  SF_SCHEMA: "PUBLIC"
+  # -- Snowflake warehouse name
+  SF_WAREHOUSE: "DEV_WAREHOUSE"
+  # -- Snowflake poolsize
+  SF_POOLSIZE: "5"
+  # -- Online analytical processing DB type
+  OLAP_DB: "snowflake"
