@@ -1,16 +1,15 @@
 {{- if .Values.djm.enabled }}
-{{- if .Values.djm.serviceAccount.create -}}
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: Role
 metadata:
-  name: {{ include "c8.fullname" . }}-djm-role-binding
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-  - kind: ServiceAccount
-    name: {{ include "c8.serviceAccountNameDjm" . }}-djm
-    namespace: {{ .Release.Namespace }}
-{{- end }}
+  name: {{ include "c8.fullname" . }}-djm-role
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded"
+rules:
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["create", "get", "list", "watch", "delete"]
 {{- end }}
