@@ -397,10 +397,10 @@ gcloud projects add-iam-policy-binding GSA_PROJECT \
     --role "roles/viewer"
 ```
 
-Create K8s SA for workload identity in the sh namespace
+Create K8s SA for workload identity in the c8 namespace
 
 ```bash
-kubectl -n sh create sa c8-backend
+kubectl -n c8 create sa c8-backend
 ```
 
 Bind K8s SA with GCP SA
@@ -408,13 +408,13 @@ Bind K8s SA with GCP SA
 ```bash
 gcloud iam service-accounts add-iam-policy-binding c8-backend@GSA_PROJECT.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:PROJECT_ID.svc.id.goog[sh/c8-backend]"
+    --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-backend]"
 ```
 
 Annotate K8s SA
 
 ```bash
-kubectl -n sh annotate serviceaccount c8-backend iam.gke.io/gcp-service-account=c8-backend@GSA_PROJECT.iam.gserviceaccount.com
+kubectl -n c8 annotate serviceaccount c8-backend iam.gke.io/gcp-service-account=c8-backend@GSA_PROJECT.iam.gserviceaccount.com
 ```
 
 Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
@@ -446,7 +446,7 @@ gcloud projects add-iam-policy-binding GSA_PROJECT \
     --role "roles/viewer"
 ```
 
-Create K8s SA for workload identity in the sh namespace
+Create K8s SA for workload identity in the c8 namespace
 
 ```bash
 kubectl -n sh create sa c8-djw
@@ -457,13 +457,13 @@ Bind K8s SA with GCP SA
 ```bash
 gcloud iam service-accounts add-iam-policy-binding c8-djw@GSA_PROJECT.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:PROJECT_ID.svc.id.goog[sh/c8-djw]"
+    --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-djw]"
 ```
 
 Annotate K8s SA
 
 ```bash
-kubectl -n sh annotate serviceaccount c8-djw iam.gke.io/gcp-service-account=c8-djw@GSA_PROJECT.iam.gserviceaccount.com
+kubectl -n c8 annotate serviceaccount c8-djw iam.gke.io/gcp-service-account=c8-djw@GSA_PROJECT.iam.gserviceaccount.com
 ```
 
 Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
