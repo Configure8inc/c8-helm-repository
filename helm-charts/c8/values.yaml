@@ -531,7 +531,7 @@ variables:
   # -- ElasticSearch url
   OPENSEARCH_NODE: ""
   # -- Snowflake account name
-  SF_ACCOUNT: "c8-qa"
+  SF_ACCOUNT: ""
   # -- Snowflake db name
   SF_DATABASE: "C8"
   # -- Snowflake db schema
