@@ -17,7 +17,7 @@ This guide delineates the steps to deploy the Configure8 (C8) application on a K
 7. A __MongoDB__ database must be set up, and accessible by the Kubernetes cluster.
 8. A __RabbitMQ__ cluster must be set up for managing message queues within the C8 application.
 9. An __OpenSearch__ cluster must be set up for robust search functionality and data analytics within the C8 app.
-10. An __Snowflake__ account must be set up to provide fast search, and an ability to make complex aggregations.
+10. A __Snowflake__ account must be set up to provide fast search and an ability to make complex aggregations.
 
 ## Step 1: Creating a Namespace
 
