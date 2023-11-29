@@ -648,11 +648,11 @@ The table below lists the key application variables that can be configured durin
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
 | variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
-| variables.SF_ACCOUNT | string | `"c8-qa"` | Snowflake account name |
+| variables.SF_ACCOUNT | string | `""` | Snowflake account name |
 | variables.SF_DATABASE | string | `"C8"` | Snowflake db name |
 | variables.SF_POOLSIZE | string | `"5"` | Snowflake poolsize |
 | variables.SF_SCHEMA | string | `"PUBLIC"` | Snowflake db schema |
-| variables.SF_WAREHOUSE | string | `"DEV_WAREHOUSE"` | Snowflake warehouse name |
+| variables.SF_WAREHOUSE | string | `""` | Snowflake warehouse name |
 | variables.SMTP_HOST | string | `"smtp.sendgrid.net"` | Address of the SMTP server (e.g., SendGrid's server). |
 | variables.SMTP_PORT | string | `"587"` | Port for connecting to the SMTP server |
 | variables.SSA_SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |

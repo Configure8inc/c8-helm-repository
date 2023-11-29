@@ -537,7 +537,7 @@ variables:
   # -- Snowflake db schema
   SF_SCHEMA: "PUBLIC"
   # -- Snowflake warehouse name
-  SF_WAREHOUSE: "DEV_WAREHOUSE"
+  SF_WAREHOUSE: ""
   # -- Snowflake poolsize
   SF_POOLSIZE: "5"
   # -- Online analytical processing DB type
