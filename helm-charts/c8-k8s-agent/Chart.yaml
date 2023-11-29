@@ -4,6 +4,6 @@ description: A Helm chart for c8 k8s-agent
 
 type: application
 
-version: 0.0.14
+version: 0.0.15
 
 appVersion: "1.1.0"
