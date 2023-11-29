@@ -368,6 +368,9 @@ gcloud container clusters update CLUSTER_NAME \
     --workload-pool=PROJECT_ID.svc.id.goog
 ```
 
+> **Note**
+> You can check the current status by running the command ```gcloud container clusters describe CLUSTER_NAME --region=COMPUTE_REGION --format="value(workloadIdentityConfig)```
+
 Replace the following:
 
 - CLUSTER_NAME: the name of your existing GKE cluster.
@@ -380,20 +383,20 @@ Replace the following:
   <summary style="font-size: 22px;">Step 2.1: Create the c8-backend service account and bind it with the k8s service account</summary>
 
 > **Important**
-> Replace the GSA_PROJECT with the project ID of the Google Cloud project of your IAM service account.
+> Replace the PROJECT_ID with the project ID of the Google Cloud project of your IAM service account.
 
 Create GCP SA which will be bound to K8s SA
 
 ```bash
 gcloud iam service-accounts create c8-backend \
-    --project=GSA_PROJECT
+    --project=PROJECT_ID
 ```
 
 Bind necessary IAM roles to the GCP SA
 
 ```bash
-gcloud projects add-iam-policy-binding GSA_PROJECT \
-    --member "serviceAccount:c8-backend@GSA_PROJECT.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding PROJECT_ID \
+    --member "serviceAccount:c8-backend@PROJECT_ID.iam.gserviceaccount.com" \
     --role "roles/viewer"
 ```
 
@@ -406,7 +409,7 @@ kubectl -n c8 create sa c8-backend
 Bind K8s SA with GCP SA
 
 ```bash
-gcloud iam service-accounts add-iam-policy-binding c8-backend@GSA_PROJECT.iam.gserviceaccount.com \
+gcloud iam service-accounts add-iam-policy-binding c8-backend@PROJECT_ID.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
     --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-backend]"
 ```
@@ -414,35 +417,35 @@ gcloud iam service-accounts add-iam-policy-binding c8-backend@GSA_PROJECT.iam.gs
 Annotate K8s SA
 
 ```bash
-kubectl -n c8 annotate serviceaccount c8-backend iam.gke.io/gcp-service-account=c8-backend@GSA_PROJECT.iam.gserviceaccount.com
+kubectl -n c8 annotate serviceaccount c8-backend iam.gke.io/gcp-service-account=c8-backend@PROJECT_ID.iam.gserviceaccount.com
 ```
 
 Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
 
 ```bash
-gcloud iam service-accounts describe --format json c8-djw@GSA_PROJECT.iam.gserviceaccount.com | jq -r '.uniqueId'
+gcloud iam service-accounts describe --format json c8-backend@PROJECT_ID.iam.gserviceaccount.com | jq -r '.uniqueId'
 ```
 
 </details>
 
 <details>
-  <summary style="font-size: 22px;">Step 2.1: Create the c8-djw service account and bind it with the k8s service account</summary>
+  <summary style="font-size: 22px;">Step 2.2: Create the c8-djw service account and bind it with the k8s service account</summary>
 
 > **Important**
-> Replace the GSA_PROJECT with the project ID of the Google Cloud project of your IAM service account.
+> Replace the PROJECT_ID with the project ID of the Google Cloud project of your IAM service account.
 
 Create GCP SA which will be bound to K8s SA
 
 ```bash
 gcloud iam service-accounts create c8-djw \
-    --project=GSA_PROJECT
+    --project=PROJECT_ID
 ```
 
 Bind necessary IAM roles to the GCP SA
 
 ```bash
-gcloud projects add-iam-policy-binding GSA_PROJECT \
-    --member "serviceAccount:c8-djw@GSA_PROJECT.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding PROJECT_ID \
+    --member "serviceAccount:c8-djw@PROJECT_ID.iam.gserviceaccount.com" \
     --role "roles/viewer"
 ```
 
@@ -455,7 +458,7 @@ kubectl -n sh create sa c8-djw
 Bind K8s SA with GCP SA
 
 ```bash
-gcloud iam service-accounts add-iam-policy-binding c8-djw@GSA_PROJECT.iam.gserviceaccount.com \
+gcloud iam service-accounts add-iam-policy-binding c8-djw@PROJECT_ID.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
     --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-djw]"
 ```
@@ -463,13 +466,13 @@ gcloud iam service-accounts add-iam-policy-binding c8-djw@GSA_PROJECT.iam.gservi
 Annotate K8s SA
 
 ```bash
-kubectl -n c8 annotate serviceaccount c8-djw iam.gke.io/gcp-service-account=c8-djw@GSA_PROJECT.iam.gserviceaccount.com
+kubectl -n c8 annotate serviceaccount c8-djw iam.gke.io/gcp-service-account=c8-djw@PROJECT_ID.iam.gserviceaccount.com
 ```
 
 Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
 
 ```bash
-gcloud iam service-accounts describe --format json c8-djw@GSA_PROJECT.iam.gserviceaccount.com | jq -r '.uniqueId'
+gcloud iam service-accounts describe --format json c8-djw@PROJECT_ID.iam.gserviceaccount.com | jq -r '.uniqueId'
 ```
 
 </details>
@@ -557,7 +560,7 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 ```
 
 > **Note**
-> If you want to discover more AWS accounts, please repeat the 2nd step for each account.
+> If you want to discover more AWS accounts, please repeat the 3rd step for each account.
 
 ## Step 5: Install the C8 Helm Chart
 
