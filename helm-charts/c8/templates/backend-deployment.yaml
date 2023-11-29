@@ -10,6 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  revisionHistoryLimit: {{ .Values.common.revisionHistoryLimit }}
   {{- if not .Values.backend.autoscaling.enabled }}
   replicas: {{ .Values.backend.replicaCount }}
   {{- end }}
@@ -31,9 +32,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-      {{- if .Values.backend.serviceAccount.create }}
-      serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}-backend
-      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}
       securityContext:
         {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
       containers:
@@ -85,6 +84,16 @@ spec:
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          - name: SF_ACCOUNT
+            value: {{ .Values.variables.SF_ACCOUNT | quote }}
+          - name: SF_DATABASE
+            value: {{ .Values.variables.SF_DATABASE | quote }}
+          - name: SF_WAREHOUSE
+            value: {{ .Values.variables.SF_WAREHOUSE | quote }}
+          - name: SF_POOLSIZE
+            value: {{ .Values.variables.SF_POOLSIZE | quote }}
+          - name: OLAP_DB
+            value: {{ .Values.variables.OLAP_DB | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params

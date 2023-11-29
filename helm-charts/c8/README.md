@@ -17,6 +17,7 @@ This guide delineates the steps to deploy the Configure8 (C8) application on a K
 7. A __MongoDB__ database must be set up, and accessible by the Kubernetes cluster.
 8. A __RabbitMQ__ cluster must be set up for managing message queues within the C8 application.
 9. An __OpenSearch__ cluster must be set up for robust search functionality and data analytics within the C8 app.
+10. A __Snowflake__ account must be set up to provide fast search and an ability to make complex aggregations.
 
 ## Step 1: Creating a Namespace
 
@@ -55,6 +56,8 @@ kubectl create secret generic c8-secret \
     --from-literal=RABBITMQ_PASSWORD='value' \
     --from-literal=SMTP_USERNAME='value' \
     --from-literal=SMTP_PASSWORD='value' \
+    --from-literal=SF_USERNAME='value' \
+    --from-literal=SF_PASSWORD='value' \
     -n c8 --dry-run=client -o yaml | kubectl apply -f -
 ```
 
@@ -77,6 +80,8 @@ kubectl create secret generic c8-secret \
 | RABBITMQ_USERNAME | string | `""` | RabbitMQ user |
 | SMTP_USERNAME | string | `""` | Username for SMTP server. |
 | SMTP_PASSWORD | string | `""` | Password or token for SMTP authentication. |
+| SF_USERNAME | string | `""` | Username for Snowflake db access. |
+| SF_PASSWORD | string | `""` | Password for Snowflake db access. |
 | AWS_ACCESS_KEY_ID | string | `""` | A unique identifier associated with an AWS User. (optional, see discovery configuration) |
 | AWS_SECRET_ACCESS_KEY | string | `""` | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role. (optional, see discovery configuration) |
 ----------------------------------------------
@@ -350,6 +355,213 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 
 </details>
 
+<details>
+  <summary style="font-size: 22px;">Configure AWS access using GCP ServiceAccount (GKE)</summary>
+
+## Step 1: Enable Workload Identity (skip if already enabled)
+
+You can enable Workload Identity on an existing Standard cluster by using the gcloud CLI or the Google Cloud console. Existing node pools are unaffected, but any new node pools in the cluster use Workload Identity.
+
+```bash
+gcloud container clusters update CLUSTER_NAME \
+    --region=COMPUTE_REGION \
+    --workload-pool=PROJECT_ID.svc.id.goog
+```
+
+> **Note**
+> You can check the current status by running the command ```gcloud container clusters describe CLUSTER_NAME --region=COMPUTE_REGION --format="value(workloadIdentityConfig)```
+
+Replace the following:
+
+- CLUSTER_NAME: the name of your existing GKE cluster.
+- COMPUTE_REGION: the Compute Engine region of your cluster. For zonal clusters, use --zone=COMPUTE_ZONE.
+- PROJECT_ID: your Google Cloud project ID.
+
+## Step 2: Create a service account and bind it with a k8s service account
+
+<details>
+  <summary style="font-size: 22px;">Step 2.1: Create the c8-backend service account and bind it with the k8s service account</summary>
+
+> **Important**
+> Replace the PROJECT_ID with the project ID of the Google Cloud project of your IAM service account.
+
+Create GCP SA which will be bound to K8s SA
+
+```bash
+gcloud iam service-accounts create c8-backend \
+    --project=PROJECT_ID
+```
+
+Bind necessary IAM roles to the GCP SA
+
+```bash
+gcloud projects add-iam-policy-binding PROJECT_ID \
+    --member "serviceAccount:c8-backend@PROJECT_ID.iam.gserviceaccount.com" \
+    --role "roles/viewer"
+```
+
+Create K8s SA for workload identity in the c8 namespace
+
+```bash
+kubectl -n c8 create sa c8-backend
+```
+
+Bind K8s SA with GCP SA
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding c8-backend@PROJECT_ID.iam.gserviceaccount.com \
+    --role roles/iam.workloadIdentityUser \
+    --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-backend]"
+```
+
+Annotate K8s SA
+
+```bash
+kubectl -n c8 annotate serviceaccount c8-backend iam.gke.io/gcp-service-account=c8-backend@PROJECT_ID.iam.gserviceaccount.com
+```
+
+Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
+
+```bash
+gcloud iam service-accounts describe --format json c8-backend@PROJECT_ID.iam.gserviceaccount.com | jq -r '.uniqueId'
+```
+
+</details>
+
+<details>
+  <summary style="font-size: 22px;">Step 2.2: Create the c8-djw service account and bind it with the k8s service account</summary>
+
+> **Important**
+> Replace the PROJECT_ID with the project ID of the Google Cloud project of your IAM service account.
+
+Create GCP SA which will be bound to K8s SA
+
+```bash
+gcloud iam service-accounts create c8-djw \
+    --project=PROJECT_ID
+```
+
+Bind necessary IAM roles to the GCP SA
+
+```bash
+gcloud projects add-iam-policy-binding PROJECT_ID \
+    --member "serviceAccount:c8-djw@PROJECT_ID.iam.gserviceaccount.com" \
+    --role "roles/viewer"
+```
+
+Create K8s SA for workload identity in the c8 namespace
+
+```bash
+kubectl -n sh create sa c8-djw
+```
+
+Bind K8s SA with GCP SA
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding c8-djw@PROJECT_ID.iam.gserviceaccount.com \
+    --role roles/iam.workloadIdentityUser \
+    --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-djw]"
+```
+
+Annotate K8s SA
+
+```bash
+kubectl -n c8 annotate serviceaccount c8-djw iam.gke.io/gcp-service-account=c8-djw@PROJECT_ID.iam.gserviceaccount.com
+```
+
+Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
+
+```bash
+gcloud iam service-accounts describe --format json c8-djw@PROJECT_ID.iam.gserviceaccount.com | jq -r '.uniqueId'
+```
+
+</details>
+
+</details>
+
+## Step 3: Create AWS IAM Role (will be assumed by C8 backend and djm service accounts to discover resources)
+
+### Step 3.1: Download IAM Policy
+
+Download the IAM policy that grants read permissions to all AWS resources:
+
+```bash
+curl -o sh-c8-discovery-policy.json https://configure8-resources.s3.us-east-2.amazonaws.com/iam/sh-c8-discovery-policy.json
+```
+
+### Step 3.2: Create IAM Policy
+
+Create the IAM policy:
+
+```bash
+aws iam create-policy --policy-name sh-c8-discovery-policy --policy-document file://sh-c8-discovery-policy.json
+```
+
+### Step 3.3: Create IAM Role
+
+Create an IAM role that can be assumed by the C8 and DJM service accounts:
+
+> **Important**
+> To get gcp_sa_backend_client_id and gcp_sa_djw_client_id values please check the 2.1 step.
+
+| Name | Description |
+|-----|-------------|
+| $account_id | The AWS account id from which you want to allow run discovery |
+| $gcp_sa_backend_client_id | The GCP IAM service account unique client ID (c8-backend) |
+| $gcp_sa_djw_client_id | The GCP IAM service account unique client ID (c8-djw) |
+
+```bash
+# Generate a JSON file for the trust relationship
+cat >trust-relationship.json <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "RoleForGoogleBackend",
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "accounts.google.com"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "accounts.google.com:aud": "${gcp_sa_backend_client_id}"
+                }
+            }
+        },
+        {
+            "Sid": "RoleForGoogleDjw",
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "accounts.google.com"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "accounts.google.com:aud": "${gcp_sa_djw_client_id}"
+                }
+            }
+        }
+    ]
+}
+EOF
+```
+
+### Create an IAM role with a defined trust relationship and description
+
+```bash
+aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
+```
+
+### Attach the sh-c8-discovery to the policy
+
+```bash
+aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy
+```
+
+> **Note**
+> If you want to discover more AWS accounts, please repeat the 3rd step for each account.
+
 ## Step 5: Install the C8 Helm Chart
 
 ### Step 5.1: Add Configure8 Chart Repository
@@ -363,6 +575,8 @@ helm repo update
 
 ### Step 5.2: Install the Helm Chart
 
+<details>
+  <summary style="font-size: 22px;">Install the Helm Chart (AWS)</summary>
 Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
 
 ```bash
@@ -384,6 +598,32 @@ helm upgrade -i sh-c8 ./helm-charts/c8 \
 > **Warning**
 > You don't need to set djm.serviceAccount.job_worker.annotations."eks.amazonaws.com/role-arn" and backend.serviceAccount.annotations."eks.amazonaws.com/role-arn" if you use access type EC2 role or AWS access user keys.
 
+</details>
+
+<details>
+  <summary style="font-size: 22px;">Install the Helm Chart (GCP)</summary>
+Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
+
+```bash
+helm upgrade -i sh-c8 ./helm-charts/c8 \
+    -n c8 \
+    --set variables.AWS_REGION='value' \
+    --set variables.DB_HOST='value' \
+    --set variables.DB_DATABASE='value' \
+    --set variables.DEEPLINK_URL='value' \
+    --set variables.HOOKS_CALLBACK_URL='value' \
+    --set variables.OPENSEARCH_NODE='value' \
+    --set variables.RABBITMQ_HOST='value' \
+    --set common.ingress.ingressClassName='value' \
+    --set djm.serviceAccount.job_worker.create=false \
+    --set djm.serviceAccount.job_worker.name="c8-djw" \
+    --set backend.serviceAccount.create=false \
+    --set backend.serviceAccount.name="c8-backend"
+
+```
+
+</details>
+
 Once you successfully install a Helm chart that includes Ingress configurations, the next vital step is to establish a CNAME record in your DNS settings. This is essential to map your domain name to the Ingress controller's service endpoint.
 
 Ensuring that the DNS propagates the new record correctly and securely linking it via TLS/SSL certificates (if applicable) will bolster both usability and security for end-users navigating to your c8 applications.
@@ -403,16 +643,22 @@ The table below lists the key application variables that can be configured durin
 | variables.DEFAULT_SENDER | string | `"notifications@example.com"` | Default email for sending notifications. |
 | variables.HOOKS_CALLBACK_URL | string | `""` | Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io |
 | variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
+| variables.OLAP_DB | string | `"snowflake"` | Online analytical processing DB type |
 | variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
 | variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
-| variables.USE_SMTP_STRATEGY | string | `"true"` | Flag to use SMTP for emails |
+| variables.SF_ACCOUNT | string | `""` | Snowflake account name |
+| variables.SF_DATABASE | string | `"C8"` | Snowflake db name |
+| variables.SF_POOLSIZE | string | `"5"` | Snowflake poolsize |
+| variables.SF_SCHEMA | string | `"PUBLIC"` | Snowflake db schema |
+| variables.SF_WAREHOUSE | string | `""` | Snowflake warehouse name |
 | variables.SMTP_HOST | string | `"smtp.sendgrid.net"` | Address of the SMTP server (e.g., SendGrid's server). |
 | variables.SMTP_PORT | string | `"587"` | Port for connecting to the SMTP server |
 | variables.SSA_SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
 | variables.SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
 | variables.TZ | string | `"America/New_York"` | Application timezone |
+| variables.USE_SMTP_STRATEGY | string | `"true"` | Flag to use SMTP for emails |
 
 ### The C8 Helm Chart Parameters
 
@@ -439,7 +685,10 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.podAnnotations | object | `{}` |  |
 | backend.podDisruptionBudget.enabled | bool | `false` | Specifies whether pod disruption budget should be created |
 | backend.podDisruptionBudget.minAvailable | string | `"50%"` | Number or percentage of pods that must be available |
-| backend.podSecurityContext | object | `{}` |  |
+| backend.podSecurityContext.fsGroup | int | `1051` |  |
+| backend.podSecurityContext.runAsGroup | int | `1051` |  |
+| backend.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| backend.podSecurityContext.runAsUser | int | `1051` |  |
 | backend.readinessProbe.failureThreshold | int | `3` |  |
 | backend.readinessProbe.httpGet.path | string | `"/api/v1/ping"` |  |
 | backend.readinessProbe.httpGet.port | int | `5000` |  |
@@ -447,11 +696,13 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.readinessProbe.timeoutSeconds | int | `10` |  |
 | backend.replicaCount | int | `1` |  |
 | backend.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
-| backend.securityContext | object | `{}` |  |
+| backend.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| backend.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| backend.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | backend.service | object | `{"port":"5000","type":"ClusterIP"}` | Configuration for backend service |
 | backend.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | backend.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| backend.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| backend.serviceAccount.name | string | `"c8-backend"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | backend.startupProbe.failureThreshold | int | `5` |  |
 | backend.startupProbe.httpGet.path | string | `"/api/v1/ping"` |  |
 | backend.startupProbe.httpGet.port | int | `5000` |  |
@@ -466,11 +717,13 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | common.ingress.ingressClassName | string | `""` |  |
 | common.ingress.labels | object | `{}` |  |
 | common.ingress.pathType | string | `"Prefix"` |  |
+| common.revisionHistoryLimit | int | `3` |  |
+| common.ttlSecondsAfterFinished | int | `172800` |  |
 | commonLabels | object | `{}` | Labels to apply to all resources |
 | djm.DJW_IMAGE | string | `"ghcr.io/configure8inc/c8-djw:1.0.0"` | Discovery job worker image |
 | djm.DJW_NODE_SELECTOR_KEY | string | `""` | Discovery job worker NodeSelector key |
 | djm.DJW_NODE_SELECTOR_VALUE | string | `""` | Discovery job worker NodeSelector value |
-| djm.DJW_POD_SECURITY_CONTEXT | string | `'{"runAsUser": 1052, "runAsGroup": 1052, "runAsNonRoot": true}'` | Discovery job worker pod security context |
+| djm.DJW_POD_SECURITY_CONTEXT | string | `"{\"runAsUser\": 1052, \"runAsGroup\": 1052, \"runAsNonRoot\": true}"` | Discovery job worker pod security context |
 | djm.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | djm.container.port | string | `"5000"` |  |
 | djm.enabled | bool | `true` |  |
@@ -479,15 +732,21 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | djm.image.tag | string | `"1.0.0"` |  |
 | djm.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | djm.podAnnotations | object | `{}` |  |
-| djm.podSecurityContext | object | `{}` |  |
+| djm.podSecurityContext.fsGroup | int | `1052` |  |
+| djm.podSecurityContext.runAsGroup | int | `1052` |  |
+| djm.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| djm.podSecurityContext.runAsUser | int | `1052` |  |
 | djm.replicaCount | int | `1` |  |
 | djm.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
-| djm.securityContext | object | `{}` |  |
+| djm.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| djm.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| djm.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | djm.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | djm.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | djm.serviceAccount.job_worker.annotations | object | `{}` | Annotations to add to the service account |
-| djm.serviceAccount.job_worker.name | string | `nil` | The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template |
-| djm.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| djm.serviceAccount.job_worker.create | bool | `true` | Specifies whether a service account should be created |
+| djm.serviceAccount.job_worker.name | string | `"c8-djw"` | The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template |
+| djm.serviceAccount.name | string | `"c8-djm"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | djm.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | frontend.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | frontend.autoscaling.enabled | bool | `false` |  |
@@ -501,25 +760,29 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | frontend.image.tag | string | `"1.0.0"` |  |
 | frontend.livenessProbe.failureThreshold | int | `2` |  |
 | frontend.livenessProbe.httpGet.path | string | `"/"` |  |
-| frontend.livenessProbe.httpGet.port | string | `"http"` |  |
+| frontend.livenessProbe.httpGet.port | int | `8080` |  |
 | frontend.livenessProbe.periodSeconds | int | `10` |  |
 | frontend.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | frontend.podAnnotations | object | `{}` |  |
 | frontend.podDisruptionBudget.enabled | bool | `false` |  |
 | frontend.podDisruptionBudget.minAvailable | string | `"50%"` |  |
-| frontend.podSecurityContext | object | `{}` |  |
+| frontend.podSecurityContext.fsGroup | int | `101` |  |
+| frontend.podSecurityContext.runAsGroup | int | `101` |  |
+| frontend.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| frontend.podSecurityContext.runAsUser | int | `101` |  |
 | frontend.readinessProbe.failureThreshold | int | `2` |  |
 | frontend.readinessProbe.httpGet.path | string | `"/"` |  |
-| frontend.readinessProbe.httpGet.port | string | `"http"` |  |
+| frontend.readinessProbe.httpGet.port | int | `8080` |  |
 | frontend.readinessProbe.initialDelaySeconds | int | `20` |  |
 | frontend.readinessProbe.periodSeconds | int | `10` |  |
 | frontend.replicaCount | int | `1` |  |
 | frontend.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
-| frontend.securityContext | object | `{}` |  |
-| frontend.service | object | `{"port":"80","type":"ClusterIP"}` | Configuration for frontend service |
+| frontend.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| frontend.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| frontend.service | object | `{"port":"8080","type":"ClusterIP"}` | Configuration for frontend service |
 | frontend.serviceAccount.annotations | object | `{}` |  |
-| frontend.serviceAccount.create | bool | `false` |  |
-| frontend.serviceAccount.name | string | `""` |  |
+| frontend.serviceAccount.create | bool | `true` |  |
+| frontend.serviceAccount.name | string | `"c8-frontend"` |  |
 | frontend.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources |
 | migration.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
@@ -527,9 +790,12 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | migration.image.repository | string | `"ghcr.io/configure8inc/c8-migrations"` |  |
 | migration.image.tag | string | `"1.0.0"` |  |
 | migration.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
-| migration.serviceAccount.annotations | object | `{}` |  |
-| migration.serviceAccount.create | bool | `false` |  |
-| migration.serviceAccount.name | string | `""` |  |
+| migration.podSecurityContext.fsGroup | int | `1051` |  |
+| migration.podSecurityContext.runAsGroup | int | `1051` |  |
+| migration.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| migration.podSecurityContext.runAsUser | int | `1051` |  |
+| migration.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| migration.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | migration.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | nameOverride | string | `""` | Provide a name in place of c8 for `app:` labels |
 | pns.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
@@ -547,14 +813,19 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.podAnnotations | object | `{}` |  |
 | pns.podDisruptionBudget.enabled | bool | `false` |  |
 | pns.podDisruptionBudget.minAvailable | string | `"50%"` |  |
-| pns.podSecurityContext | object | `{}` |  |
+| pns.podSecurityContext.fsGroup | int | `1057` |  |
+| pns.podSecurityContext.runAsGroup | int | `1057` |  |
+| pns.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| pns.podSecurityContext.runAsUser | int | `1057` |  |
 | pns.replicaCount | int | `1` |  |
 | pns.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
-| pns.securityContext | object | `{}` |  |
+| pns.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| pns.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| pns.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | pns.service | object | `{"enabled":true,"port":"5000","type":"ClusterIP"}` | Configuration for pns service |
 | pns.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | pns.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| pns.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| pns.serviceAccount.name | string | `"c8-pns"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | pns.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | ssa.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | ssa.container.port | string | `"5000"` |  |
@@ -577,7 +848,10 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.podAnnotations | object | `{}` |  |
 | ssa.podDisruptionBudget.enabled | bool | `false` | Specifies whether pod disruption budget should be created |
 | ssa.podDisruptionBudget.minAvailable | string | `"50%"` | Number or percentage of pods that must be available |
-| ssa.podSecurityContext | object | `{}` |  |
+| ssa.podSecurityContext.fsGroup | int | `1055` |  |
+| ssa.podSecurityContext.runAsGroup | int | `1055` |  |
+| ssa.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| ssa.podSecurityContext.runAsUser | int | `1055` |  |
 | ssa.readinessProbe.failureThreshold | int | `3` |  |
 | ssa.readinessProbe.httpGet.path | string | `"/self-service/api/health"` |  |
 | ssa.readinessProbe.httpGet.port | int | `5000` |  |
@@ -586,11 +860,11 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.readinessProbe.timeoutSeconds | int | `10` |  |
 | ssa.replicaCount | int | `1` |  |
 | ssa.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
-| ssa.securityContext | object | `{}` |  |
+| ssa.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| ssa.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| ssa.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | ssa.service | object | `{"enabled":true,"port":"5000","type":"ClusterIP"}` | Configuration for ssa service |
 | ssa.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | ssa.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| ssa.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| ssa.serviceAccount.name | string | `"c8-ssa"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | ssa.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
-
-----------------------------------------------

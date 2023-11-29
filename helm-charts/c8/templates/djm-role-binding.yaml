@@ -1,0 +1,19 @@
+{{- if .Values.djm.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "c8.fullname" . }}-djm-role-binding
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded"
+roleRef:
+  kind: Role
+  name: {{ include "c8.fullname" . }}-djm-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "c8.serviceAccountNameDjm" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

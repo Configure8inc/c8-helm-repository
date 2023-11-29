@@ -13,6 +13,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded"
 spec:
   backoffLimit: 0
+  ttlSecondsAfterFinished: {{ .Values.common.ttlSecondsAfterFinished }}
   template:
     metadata:
       {{- with .Values.backend.podAnnotations }}
@@ -24,9 +25,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-      {{- if .Values.migration.serviceAccount.create }}
-      serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}-migration
-      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNameBackend" . }}
       securityContext:
         {{- toYaml .Values.migration.podSecurityContext | nindent 8 }}
       containers:
@@ -57,6 +56,16 @@ spec:
             value: {{ .Values.variables.DB_PORT | quote }}
           - name: MONGO_DRIVER_TYPE
             value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
+          - name: SF_ACCOUNT
+            value: {{ .Values.variables.SF_ACCOUNT | quote }}
+          - name: SF_DATABASE
+            value: {{ .Values.variables.SF_DATABASE | quote }}
+          - name: SF_WAREHOUSE
+            value: {{ .Values.variables.SF_WAREHOUSE | quote }}
+          - name: SF_POOLSIZE
+            value: {{ .Values.variables.SF_POOLSIZE | quote }}
+          - name: OLAP_DB
+            value: {{ .Values.variables.OLAP_DB | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params

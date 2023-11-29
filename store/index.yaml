@@ -3,6 +3,16 @@ entries:
   c8:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2023-11-27T17:11:03.637108+01:00"
+    description: A Helm chart for the C8 app
+    digest: f3855eebece2e137db10b21842ddccc7c64653180dcf824eec6b8569ebf94f9d
+    name: c8
+    type: application
+    urls:
+    - https://helm.configure8.io/store/c8-0.0.7.tgz
+    version: 0.0.7
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2023-11-24T17:59:45.315752+02:00"
     description: A Helm chart for the C8 app
     digest: e686bfc7d653579603ff1a5438f62fc6f079ccadf0b3f959336d7b5250e46588

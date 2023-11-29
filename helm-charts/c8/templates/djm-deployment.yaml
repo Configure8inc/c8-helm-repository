@@ -10,6 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  revisionHistoryLimit: {{ .Values.common.revisionHistoryLimit }}
   replicas: {{ default "1" .Values.djm.replicaCount }}
   {{- if .Values.djm.updateStrategy }}
   strategy:
@@ -29,9 +30,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-      {{- if .Values.djm.serviceAccount.create }}
-      serviceAccountName: {{ include "c8.serviceAccountNameDjm" . }}-djm
-      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNameDjm" . }}
       securityContext:
         {{- toYaml .Values.djm.podSecurityContext | nindent 8 }}
       containers:
@@ -58,7 +57,7 @@ spec:
           - name: DJW_SERVICE
             value: "discovery-job-worker"
           - name: DJW_SERVICE_ACCOUNT_NAME
-            value: {{ include "c8.serviceAccountNameDjm" . }}-djw
+            value: {{ include "c8.serviceAccountNameDjw" . }}
           - name: DB_AUTH_SOURCE
             value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_AUTH_MECHANISM
@@ -89,6 +88,16 @@ spec:
             value: {{ .Values.djm.DJW_IMAGE | quote }}
           - name: IMAGE_PULL_SECRET
             value: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+          - name: SF_ACCOUNT
+            value: {{ .Values.variables.SF_ACCOUNT | quote }}
+          - name: SF_DATABASE
+            value: {{ .Values.variables.SF_DATABASE | quote }}
+          - name: SF_WAREHOUSE
+            value: {{ .Values.variables.SF_WAREHOUSE | quote }}
+          - name: SF_POOLSIZE
+            value: {{ .Values.variables.SF_POOLSIZE | quote }}
+          - name: OLAP_DB
+            value: {{ .Values.variables.OLAP_DB | quote }}
           {{- if .Values.djm.DJW_NODE_SELECTOR_KEY }}
           - name: DJW_NODE_SELECTOR_KEY
             value: {{ .Values.djm.DJW_NODE_SELECTOR_KEY | quote }}
