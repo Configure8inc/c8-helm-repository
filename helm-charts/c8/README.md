@@ -91,7 +91,24 @@ kubectl create secret generic c8-secret \
 
 ## Step 4: Install the C8 Helm Chart
 
-### Step 4.1: Add Configure8 Chart Repository
+### Step 4.1: Configure access for the discovery job
+
+#### AWS
+
+- [Using service account](./AWS-IAM-SA.md)
+- [Using IAM role for EC2](./AWS-IAM-EC2-ROLE.md)
+- [Using access keys for IAM users (AWS\Azure\GCP\Self-Hosted)](./AWS-IAM-KEYS.md)
+- [Using GCP ServiceAccount (GKE)](./AWS-GCP-SA.md)
+
+#### GCP (It can be configured after chart installation)
+
+- [Using service account](https://docs.configure8.io/configure8-product-docs/fundamentals/plug-ins/gcp)
+
+#### Azure (It can be configured after chart installation)
+
+- [Using application](https://docs.configure8.io/configure8-product-docs/fundamentals/plug-ins/azure)
+
+### Step 4.2: Add Configure8 Chart Repository
 
 Add the [Configure8](https://app.configure8.io) chart repository and update it:
 
