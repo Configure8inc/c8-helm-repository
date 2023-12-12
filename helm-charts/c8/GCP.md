@@ -88,7 +88,7 @@ kubectl create secret generic c8-secret \
 > **Warning**
 > You need to generate your own API_KEY, CRYPTO_IV, JWT_SECRET, and CRYPTO_SECRET which can be any cryptographically secure random string. Feel free to refer to Open Web Application Security Project (OWASP) for secure random number generation recommendations: https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#secure-random-number-generation
 
-### Step 4: Install the Helm Chart
+## Step 4: Install the Helm Chart
 
 Add the [Configure8](https://app.configure8.io) chart repository and update it:
 

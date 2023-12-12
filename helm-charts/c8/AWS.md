@@ -45,8 +45,7 @@ kubectl create secret docker-registry c8-docker-registry-secret \
 Generate a Kubernetes secret for the C8 application, which will contain sensitive data such as API keys and database credentials. Replace 'value' with the actual values:
 
 ```bash
-kubectl create secret generic c8-secret \
-    --from-literal=API_KEY='value' \
+kubectl create secret generic c8-secret \y
     --from-literal=CRYPTO_IV='value' \
     --from-literal=CRYPTO_SECRET='value' \
     --from-literal=JWT_SECRET='value' \
@@ -89,7 +88,7 @@ kubectl create secret generic c8-secret \
 > **Warning**
 > You need to generate your own API_KEY, CRYPTO_IV, JWT_SECRET, and CRYPTO_SECRET which can be any cryptographically secure random string. Feel free to refer to Open Web Application Security Project (OWASP) for secure random number generation recommendations: https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#secure-random-number-generation
 
-### Step 4: Install the Helm Chart (AWS EKS)
+## Step 4: Install the Helm Chart (AWS EKS)
 
 Add the [Configure8](https://app.configure8.io) chart repository and update it:
 
