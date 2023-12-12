@@ -103,10 +103,10 @@ helm repo update
 Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
 
 > **Note**
-> The example below uses discovery access type [using GCP ServiceAccount (GKE) to access AWS](./AWS-GCP-SA.md)
+> The example below the uses discovery access type [using GCP ServiceAccount (GKE) to access AWS](./AWS-GCP-SA.md)
 
 ```bash
-helm upgrade -i sh-c8 ./helm-charts/c8 \
+helm upgrade -i c8 c8 ./helm-charts/c8 \
     -n c8 \
     --set variables.AWS_REGION='value' \
     --set variables.DB_HOST='value' \
@@ -122,10 +122,10 @@ helm upgrade -i sh-c8 ./helm-charts/c8 \
 ```
 
 > **Note**
-> The example below uses discovery access type [Using service account](./AWS-IAM-SA.md)
+> The example below uses the discovery access type [Using service account](./AWS-IAM-SA.md)
 
 ```bash
-helm upgrade -i sh-c8 ./helm-charts/c8 \
+helm upgrade -i c8 c8 \
     -n c8 \
     --set variables.AWS_REGION='value' \
     --set variables.DB_HOST='value' \
@@ -138,6 +138,22 @@ helm upgrade -i sh-c8 ./helm-charts/c8 \
     --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
     --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
 
+```
+
+> **Note**
+> The example below uses the discovery access type: Azure application, GCP service account, and AWS access keys.
+
+```bash
+helm upgrade -i c8 c8 \
+    -n c8 \
+    --set variables.AWS_REGION='value' \
+    --set variables.DB_HOST='value' \
+    --set variables.DB_DATABASE='value' \
+    --set variables.DEEPLINK_URL='value' \
+    --set variables.HOOKS_CALLBACK_URL='value' \
+    --set variables.OPENSEARCH_NODE='value' \
+    --set variables.RABBITMQ_HOST='value' \
+    --set common.ingress.ingressClassName='value'
 ```
 
 > **Note**
