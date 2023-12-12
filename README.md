@@ -18,8 +18,7 @@ helm repo update
 ## Installation
 
 ### c8
-- [AWS](helm-charts/c8/AWS.md)
-- [GCP](helm-charts/c8/GCP.md)
+- [AWS\GCP\Azure\Self-Hosted](helm-charts/c8/README.md)
 
 #### Configure AWS access for the discovery job
 - [Using service account](helm-charts/c8/AWS-IAM-SA.md)
@@ -34,4 +33,4 @@ helm repo update
 - [Using application](https://docs.configure8.io/configure8-product-docs/fundamentals/plug-ins/azure)
 
 ### c8-k8s-agent
-- [AWS\GCP\Self-Hosted](helm-charts/c8/README.md)
+- [AWS\GCP\Azure\Self-Hosted](helm-charts/c8/README.md)
