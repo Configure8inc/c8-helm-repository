@@ -123,7 +123,7 @@ Install the Helm chart with the desired configurations. Replace the placeholders
 > The example below the uses discovery access type [using GCP ServiceAccount (GKE) to access AWS](./AWS-GCP-SA.md)
 
 ```bash
-helm upgrade -i c8 c8 ./helm-charts/c8 \
+helm upgrade -i c8 c8 \
     -n c8 \
     --set variables.AWS_REGION='value' \
     --set variables.DB_HOST='value' \
@@ -139,7 +139,7 @@ helm upgrade -i c8 c8 ./helm-charts/c8 \
 ```
 
 > **Note**
-> The example below uses the discovery access type [Using service account](./AWS-IAM-SA.md)
+> The example below uses the discovery access type [Using service account (EKS)](./AWS-IAM-SA.md)
 
 ```bash
 helm upgrade -i c8 c8 \
