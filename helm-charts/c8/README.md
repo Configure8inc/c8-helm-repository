@@ -89,482 +89,26 @@ kubectl create secret generic c8-secret \
 > **Warning**
 > You need to generate your own API_KEY, CRYPTO_IV, JWT_SECRET, and CRYPTO_SECRET which can be any cryptographically secure random string. Feel free to refer to Open Web Application Security Project (OWASP) for secure random number generation recommendations: https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#secure-random-number-generation
 
-## Step 4: Configure AWS access for the discovery job
+## Step 4: Install the C8 Helm Chart
 
-<details>
-  <summary style="font-size: 22px;">Configure AWS access using service account (AWS EKS)</summary>
+### Step 4.1: Configure access for the discovery job
 
-### Step 1: Create IAM Role for C8 and DJM Service Accounts
+#### AWS
 
-### Step 1.1: Create IAM Policy
+- [Using service account](./AWS-IAM-SA.md)
+- [Using IAM role for EC2](./AWS-IAM-EC2-ROLE.md)
+- [Using access keys for IAM users (AWS\Azure\GCP\Self-Hosted)](./AWS-IAM-KEYS.md)
+- [Using GCP ServiceAccount (GKE)](./AWS-GCP-SA.md)
 
-Replace the placeholders with your specific values:
+#### GCP (It can be configured after chart installation)
 
-> *placeholders description*:
+- [Using service account](https://docs.configure8.io/configure8-product-docs/fundamentals/plug-ins/gcp)
 
-| Name | Description |
-|-----|-------------|
-| $AWS_EKS_CLUSTER_NAME | The name of the AWS EKS cluster to which we will deploy the application |
-| $AWS_EKS_CLUSTER_REGION  | The AWS Region of the AWS EKS cluster to which we will deploy the application |
-| $APP_NAMESPACE  | The Kubernetes namespace of the AWS EKS cluster to which we will deploy the application |
+#### Azure (It can be configured after chart installation)
 
-```bash
-account_id=$(aws sts get-caller-identity --query "Account" --output text)
-oidc_provider=$(aws eks describe-cluster --name $AWS_EKS_CLUSTER_NAME --region $AWS_EKS_CLUSTER_REGION --query "cluster.identity.oidc.issuer" --output text | sed -e "s/^https:\/\///")
-namespace=$APP_NAMESPACE
-service_account_c8_app=c8-backend
-service_account_c8_djw=c8-djw
-```
+- [Using application](https://docs.configure8.io/configure8-product-docs/fundamentals/plug-ins/azure)
 
-### Step 1.2: Create Trust Relationship for IAM Role
-
-Create a trust relationship for the IAM role:
-
-```bash
-# Generate a JSON file for the trust relationship
-cat >trust-relationship-sa.json <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Federated": "arn:aws:iam::${account_id}:oidc-provider/${oidc_provider}"
-      },
-      "Action": "sts:AssumeRoleWithWebIdentity",
-      "Condition": {
-        "StringEquals": {
-          "${oidc_provider}:aud": "sts.amazonaws.com",
-          "${oidc_provider}:sub": [
-            "system:serviceaccount:${namespace}:${service_account_c8_app}",
-            "system:serviceaccount:${namespace}:${service_account_c8_djw}"
-          ]
-        }
-      }
-    }
-  ]
-}
-EOF
-```
-
-### Step 1.3: Create IAM Role
-
-```bash
-# Create an IAM role with a defined trust relationship and description
-aws iam create-role --role-name sh-c8-service-account --assume-role-policy-document file://trust-relationship-sa.json --description "The role for the Configure8 pods service account"
-```
-
-### Step 2: Create IAM Role to Assume by C8 and DJM Service Accounts
-
-### Step 2.1: Download IAM Policy
-
-Download the IAM policy that grants read permissions to all AWS resources:
-
-```bash
-curl -o sh-c8-discovery-policy.json https://configure8-resources.s3.us-east-2.amazonaws.com/iam/sh-c8-discovery-policy.json
-```
-
-### Step 2.2: Create IAM Policy
-
-Create the IAM policy:
-
-```bash
-aws iam create-policy --policy-name sh-c8-discovery-policy --policy-document file://sh-c8-discovery-policy.json
-```
-
-### Step 2.3: Create IAM Role
-
-Create an IAM role that can be assumed by the C8 and DJM service accounts:
-
-```bash
-# Generate a JSON file for the trust relationship
-cat >trust-relationship.json <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::${account_id}:role/sh-c8-service-account"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-EOF
-```
-
-### Create an IAM role with a defined trust relationship and description
-
-```bash
-aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
-```
-
-### Attach the sh-c8-discovery to the policy
-
-```bash
-aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy
-```
-
-> **Note**
-> If you want to discover more AWS accounts, please repeat the 2nd step for each account.
-
-</details>
-
-<details>
-  <summary style="font-size: 22px;">Configure AWS access using IAM role for EC2</summary>
-
-### Step 1: Create IAM Role for EC2
-
-[Please refer to the official AWS documentation about creating an AWS IAM role for the EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html#create-iam-role)
-
-## Step 2: Create IAM Role to assume by EC2 instance role.
-
-### Step 2.1: Download IAM Policy
-
-Download the IAM policy that grants read permissions to all AWS resources:
-
-```bash
-curl -o sh-c8-discovery-policy.json https://configure8-resources.s3.us-east-2.amazonaws.com/iam/sh-c8-discovery-policy.json
-```
-
-### Step 2.2: Create IAM Policy
-
-Create the IAM policy:
-
-```bash
-aws iam create-policy --policy-name sh-c8-discovery-policy --policy-document file://sh-c8-discovery-policy.json
-```
-
-### Step 2.3: Create IAM Role
-
-Create an IAM role that can be assumed by EC2 roles:
-
-| Name | Description |
-|-----|-------------|
-| $account_id | The AWS account id from which you want to allow run discovery |
-| $ec2_role  | The AWS role name from which you want to allow run discovery |
-
-```bash
-# Generate a JSON file for the trust relationship
-cat >trust-relationship.json <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::${account_id}:role/${ec2_role}"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-EOF
-```
-
-### Create an IAM role with a defined trust relationship and description
-
-```bash
-aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
-```
-
-### Attach the sh-c8-discovery to the policy
-
-```bash
-aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::${account_id}:policy/sh-c8-discovery-policy
-```
-
-> **Note**
-> If you want to discover more AWS accounts, please repeat the 2nd step for each account.
-
-</details>
-
-<details>
-  <summary style="font-size: 22px;">Configure AWS access using access keys for IAM users</summary>
-
-### Step 1: Create IAM User
-
-[Please refer to the official AWS documentation about creating access keys for IAM users](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)
-
-> **Important**
-> As a [best practice](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html), use temporary security credentials (such as IAM roles) instead of creating long-term credentials like access keys.
-
-### Step 2: Create IAM Role to assume by EC2 instance role.
-
-### Step 2.1: Download IAM Policy
-
-Download the IAM policy that grants read permissions to all AWS resources:
-
-```bash
-curl -o sh-c8-discovery-policy.json https://configure8-resources.s3.us-east-2.amazonaws.com/iam/sh-c8-discovery-policy.json
-```
-
-### Step 2.2: Create IAM Policy
-
-Create the IAM policy:
-
-```bash
-aws iam create-policy --policy-name sh-c8-discovery-policy --policy-document file://sh-c8-discovery-policy.json
-```
-
-### Step 2.3: Create IAM Role
-
-Create an IAM role that can be assumed by EC2 roles:
-
-| Name | Description |
-|-----|-------------|
-| $account_id | The AWS account id from which you want to allow run discovery |
-| $iam_user  | The AWS IAM user name from which you want to allow run discovery |
-
-```bash
-# Generate a JSON file for the trust relationship
-cat >trust-relationship.json <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::${account_id}:user/${iam_user}"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-EOF
-```
-
-### Create an IAM role with a defined trust relationship and description
-
-```bash
-aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
-```
-
-### Attach the sh-c8-discovery to the policy
-
-```bash
-aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::${account_id}:policy/sh-c8-discovery-policy
-```
-
-> **Note**
-> If you want to discover more AWS accounts, please repeat the 2nd step for each account.
-
-> **Important**
-> Don't forget to add the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY variables to the c8-secret secret on the 3rd step.
-
-</details>
-
-<details>
-  <summary style="font-size: 22px;">Configure AWS access using GCP ServiceAccount (GKE)</summary>
-
-## Step 1: Enable Workload Identity (skip if already enabled)
-
-You can enable Workload Identity on an existing Standard cluster by using the gcloud CLI or the Google Cloud console. Existing node pools are unaffected, but any new node pools in the cluster use Workload Identity.
-
-```bash
-gcloud container clusters update CLUSTER_NAME \
-    --region=COMPUTE_REGION \
-    --workload-pool=PROJECT_ID.svc.id.goog
-```
-
-> **Note**
-> You can check the current status by running the command ```gcloud container clusters describe CLUSTER_NAME --region=COMPUTE_REGION --format="value(workloadIdentityConfig)```
-
-Replace the following:
-
-- CLUSTER_NAME: the name of your existing GKE cluster.
-- COMPUTE_REGION: the Compute Engine region of your cluster. For zonal clusters, use --zone=COMPUTE_ZONE.
-- PROJECT_ID: your Google Cloud project ID.
-
-## Step 2: Create a service account and bind it with a k8s service account
-
-<details>
-  <summary style="font-size: 22px;">Step 2.1: Create the c8-backend service account and bind it with the k8s service account</summary>
-
-> **Important**
-> Replace the PROJECT_ID with the project ID of the Google Cloud project of your IAM service account.
-
-Create GCP SA which will be bound to K8s SA
-
-```bash
-gcloud iam service-accounts create c8-backend \
-    --project=PROJECT_ID
-```
-
-Bind necessary IAM roles to the GCP SA
-
-```bash
-gcloud projects add-iam-policy-binding PROJECT_ID \
-    --member "serviceAccount:c8-backend@PROJECT_ID.iam.gserviceaccount.com" \
-    --role "roles/viewer"
-```
-
-Create K8s SA for workload identity in the c8 namespace
-
-```bash
-kubectl -n c8 create sa c8-backend
-```
-
-Bind K8s SA with GCP SA
-
-```bash
-gcloud iam service-accounts add-iam-policy-binding c8-backend@PROJECT_ID.iam.gserviceaccount.com \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-backend]"
-```
-
-Annotate K8s SA
-
-```bash
-kubectl -n c8 annotate serviceaccount c8-backend iam.gke.io/gcp-service-account=c8-backend@PROJECT_ID.iam.gserviceaccount.com
-```
-
-Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
-
-```bash
-gcloud iam service-accounts describe --format json c8-backend@PROJECT_ID.iam.gserviceaccount.com | jq -r '.uniqueId'
-```
-
-</details>
-
-<details>
-  <summary style="font-size: 22px;">Step 2.2: Create the c8-djw service account and bind it with the k8s service account</summary>
-
-> **Important**
-> Replace the PROJECT_ID with the project ID of the Google Cloud project of your IAM service account.
-
-Create GCP SA which will be bound to K8s SA
-
-```bash
-gcloud iam service-accounts create c8-djw \
-    --project=PROJECT_ID
-```
-
-Bind necessary IAM roles to the GCP SA
-
-```bash
-gcloud projects add-iam-policy-binding PROJECT_ID \
-    --member "serviceAccount:c8-djw@PROJECT_ID.iam.gserviceaccount.com" \
-    --role "roles/viewer"
-```
-
-Create K8s SA for workload identity in the c8 namespace
-
-```bash
-kubectl -n sh create sa c8-djw
-```
-
-Bind K8s SA with GCP SA
-
-```bash
-gcloud iam service-accounts add-iam-policy-binding c8-djw@PROJECT_ID.iam.gserviceaccount.com \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-djw]"
-```
-
-Annotate K8s SA
-
-```bash
-kubectl -n c8 annotate serviceaccount c8-djw iam.gke.io/gcp-service-account=c8-djw@PROJECT_ID.iam.gserviceaccount.com
-```
-
-Get the service account unique client ID (will be used in the step below to create an AWS IAM role).
-
-```bash
-gcloud iam service-accounts describe --format json c8-djw@PROJECT_ID.iam.gserviceaccount.com | jq -r '.uniqueId'
-```
-
-</details>
-
-</details>
-
-## Step 3: Create AWS IAM Role (will be assumed by C8 backend and djm service accounts to discover resources)
-
-### Step 3.1: Download IAM Policy
-
-Download the IAM policy that grants read permissions to all AWS resources:
-
-```bash
-curl -o sh-c8-discovery-policy.json https://configure8-resources.s3.us-east-2.amazonaws.com/iam/sh-c8-discovery-policy.json
-```
-
-### Step 3.2: Create IAM Policy
-
-Create the IAM policy:
-
-```bash
-aws iam create-policy --policy-name sh-c8-discovery-policy --policy-document file://sh-c8-discovery-policy.json
-```
-
-### Step 3.3: Create IAM Role
-
-Create an IAM role that can be assumed by the C8 and DJM service accounts:
-
-> **Important**
-> To get gcp_sa_backend_client_id and gcp_sa_djw_client_id values please check the 2.1 step.
-
-| Name | Description |
-|-----|-------------|
-| $account_id | The AWS account id from which you want to allow run discovery |
-| $gcp_sa_backend_client_id | The GCP IAM service account unique client ID (c8-backend) |
-| $gcp_sa_djw_client_id | The GCP IAM service account unique client ID (c8-djw) |
-
-```bash
-# Generate a JSON file for the trust relationship
-cat >trust-relationship.json <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "RoleForGoogleBackend",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "accounts.google.com"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "accounts.google.com:aud": "${gcp_sa_backend_client_id}"
-                }
-            }
-        },
-        {
-            "Sid": "RoleForGoogleDjw",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "accounts.google.com"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "accounts.google.com:aud": "${gcp_sa_djw_client_id}"
-                }
-            }
-        }
-    ]
-}
-EOF
-```
-
-### Create an IAM role with a defined trust relationship and description
-
-```bash
-aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
-```
-
-### Attach the sh-c8-discovery to the policy
-
-```bash
-aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy
-```
-
-> **Note**
-> If you want to discover more AWS accounts, please repeat the 3rd step for each account.
-
-## Step 5: Install the C8 Helm Chart
-
-### Step 5.1: Add Configure8 Chart Repository
+### Step 4.2: Add Configure8 Chart Repository
 
 Add the [Configure8](https://app.configure8.io) chart repository and update it:
 
@@ -573,14 +117,13 @@ helm repo add c8 https://helm.configure8.io/store/
 helm repo update
 ```
 
-### Step 5.2: Install the Helm Chart
-
-<details>
-  <summary style="font-size: 22px;">Install the Helm Chart (AWS)</summary>
 Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
 
+> **Note**
+> The example below the uses discovery access type [using GCP ServiceAccount (GKE) to access AWS](./AWS-GCP-SA.md)
+
 ```bash
-helm upgrade -i sh-c8 ./helm-charts/c8 \
+helm upgrade -i c8 c8 \
     -n c8 \
     --set variables.AWS_REGION='value' \
     --set variables.DB_HOST='value' \
@@ -595,17 +138,11 @@ helm upgrade -i sh-c8 ./helm-charts/c8 \
 
 ```
 
-> **Warning**
-> You don't need to set djm.serviceAccount.job_worker.annotations."eks.amazonaws.com/role-arn" and backend.serviceAccount.annotations."eks.amazonaws.com/role-arn" if you use access type EC2 role or AWS access user keys.
-
-</details>
-
-<details>
-  <summary style="font-size: 22px;">Install the Helm Chart (GCP)</summary>
-Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
+> **Note**
+> The example below uses the discovery access type [Using service account (EKS)](./AWS-IAM-SA.md)
 
 ```bash
-helm upgrade -i sh-c8 ./helm-charts/c8 \
+helm upgrade -i c8 c8 \
     -n c8 \
     --set variables.AWS_REGION='value' \
     --set variables.DB_HOST='value' \
@@ -615,14 +152,29 @@ helm upgrade -i sh-c8 ./helm-charts/c8 \
     --set variables.OPENSEARCH_NODE='value' \
     --set variables.RABBITMQ_HOST='value' \
     --set common.ingress.ingressClassName='value' \
-    --set djm.serviceAccount.job_worker.create=false \
-    --set djm.serviceAccount.job_worker.name="c8-djw" \
-    --set backend.serviceAccount.create=false \
-    --set backend.serviceAccount.name="c8-backend"
+    --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
+    --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
 
 ```
 
-</details>
+> **Note**
+> The example below uses the discovery access type: Azure application, GCP service account, and AWS access keys.
+
+```bash
+helm upgrade -i c8 c8 \
+    -n c8 \
+    --set variables.AWS_REGION='value' \
+    --set variables.DB_HOST='value' \
+    --set variables.DB_DATABASE='value' \
+    --set variables.DEEPLINK_URL='value' \
+    --set variables.HOOKS_CALLBACK_URL='value' \
+    --set variables.OPENSEARCH_NODE='value' \
+    --set variables.RABBITMQ_HOST='value' \
+    --set common.ingress.ingressClassName='value'
+```
+
+> **Note**
+> Depending on the chosen discovery access type, the serviceAccount parameters can be overridden
 
 Once you successfully install a Helm chart that includes Ingress configurations, the next vital step is to establish a CNAME record in your DNS settings. This is essential to map your domain name to the Ingress controller's service endpoint.
 
