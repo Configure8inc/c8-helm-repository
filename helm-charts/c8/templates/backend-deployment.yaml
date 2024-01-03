@@ -84,6 +84,8 @@ spec:
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          - name: RABBITMQ_USE_SSL
+            value: {{ .Values.variables.RABBITMQ_USE_SSL | quote }}
           - name: SF_ACCOUNT
             value: {{ .Values.variables.SF_ACCOUNT | quote }}
           - name: SF_DATABASE

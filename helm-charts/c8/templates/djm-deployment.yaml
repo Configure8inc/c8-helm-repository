@@ -82,6 +82,8 @@ spec:
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT
             value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          - name: RABBITMQ_USE_SSL
+            value: {{ .Values.variables.RABBITMQ_USE_SSL | quote }}
           - name: DJW_APP_URL
             value: {{ .Values.variables.DEEPLINK_URL | quote }}
           - name: DJW_IMAGE

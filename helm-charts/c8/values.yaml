@@ -518,6 +518,8 @@ variables:
   RABBITMQ_HOST: ""
   # -- RabbitMQ port
   RABBITMQ_PORT: 5672
+  # -- RabbitMQ ssl flag
+  RABBITMQ_USE_SSL: "false"
   # -- The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by mongodb
   DB_AUTH_MECHANISM: "SCRAM-SHA-1"
   # -- Database host

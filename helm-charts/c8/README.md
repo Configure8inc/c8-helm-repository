@@ -199,6 +199,7 @@ The table below lists the key application variables that can be configured durin
 | variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
+| variables.RABBITMQ_USE_SSL | bool | `false` | RabbitMQ ssl flag |
 | variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
 | variables.SF_ACCOUNT | string | `""` | Snowflake account name |
 | variables.SF_DATABASE | string | `"C8"` | Snowflake db name |
