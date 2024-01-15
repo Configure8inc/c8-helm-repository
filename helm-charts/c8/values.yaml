@@ -496,6 +496,8 @@ variables:
   SEGMENT_KEY: "na"
   # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
+  # -- Enable or disable analytics
+  DISABLE_ANALYTICS: "false"
 
   ##### SSA #########
   # -- Enable or disable swagger documentation

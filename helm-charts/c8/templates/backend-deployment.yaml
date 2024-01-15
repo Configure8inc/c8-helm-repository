@@ -96,6 +96,8 @@ spec:
             value: {{ .Values.variables.SF_POOLSIZE | quote }}
           - name: OLAP_DB
             value: {{ .Values.variables.OLAP_DB | quote }}
+          - name: DISABLE_ANALYTICS
+            value: {{ .Values.variables.DISABLE_ANALYTICS | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params
