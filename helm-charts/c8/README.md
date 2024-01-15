@@ -193,13 +193,14 @@ The table below lists the key application variables that can be configured durin
 | variables.DB_PORT | string | `"27017"` | Database port |
 | variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
 | variables.DEFAULT_SENDER | string | `"notifications@example.com"` | Default email for sending notifications. |
+| variables.DISABLE_ANALYTICS | string | `"false"` | Enable or disable analytics |
 | variables.HOOKS_CALLBACK_URL | string | `""` | Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io |
 | variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
 | variables.OLAP_DB | string | `"snowflake"` | Online analytical processing DB type |
 | variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
-| variables.RABBITMQ_USE_SSL | bool | `false` | Enable or disable SSL |
+| variables.RABBITMQ_USE_SSL | string | `"false"` | RabbitMQ ssl flag |
 | variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
 | variables.SF_ACCOUNT | string | `""` | Snowflake account name |
 | variables.SF_DATABASE | string | `"C8"` | Snowflake db name |

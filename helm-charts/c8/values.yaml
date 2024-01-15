@@ -497,7 +497,7 @@ variables:
   # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
   # -- Enable or disable analytics
-  DISABLE_ANALYTICS: "false"
+  DISABLE_ANALYTICS: "true"
 
   ##### SSA #########
   # -- Enable or disable swagger documentation
