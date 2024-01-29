@@ -530,6 +530,8 @@ variables:
   DB_DATABASE: "c8"
   # -- Database port
   DB_PORT: "27017"
+  # -- Additional parameters for the database connection.
+  DB_CONNECTION_ADDITIONAL_PARAMS: ""
   # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
   MONGO_DRIVER_TYPE: "mongoDb"
   # -- ElasticSearch url

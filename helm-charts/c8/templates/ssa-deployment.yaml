@@ -74,6 +74,8 @@ spec:
             value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
           - name: SWAGGER_ENABLED
             value: {{ .Values.variables.SSA_SWAGGER_ENABLED | quote }}
+          - name: DB_CONNECTION_ADDITIONAL_PARAMS
+            value: {{ .Values.variables.DB_CONNECTION_ADDITIONAL_PARAMS | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params

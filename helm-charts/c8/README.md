@@ -191,6 +191,7 @@ The table below lists the key application variables that can be configured durin
 | variables.DB_DATABASE | string | `"c8"` | Database name |
 | variables.DB_HOST | string | `""` | Database host |
 | variables.DB_PORT | string | `"27017"` | Database port |
+| variables.DB_CONNECTION_ADDITIONAL_PARAMS | string | `""` | Additional parameters for the database connection |
 | variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
 | variables.DEFAULT_SENDER | string | `"notifications@example.com"` | Default email for sending notifications. |
 | variables.DISABLE_ANALYTICS | string | `"false"` | Enable or disable analytics |
