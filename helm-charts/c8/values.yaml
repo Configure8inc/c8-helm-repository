@@ -530,6 +530,8 @@ variables:
   DB_DATABASE: "c8"
   # -- Database port
   DB_PORT: "27017"
+  # -- Additional parameters for the database connection, should be provided int query params format like "key1=value&key2=value2". If no params provided should be empty string.
+  DB_CONNECTION_ADDITIONAL_PARAMS: ""
   # -- Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance
   MONGO_DRIVER_TYPE: "mongoDb"
   # -- ElasticSearch url

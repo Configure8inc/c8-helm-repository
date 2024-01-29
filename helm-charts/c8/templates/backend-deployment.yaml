@@ -96,6 +96,8 @@ spec:
             value: {{ .Values.variables.SF_POOLSIZE | quote }}
           - name: OLAP_DB
             value: {{ .Values.variables.OLAP_DB | quote }}
+          - name: DB_CONNECTION_ADDITIONAL_PARAMS
+            value: {{ .Values.variables.DB_CONNECTION_ADDITIONAL_PARAMS | quote }}
           - name: DISABLE_ANALYTICS
             value: {{ .Values.variables.DISABLE_ANALYTICS | quote }}
           envFrom:
