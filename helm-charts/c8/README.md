@@ -199,6 +199,8 @@ The table below lists the key application variables that can be configured durin
 | variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
 | variables.OLAP_DB | string | `"snowflake"` | Online analytical processing DB type |
 | variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
+| variables.OPENSEARCH_AWS_AUTHENTICATE | string | `"true"` | Enable or disable AWS authentication |
+| variables.OPENSEARCH_AWS_SERVICE | string | `"es"` | AWS OPENSEARCH AUTHENTICATE service "es" or "aoss"  |
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
 | variables.RABBITMQ_USE_SSL | string | `"false"` | RabbitMQ ssl flag |

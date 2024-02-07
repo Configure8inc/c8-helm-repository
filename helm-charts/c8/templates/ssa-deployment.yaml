@@ -57,9 +57,15 @@ spec:
             {{- toYaml .Values.ssa.resources | nindent 12 }}
           env:
           - name: SERVICE
-            value: "c8app"
+            value: "c8ssa"
+          - name: AWS_REGION
+            value: {{ .Values.variables.AWS_REGION | quote }}
           - name: OPENSEARCH_NODE
             value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
+          - name: OPENSEARCH_AWS_AUTHENTICATE
+            value: {{ .Values.variables.OPENSEARCH_AWS_AUTHENTICATE | quote }}
+          - name: OPENSEARCH_AWS_SERVICE
+            value: {{ .Values.variables.OPENSEARCH_AWS_SERVICE | quote }}
           - name: DB_AUTH_SOURCE
             value: {{ .Values.variables.DB_DATABASE | quote }}
           - name: DB_HOST

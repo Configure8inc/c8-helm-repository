@@ -78,6 +78,10 @@ spec:
             value: {{ .Release.Namespace }}
           - name: OPENSEARCH_NODE
             value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
+          - name: OPENSEARCH_AWS_AUTHENTICATE
+            value: {{ .Values.variables.OPENSEARCH_AWS_AUTHENTICATE | quote }}
+          - name: OPENSEARCH_AWS_SERVICE
+            value: {{ .Values.variables.OPENSEARCH_AWS_SERVICE | quote }}
           - name: RABBITMQ_HOST
             value: {{ .Values.variables.RABBITMQ_HOST | quote }}
           - name: RABBITMQ_PORT

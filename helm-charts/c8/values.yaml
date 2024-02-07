@@ -502,6 +502,10 @@ variables:
   ##### SSA #########
   # -- Enable or disable swagger documentation
   SSA_SWAGGER_ENABLED: "false"
+  # -- Enable or disable AWS authentication
+  OPENSEARCH_AWS_AUTHENTICATE: "true"
+  # -- AWS OPENSEARCH AUTHENTICATE service "es" or "aoss" 
+  OPENSEARCH_AWS_SERVICE: "es"
 
   ##### NPS #########
   # -- Default email for sending notifications.
