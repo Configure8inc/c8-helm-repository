@@ -3,7 +3,7 @@
 This guide delineates the steps to deploy the Configure8 (C8) application on a Kubernetes cluster using a Helm chart.
 
 <p align="center">
-  <img src="../../images/c8-app.png" alt="C8 helm chart" width="300" />
+  <img src="../../images/c8-sh.png" alt="C8 helm chart" width="300" />
 </p>
 
 ## Requirements
