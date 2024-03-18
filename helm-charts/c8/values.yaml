@@ -16,7 +16,6 @@ frontend:
   image:
     repository: "ghcr.io/configure8inc/c8-frontend"
     pullPolicy: IfNotPresent
-    tag: "1.0.0"
 
   replicaCount: 1
 
@@ -100,6 +99,9 @@ common:
     labels: {}
     pathType: Prefix
 
+  # -- Application version (used for deployment and image tags)
+  app_version: "1.0.0"
+
   # -- image pull secrets
   IMAGE_PULL_SECRET: c8-docker-registry-secret
   C8_SECRET_NAME: c8-secret
@@ -117,8 +119,6 @@ migration:
   image:
     repository: "ghcr.io/configure8inc/c8-migrations"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   podSecurityContext:
     runAsUser: 1051
@@ -156,8 +156,6 @@ backend:
   image:
     repository: "ghcr.io/configure8inc/c8-backend"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   # -- Configuration for backend service
   service:
@@ -244,8 +242,6 @@ djm:
     # -- c8 docker image repository
     repository: "ghcr.io/configure8inc/c8-djm"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   # -- Discovery job worker image
   DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:1.0.0"
@@ -332,8 +328,6 @@ ssa:
   image:
     repository: "ghcr.io/configure8inc/c8-ssa"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   container:
     port: "5000"
@@ -424,8 +418,6 @@ pns:
   image:
     repository: "ghcr.io/configure8inc/c8-pns"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   container:
     port: "5000"

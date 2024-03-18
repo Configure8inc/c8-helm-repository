@@ -39,7 +39,7 @@ spec:
           securityContext:
             {{- toYaml .Values.djm.securityContext | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.djm.image.repository }}:{{ .Values.djm.image.tag }}"
+          image: "{{ .Values.djm.image.repository }}:{{ .Values.common.app_version }}"
           imagePullPolicy: {{ .Values.djm.image.pullPolicy }}
           ports:
             - name: http

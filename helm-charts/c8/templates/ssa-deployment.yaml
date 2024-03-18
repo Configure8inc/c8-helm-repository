@@ -38,7 +38,7 @@ spec:
           securityContext:
             {{- toYaml .Values.ssa.securityContext | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.ssa.image.repository }}:{{ .Values.ssa.image.tag }}"
+          image: "{{ .Values.ssa.image.repository }}:{{ .Values.common.app_version }}"
           imagePullPolicy: {{ .Values.ssa.image.pullPolicy }}
           ports:
             - name: http
