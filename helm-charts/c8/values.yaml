@@ -36,13 +36,13 @@ frontend:
     targetMemoryUtilizationPercentage: 80
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 300m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 1
+      memory: 256Mi
+    requests:
+      cpu: 0.2
+      memory: 256Mi
 
   livenessProbe:
     httpGet:
@@ -163,13 +163,13 @@ backend:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 2
+      memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
 
   livenessProbe:
     httpGet:
@@ -257,13 +257,13 @@ djm:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
 
   # livenessProbe:
   #   httpGet:
@@ -339,13 +339,13 @@ ssa:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
 
   livenessProbe:
     httpGet:
@@ -429,13 +429,13 @@ pns:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
 
   # livenessProbe:
   #   httpGet:
