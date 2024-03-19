@@ -3,7 +3,7 @@
 This guide delineates the steps to deploy the Configure8 (C8) application on a Kubernetes cluster using a Helm chart.
 
 <p align="center">
-  <img src="../../images/c8-app.png" alt="C8 helm chart" width="300" />
+  <img src="../../images/c8-sh.png" alt="C8 helm chart" width="300" />
 </p>
 
 ## Requirements
@@ -232,7 +232,6 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.enabled | bool | `true` |  |
 | backend.image.pullPolicy | string | `"IfNotPresent"` |  |
 | backend.image.repository | string | `"ghcr.io/configure8inc/c8-backend"` |  |
-| backend.image.tag | string | `"1.0.0"` |  |
 | backend.livenessProbe.failureThreshold | int | `3` |  |
 | backend.livenessProbe.httpGet.path | string | `"/api/v1/ping"` |  |
 | backend.livenessProbe.httpGet.port | int | `5000` |  |
@@ -276,6 +275,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | common.ingress.pathType | string | `"Prefix"` |  |
 | common.revisionHistoryLimit | int | `3` |  |
 | common.ttlSecondsAfterFinished | int | `172800` |  |
+| common.app_version | string | `"1.0.0"` | `"Application version (used for deployment and image tags)"` |
 | commonLabels | object | `{}` | Labels to apply to all resources |
 | djm.DJW_IMAGE | string | `"ghcr.io/configure8inc/c8-djw:1.0.0"` | Discovery job worker image |
 | djm.DJW_NODE_SELECTOR_KEY | string | `""` | Discovery job worker NodeSelector key |
@@ -286,7 +286,6 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | djm.enabled | bool | `true` |  |
 | djm.image.pullPolicy | string | `"IfNotPresent"` |  |
 | djm.image.repository | string | `"ghcr.io/configure8inc/c8-djm"` | c8 docker image repository |
-| djm.image.tag | string | `"1.0.0"` |  |
 | djm.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | djm.podAnnotations | object | `{}` |  |
 | djm.podSecurityContext.fsGroup | int | `1052` |  |
@@ -314,7 +313,6 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | frontend.enabled | bool | `true` |  |
 | frontend.image.pullPolicy | string | `"IfNotPresent"` |  |
 | frontend.image.repository | string | `"ghcr.io/configure8inc/c8-frontend"` |  |
-| frontend.image.tag | string | `"1.0.0"` |  |
 | frontend.livenessProbe.failureThreshold | int | `2` |  |
 | frontend.livenessProbe.httpGet.path | string | `"/"` |  |
 | frontend.livenessProbe.httpGet.port | int | `8080` |  |
@@ -345,7 +343,6 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | migration.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | migration.image.pullPolicy | string | `"IfNotPresent"` |  |
 | migration.image.repository | string | `"ghcr.io/configure8inc/c8-migrations"` |  |
-| migration.image.tag | string | `"1.0.0"` |  |
 | migration.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | migration.podSecurityContext.fsGroup | int | `1051` |  |
 | migration.podSecurityContext.runAsGroup | int | `1051` |  |
@@ -365,7 +362,6 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.enabled | bool | `true` |  |
 | pns.image.pullPolicy | string | `"IfNotPresent"` |  |
 | pns.image.repository | string | `"ghcr.io/configure8inc/c8-pns"` |  |
-| pns.image.tag | string | `"1.0.0"` |  |
 | pns.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
 | pns.podAnnotations | object | `{}` |  |
 | pns.podDisruptionBudget.enabled | bool | `false` |  |
@@ -389,7 +385,6 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.enabled | bool | `true` |  |
 | ssa.image.pullPolicy | string | `"IfNotPresent"` |  |
 | ssa.image.repository | string | `"ghcr.io/configure8inc/c8-ssa"` |  |
-| ssa.image.tag | string | `"1.0.0"` |  |
 | ssa.ingress.annotations | object | `{}` |  |
 | ssa.ingress.enabled | bool | `true` |  |
 | ssa.ingress.ingressClassName | string | `""` |  |

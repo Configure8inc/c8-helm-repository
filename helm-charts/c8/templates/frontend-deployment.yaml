@@ -40,7 +40,7 @@ spec:
           securityContext:
             {{- toYaml .Values.frontend.securityContext | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.common.app_version }}"
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
           ports:
             - name: http

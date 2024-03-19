@@ -16,7 +16,6 @@ frontend:
   image:
     repository: "ghcr.io/configure8inc/c8-frontend"
     pullPolicy: IfNotPresent
-    tag: "1.0.0"
 
   replicaCount: 1
 
@@ -37,13 +36,13 @@ frontend:
     targetMemoryUtilizationPercentage: 80
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 300m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 1
+      memory: 256Mi
+    requests:
+      cpu: 0.2
+      memory: 256Mi
 
   livenessProbe:
     httpGet:
@@ -100,6 +99,9 @@ common:
     labels: {}
     pathType: Prefix
 
+  # -- Application version (used for deployment and image tags)
+  app_version: "1.0.0"
+
   # -- image pull secrets
   IMAGE_PULL_SECRET: c8-docker-registry-secret
   C8_SECRET_NAME: c8-secret
@@ -117,8 +119,6 @@ migration:
   image:
     repository: "ghcr.io/configure8inc/c8-migrations"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   podSecurityContext:
     runAsUser: 1051
@@ -156,8 +156,6 @@ backend:
   image:
     repository: "ghcr.io/configure8inc/c8-backend"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   # -- Configuration for backend service
   service:
@@ -165,13 +163,13 @@ backend:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 2
+      memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
 
   livenessProbe:
     httpGet:
@@ -244,8 +242,6 @@ djm:
     # -- c8 docker image repository
     repository: "ghcr.io/configure8inc/c8-djm"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   # -- Discovery job worker image
   DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:1.0.0"
@@ -261,13 +257,13 @@ djm:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
 
   # livenessProbe:
   #   httpGet:
@@ -332,8 +328,6 @@ ssa:
   image:
     repository: "ghcr.io/configure8inc/c8-ssa"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   container:
     port: "5000"
@@ -345,13 +339,13 @@ ssa:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
 
   livenessProbe:
     httpGet:
@@ -424,8 +418,6 @@ pns:
   image:
     repository: "ghcr.io/configure8inc/c8-pns"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0.0"
 
   container:
     port: "5000"
@@ -437,13 +429,13 @@ pns:
     port: "5000"
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
-  resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
 
   # livenessProbe:
   #   httpGet:

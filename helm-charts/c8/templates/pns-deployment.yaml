@@ -39,7 +39,7 @@ spec:
           securityContext:
             {{- toYaml .Values.pns.securityContext | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.pns.image.repository }}:{{ .Values.pns.image.tag }}"
+          image: "{{ .Values.pns.image.repository }}:{{ .Values.common.app_version }}"
           imagePullPolicy: {{ .Values.pns.image.pullPolicy }}
           ports:
             - name: http
