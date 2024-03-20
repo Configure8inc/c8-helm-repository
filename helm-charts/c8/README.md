@@ -133,9 +133,8 @@ helm upgrade -i c8 c8/c8 \
     --set variables.OPENSEARCH_NODE='value' \
     --set variables.RABBITMQ_HOST='value' \
     --set common.ingress.ingressClassName='value' \
-    --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
-    --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
-
+    --set djm.serviceAccount.job_worker.annotations."iam\.gke\.io/gcp-service-account"="c8-backend@PROJECT_ID.iam.gserviceaccount.com" \
+    --set backend.serviceAccount.annotations."iam\.gke\.io/gcp-service-account"="c8-djw@PROJECT_ID.iam.gserviceaccount.com"
 ```
 
 > **Note**
@@ -154,7 +153,6 @@ helm upgrade -i c8 c8/c8 \
     --set common.ingress.ingressClassName='value' \
     --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
     --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
-
 ```
 
 > **Note**
