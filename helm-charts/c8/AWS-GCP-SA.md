@@ -1,5 +1,7 @@
 ## Configure AWS access using GCP ServiceAccount (GKE)
 
+This method outlines the procedure for configuring AWS access through a GCP ServiceAccount. It is designed to establish secure cross-cloud access, allowing C8 managed by Google Cloud Platform (GCP) to interact seamlessly with AWS services.
+
 ## Step 1: Enable Workload Identity (skip if already enabled)
 
 You can enable Workload Identity on an existing Standard cluster by using the gcloud CLI or the Google Cloud console. Existing node pools are unaffected, but any new node pools in the cluster use Workload Identity.
@@ -56,7 +58,7 @@ gcloud iam service-accounts add-iam-policy-binding c8-backend@PROJECT_ID.iam.gse
     --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-backend]"
 ```
 
-Annotate K8s SA
+Annotate the Kubernetes Service Account, which can be achieved by adding an annotation to the c8-backend service account during the Helm installation command(or by using the BACKEND_SA_ANNOTATION variable with the installation helper script).
 
 ```bash
 kubectl -n c8 annotate serviceaccount c8-backend iam.gke.io/gcp-service-account=c8-backend@PROJECT_ID.iam.gserviceaccount.com
@@ -105,7 +107,7 @@ gcloud iam service-accounts add-iam-policy-binding c8-djw@PROJECT_ID.iam.gservic
     --member "serviceAccount:PROJECT_ID.svc.id.goog[c8/c8-djw]"
 ```
 
-Annotate K8s SA
+Annotate the Kubernetes Service Account, which can be achieved by adding an annotation to the c8-djw service account during the Helm installation command(or by using the DJW_SA_ANNOTATION variable with the installation helper script).
 
 ```bash
 kubectl -n c8 annotate serviceaccount c8-djw iam.gke.io/gcp-service-account=c8-djw@PROJECT_ID.iam.gserviceaccount.com
@@ -195,7 +197,7 @@ EOF
 aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
 ```
 
-### Attach the sh-c8-discovery to the policy
+### Attach the sh-c8-discovery-policy policy to the sh-c8-discovery role
 
 ```bash
 aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy

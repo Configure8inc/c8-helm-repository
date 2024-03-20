@@ -1,5 +1,7 @@
 ## Configure AWS access using IAM role for EC2
 
+This method allows you to create an IAM role for C8 and assume it from another role.
+
 ### Step 1: Create IAM Role for EC2
 
 [Please refer to the official AWS documentation about creating an AWS IAM role for the EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html#create-iam-role)
@@ -55,7 +57,7 @@ EOF
 aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
 ```
 
-### Attach the sh-c8-discovery to the policy
+### Attach the sh-c8-discovery-policy policy to the sh-c8-discovery role
 
 ```bash
 aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::${account_id}:policy/sh-c8-discovery-policy

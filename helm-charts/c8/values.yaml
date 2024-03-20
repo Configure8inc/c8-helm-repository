@@ -484,8 +484,6 @@ variables:
   DEEPLINK_URL: ""
   # -- Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io
   HOOKS_CALLBACK_URL: ""
-  # -- Application analytics segment key
-  SEGMENT_KEY: "na"
   # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
   # -- Enable or disable analytics
@@ -496,12 +494,12 @@ variables:
   SSA_SWAGGER_ENABLED: "false"
   # -- Enable or disable AWS authentication
   OPENSEARCH_AWS_AUTHENTICATE: "true"
-  # -- AWS OPENSEARCH AUTHENTICATE service "es" or "aoss" 
+  # -- Specify the AWS OpenSearch service type, either 'es' for OpenSearch or 'aoss' for serverless OpenSearch Service
   OPENSEARCH_AWS_SERVICE: "es"
 
   ##### NPS #########
   # -- Default email for sending notifications.
-  DEFAULT_SENDER: "notifications@example.com"
+  DEFAULT_SENDER: ""
   # -- Flag to use SMTP for emails
   USE_SMTP_STRATEGY: "true"
   # -- Address of the SMTP server (e.g., SendGrid's server).
