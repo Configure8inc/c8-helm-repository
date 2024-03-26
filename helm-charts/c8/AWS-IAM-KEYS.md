@@ -1,5 +1,7 @@
 ## Configure AWS access using access keys for IAM users
 
+This method describes the process of configuring AWS access by creating and using access keys for IAM users. It enables AWS access across all installation methods. Don't forget to add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to the c8-secret during installation.
+
 ### Step 1: Create IAM User
 
 [Please refer to the official AWS documentation about creating access keys for IAM users](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)
@@ -58,7 +60,7 @@ EOF
 aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
 ```
 
-### Attach the sh-c8-discovery to the policy
+### Attach the sh-c8-discovery-policy policy to the sh-c8-discovery role
 
 ```bash
 aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::${account_id}:policy/sh-c8-discovery-policy
@@ -68,4 +70,4 @@ aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam:
 > If you want to discover more AWS accounts, please repeat the 2nd step for each account.
 
 > **Important**
-> Don't forget to add the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY variables to the c8-secret secret on the 3rd step.
+> Don't forget to add the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY variables to the c8-secret.

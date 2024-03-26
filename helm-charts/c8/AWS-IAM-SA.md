@@ -1,5 +1,7 @@
 ## Step 4: Configure AWS access for the discovery job using service account (AWS EKS)
 
+This method outlines how to configure AWS access for discovery jobs using a service account, specifically within AWS EKS (Elastic Kubernetes Service). It involves setting up a dedicated service account in Kubernetes that is linked to an IAM role, providing the necessary permissions for discovery tasks within the AWS environment. This setup ensures secure and efficient access management, tailored for discovery operations in Kubernetes-managed AWS services.
+
 ### Step 1: Create IAM Role for C8 and DJM Service Accounts
 
 ### Step 1.1: Create IAM Policy
@@ -106,10 +108,19 @@ EOF
 aws iam create-role --role-name sh-c8-discovery --assume-role-policy-document file://trust-relationship.json --description "sh-c8-discovery"
 ```
 
-### Attach the sh-c8-discovery to the policy
+### Attach the sh-c8-discovery-policy policy to the sh-c8-discovery role
 
 ```bash
 aws iam attach-role-policy --role-name sh-c8-discovery --policy-arn=arn:aws:iam::$account_id:policy/sh-c8-discovery-policy
+```
+
+### Annotate the Kubernetes Service Accounts
+
+Annotate the Kubernetes Service Account, which can be achieved by adding an annotation to the c8-backend and c8-djw service account during the Helm installation command(or by using the BACKEND_SA_ANNOTATION and DJW_SA_ANNOTATION variable with the installation helper script).
+
+```bash
+kubectl -n c8 annotate serviceaccount c8-backend eks.amazonaws.com/role-arn=arn:aws:iam::${account_id}:role/sh-c8-service-account
+kubectl -n c8 annotate serviceaccount c8-djw eks.amazonaws.com/role-arn=arn:aws:iam::${account_id}:role/sh-c8-service-account
 ```
 
 > **Note**

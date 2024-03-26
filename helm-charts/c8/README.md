@@ -8,16 +8,16 @@ This guide delineates the steps to deploy the Configure8 (C8) application on a K
 
 ## Requirements
 
-1. A running Kubernetes version 1.22 or above to guarantee compatibility with the C8 App. Ensure the cluster has public internet access to fetch Docker images from repositories, specifically from GitHub.
-2. A Kubernetes user with sufficient cluster access privileges to install the C8 app.
+1. A running Kubernetes version 1.22 or above is required to guarantee compatibility with the C8 App. Ensure the cluster has public internet access to fetch Docker images from repositories, specifically from GitHub.
+2. A Kubernetes user with sufficient cluster access privileges is required to install the C8 app.
 3. The [Helm Package Manager](https://helm.sh/).
 4. The [Kubectl](https://kubernetes.io/docs/tasks/tools/)
 5. The [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-6. A token provided by the C8 team for adding image pull secrets to the cluster.
-7. A __MongoDB__ database must be set up, and accessible by the Kubernetes cluster.
-8. A __RabbitMQ__ cluster must be set up for managing message queues within the C8 application.
-9. An __OpenSearch__ cluster must be set up for robust search functionality and data analytics within the C8 app.
-10. A __Snowflake__ account must be set up to provide fast search and an ability to make complex aggregations.
+6. A token provided by the C8 team is required for adding image pull secrets to the cluster.
+7. A __MongoDB__ version 6.0 or above must be set up and accessible by the Kubernetes cluster.
+8. A __RabbitMQ__ version 3.13 or above must be set up for managing message queues within the C8 application.
+9. An __OpenSearch__ cluster version 2.5 or above must be set up for robust search functionality and data analytics within the C8 app.
+10. A __Snowflake__ account must be set up to provide fast search capabilities and the ability to perform complex aggregations.
 
 ## Step 1: Creating a Namespace
 
@@ -63,28 +63,28 @@ kubectl create secret generic c8-secret \
 
 ### Secrets Description
 
-| Name | Type | Default | Description |
-|-----|------|---------|-------------|
-| API_KEY | string | `""` | Unique secret key |
-| CRYPTO_IV | string | `""` | Crypto initialization vector |
-| CRYPTO_SECRET | string | `""` | Crypto password |
-| DB_PASSWORD | string | `""` | Database password |
-| DB_USERNAME | string | `""` | Database username |
-| GITHUB_APP_CLIENT_ID | string | `""` | GitHub application client id. Should be created per installation in advance (optional) |
-| GITHUB_APP_CLIENT_SECRET | string | `""` | GitHub application client secret. (optional) |
-| GITHUB_APP_INSTALL_URL | string | `""` | GitHub application installation url. (optional) |
-| GOOGLE_KEY | string | `""` | Google application key. Required for the sign in with google (optional) |
-| GOOGLE_SECRET | string | `""` | Google application secret. Required for the login with google (optional) |
-| JWT_SECRET | string | `""` | Unique secret used for sign user's JWT tokens |
-| RABBITMQ_PASSWORD | string | `""` | RabbitMQ password |
-| RABBITMQ_USERNAME | string | `""` | RabbitMQ user |
-| SMTP_USERNAME | string | `""` | Username for SMTP server. |
-| SMTP_PASSWORD | string | `""` | Password or token for SMTP authentication. |
-| SF_USERNAME | string | `""` | Username for Snowflake db access. |
-| SF_PASSWORD | string | `""` | Password for Snowflake db access. |
-| AWS_ACCESS_KEY_ID | string | `""` | A unique identifier associated with an AWS User. (optional, see discovery configuration) |
-| AWS_SECRET_ACCESS_KEY | string | `""` | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role. (optional, see discovery configuration) |
-----------------------------------------------
+| Name                      | Type   | Required | Default | Description                                                                                      |
+|---------------------------|--------|----------|---------|--------------------------------------------------------------------------------------------------|
+| API_KEY                   | string | True     | `""`    | Unique secret key                                                                                |
+| CRYPTO_IV                 | string | True     | `""`    | Crypto initialization vector                                                                     |
+| CRYPTO_SECRET             | string | True     | `""`    | Crypto password                                                                                  |
+| DB_PASSWORD               | string | True     | `""`    | Database password                                                                                |
+| DB_USERNAME               | string | True     | `""`    | Database username                                                                                |
+| GITHUB_APP_CLIENT_ID      | string | False    | `""`    | GitHub application client id. Should be created per installation in advance (optional)           |
+| GITHUB_APP_CLIENT_SECRET  | string | False    | `""`    | GitHub application client secret.                                                                |
+| GITHUB_APP_INSTALL_URL    | string | False    | `""`    | GitHub application installation url.                                                             |
+| GOOGLE_KEY                | string | False    | `""`    | Google application key. Required for the sign in with google                                     |
+| GOOGLE_SECRET             | string | False    | `""`    | Google application secret. Required for the login with google                                    |
+| JWT_SECRET                | string | True     | `""`    | Unique secret used for sign user's JWT tokens                                                    |
+| RABBITMQ_PASSWORD         | string | True     | `""`    | RabbitMQ password                                                                                |
+| RABBITMQ_USERNAME         | string | True     | `""`    | RabbitMQ user                                                                                    |
+| SMTP_USERNAME             | string | True     | `""`    | Username for SMTP server.                                                                        |
+| SMTP_PASSWORD             | string | True     | `""`    | Password or token for SMTP authentication.                                                       |
+| SF_USERNAME               | string | True     | `""`    | Username for Snowflake db access.                                                                |
+| SF_PASSWORD               | string | True     | `""`    | Password for Snowflake db access.                                                                |
+| SEGMENT_KEY               | string | False    | `""`    | Segment key for application analytics.                                                           |
+| AWS_ACCESS_KEY_ID         | string | False    | `""`    | A unique identifier associated with an AWS User.                                                 |
+| AWS_SECRET_ACCESS_KEY     | string | False    | `""`    | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role.               |
 
 > **Warning**
 > You need to generate your own API_KEY, CRYPTO_IV, JWT_SECRET, and CRYPTO_SECRET which can be any cryptographically secure random string. Feel free to refer to Open Web Application Security Project (OWASP) for secure random number generation recommendations: https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#secure-random-number-generation
@@ -133,9 +133,8 @@ helm upgrade -i c8 c8/c8 \
     --set variables.OPENSEARCH_NODE='value' \
     --set variables.RABBITMQ_HOST='value' \
     --set common.ingress.ingressClassName='value' \
-    --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
-    --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
-
+    --set djm.serviceAccount.job_worker.annotations."iam\.gke\.io/gcp-service-account"="c8-backend@PROJECT_ID.iam.gserviceaccount.com" \
+    --set backend.serviceAccount.annotations."iam\.gke\.io/gcp-service-account"="c8-djw@PROJECT_ID.iam.gserviceaccount.com"
 ```
 
 > **Note**
@@ -154,7 +153,6 @@ helm upgrade -i c8 c8/c8 \
     --set common.ingress.ingressClassName='value' \
     --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
     --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
-
 ```
 
 > **Note**
@@ -184,38 +182,37 @@ Ensuring that the DNS propagates the new record correctly and securely linking i
 
 The table below lists the key application variables that can be configured during deployment:
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| variables.AWS_REGION | string | `"us-east-1"` | The region what actually we use with AWS integration |
-| variables.DB_AUTH_MECHANISM | string | `"SCRAM-SHA-1"` | The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by mongodb |
-| variables.DB_DATABASE | string | `"c8"` | Database name |
-| variables.DB_HOST | string | `""` | Database host |
-| variables.DB_PORT | string | `"27017"` | Database port |
-| variables.DB_CONNECTION_ADDITIONAL_PARAMS | string | `""` | Additional parameters for the database connection, should be provided int query params format like "key1=value&key2=value2". If no params provided should be empty string. |
-| variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
-| variables.DEFAULT_SENDER | string | `"notifications@example.com"` | Default email for sending notifications. |
-| variables.DISABLE_ANALYTICS | string | `"false"` | Enable or disable analytics |
-| variables.HOOKS_CALLBACK_URL | string | `""` | Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io |
-| variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
-| variables.OLAP_DB | string | `"snowflake"` | Online analytical processing DB type |
-| variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
-| variables.OPENSEARCH_AWS_AUTHENTICATE | string | `"true"` | Enable or disable AWS authentication |
-| variables.OPENSEARCH_AWS_SERVICE | string | `"es"` | AWS OPENSEARCH AUTHENTICATE service "es" or "aoss"  |
-| variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
-| variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
-| variables.RABBITMQ_USE_SSL | string | `"false"` | RabbitMQ ssl flag |
-| variables.SEGMENT_KEY | string | `"na"` | Application analytics segment key |
-| variables.SF_ACCOUNT | string | `""` | Snowflake account name |
-| variables.SF_DATABASE | string | `"C8"` | Snowflake db name |
-| variables.SF_POOLSIZE | string | `"5"` | Snowflake poolsize |
-| variables.SF_SCHEMA | string | `"PUBLIC"` | Snowflake db schema |
-| variables.SF_WAREHOUSE | string | `""` | Snowflake warehouse name |
-| variables.SMTP_HOST | string | `"smtp.sendgrid.net"` | Address of the SMTP server (e.g., SendGrid's server). |
-| variables.SMTP_PORT | string | `"587"` | Port for connecting to the SMTP server |
-| variables.SSA_SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
-| variables.SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
-| variables.TZ | string | `"America/New_York"` | Application timezone |
-| variables.USE_SMTP_STRATEGY | string | `"true"` | Flag to use SMTP for emails |
+| Key                                     | Type   | Required | Default                  | Description                                                                                                                                 |
+|-----------------------------------------|--------|----------|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| variables.AWS_REGION                    | string | Yes      | `"us-east-1"`            | The region that we actually use with AWS integration                                                                                        |
+| variables.DB_AUTH_MECHANISM             | string | Yes      | `"SCRAM-SHA-1"`          | The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by MongoDB                              |
+| variables.DB_DATABASE                   | string | Yes      | `"c8"`                   | Database name                                                                                                                               |
+| variables.DB_HOST                       | string | Yes      | `""`                     | Database host                                                                                                                               |
+| variables.DB_PORT                       | string | Yes      | `"27017"`                | Database port                                                                                                                               |
+| variables.DB_CONNECTION_ADDITIONAL_PARAMS | string | No       | `""`                     | Additional parameters for the database connection, should be provided in query params format like "key1=value&key2=value2". If no params provided should be an empty string.|
+| variables.DEEPLINK_URL                  | string | Yes      | `""`                     | Url on which the application will be available. For example https://configure8.my-company.io                                                |
+| variables.DEFAULT_SENDER                | string | Yes      | `""` | Default email for sending notifications.                                                                                                                        |
+| variables.DISABLE_ANALYTICS             | string | No       | `"true"`                | Enable or disable analytics                                                                                                                  |
+| variables.HOOKS_CALLBACK_URL            | string | Yes      | `""`                     | Url on which the application will be available. Usually should be the same as DEEPLINK_URL. For example https://configure8.my-company.io    |
+| variables.MONGO_DRIVER_TYPE             | string | Yes      | `"mongoDb"`              | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance                                                             |
+| variables.OLAP_DB                       | string | Yes      | `"snowflake"`           | Online analytical processing DB type                                                                                                         |
+| variables.OPENSEARCH_NODE               | string | Yes      | `""`                     | ElasticSearch url                                                                                                                           |
+| variables.OPENSEARCH_AWS_AUTHENTICATE   | string | Yes      | `"true"`                 | Enable or disable AWS authentication                                                                                                        |
+| variables.OPENSEARCH_AWS_SERVICE        | string | Yes      | `"es"`                   | Specify the AWS OpenSearch service type, either 'es' for OpenSearch or 'aoss' for serverless OpenSearch Service.                            |
+| variables.RABBITMQ_HOST                 | string | Yes      | `""`                     | RabbitMQ host                                                                                                                               |
+| variables.RABBITMQ_PORT                 | int    | Yes      | `5672`                   | RabbitMQ port                                                                                                                               |
+| variables.RABBITMQ_USE_SSL              | string | No       | `"false"`                | RabbitMQ SSL flag                                                                                                                           |
+| variables.SF_ACCOUNT                    | string | Yes      | `""`                     | Snowflake account name                                                                                                                      |
+| variables.SF_DATABASE                   | string | Yes      | `"C8"`                   | Snowflake DB name                                                                                                                           |
+| variables.SF_POOLSIZE                   | string | No       | `"5"`                    | Snowflake pool size                                                                                                                         |
+| variables.SF_SCHEMA                     | string | Yes      | `"PUBLIC"`               | Snowflake DB schema                                                                                                                         |
+| variables.SF_WAREHOUSE                  | string | Yes      | `""`                     | Snowflake warehouse name                                                                                                                    |
+| variables.SMTP_HOST                     | string | Yes      | `"smtp.sendgrid.net"`    | Address of the SMTP server (e.g., SendGrid's server).                                                                                       |
+| variables.SMTP_PORT                     | string | Yes      | `"587"`                  | Port for connecting to the SMTP server                                                                                                      |
+| variables.SSA_SWAGGER_ENABLED           | string | No       | `"false"`                | Enable or disable swagger documentation                                                                                                     |
+| variables.SWAGGER_ENABLED               | string | No       | `"false"`                | Enable or disable swagger documentation                                                                                                     |
+| variables.TZ                            | string | Yes      | `"America/New_York"`     | Application timezone                                                                                                                        |
+
 
 ### The C8 Helm Chart Parameters
 
