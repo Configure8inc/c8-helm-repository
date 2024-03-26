@@ -98,8 +98,10 @@ spec:
             value: {{ .Values.variables.SF_ACCOUNT | quote }}
           - name: SF_DATABASE
             value: {{ .Values.variables.SF_DATABASE | quote }}
-          - name: SF_WAREHOUSE
-            value: {{ .Values.variables.SF_WAREHOUSE | quote }}
+          - name: SF_READ_WAREHOUSE
+            value: {{ .Values.variables.SF_READ_WAREHOUSE | quote }}
+          - name: SF_WRITE_WAREHOUSE
+            value: {{ .Values.variables.SF_WRITE_WAREHOUSE | quote }}
           - name: SF_POOLSIZE
             value: {{ .Values.variables.SF_POOLSIZE | quote }}
           - name: OLAP_DB

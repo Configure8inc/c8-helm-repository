@@ -536,8 +536,10 @@ variables:
   SF_DATABASE: "C8"
   # -- Snowflake db schema
   SF_SCHEMA: "PUBLIC"
-  # -- Snowflake warehouse name
-  SF_WAREHOUSE: ""
+  # -- Snowflake RO warehouse name
+  SF_READ_WAREHOUSE: ""
+  # -- Snowflake RW warehouse name
+  SF_WRITE_WAREHOUSE: ""
   # -- Snowflake poolsize
   SF_POOLSIZE: "5"
   # -- Online analytical processing DB type
