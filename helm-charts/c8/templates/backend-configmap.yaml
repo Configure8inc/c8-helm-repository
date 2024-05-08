@@ -12,6 +12,6 @@ data:
   # -- Description for the swagger file, usually shouldn't be changed
   SWAGGER_DESCRIPTION: "C8 API"
   # -- Swagger documentation relative url, by default /docs
-  SWAGGER_PREFIX: "na"
+  SWAGGER_PREFIX: "/docs"
   # -- Swagger documentation title
   SWAGGER_TITLE: "C8 Backend API"

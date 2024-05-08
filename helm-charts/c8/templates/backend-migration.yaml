@@ -3,6 +3,9 @@ kind: Job
 metadata:
   name: {{ include "c8.fullname" . }}-migration
   labels:
+    {{- with .Values.migration.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
     {{- include "c8.labels" . | nindent 4 }}
     {{- with .Values.commonLabels }}
     {{- toYaml . | nindent 4 }}
@@ -21,6 +24,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
+        {{- with .Values.migration.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         c8app: "migration"
     spec:
       imagePullSecrets:
@@ -47,7 +53,7 @@ spec:
           - name: DB_AUTH_MECHANISM
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
           - name: DB_AUTH_SOURCE
-            value: {{ .Values.variables.DB_DATABASE | quote }}
+            value: {{ .Values.variables.DB_AUTH_SOURCE | quote }}
           - name: DB_HOST
             value: {{ .Values.variables.DB_HOST | quote }}
           - name: DB_DATABASE

@@ -8,6 +8,10 @@ commonLabels: {}
 frontend:
   enabled: true
 
+  # -- Frontend labels
+  labels:
+    appComponent: frontend
+
   # -- Configuration for frontend service
   service:
     type: ClusterIP
@@ -98,6 +102,7 @@ common:
     annotations: {}
     labels: {}
     pathType: Prefix
+    additionalHosts: []
 
   # -- Application version (used for deployment and image tags)
   app_version: "1.0.0"
@@ -107,6 +112,10 @@ common:
   C8_SECRET_NAME: c8-secret
 
 migration:
+  # -- Migration labels
+  labels:
+    appComponent: migration
+
   # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
@@ -134,6 +143,10 @@ migration:
 
 backend:
   enabled: true
+
+  # -- Backend labels
+  labels:
+    appComponent: backend
 
   replicaCount: 1
 
@@ -224,8 +237,42 @@ backend:
     # -- Number or percentage of pods that must be available
     minAvailable: 50%
 
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  # --- Persistence ---
+  persistence:
+    # -- Persistence type
+    type: pvc
+    # -- Enable persistence using Persistent Volume Claims
+    enabled: false
+    # -- Storage class name
+    storageClassName: efs-sc
+    # -- Access mode
+    accessModes:
+      - ReadWriteOne
+    # -- Storage size
+    size: 10Gi
+    # -- PVC annotations
+    annotations: {}
+    # -- PVC finalizers
+    finalizers:
+      - kubernetes.io/pvc-protection
+    # -- PVC selector labels
+    selectorLabels: {}
+    # -- PVC extra PVC labels
+    extraPvcLabels: {}
+    # -- Use an existing PVC? If yes, set this to the name of the PVC
+    existingClaim: ""
+    # -- Mount path
+    mountPath: /home/c8/app/packages/backend
+
 djm:
   enabled: true
+
+  # -- Backend labels
+  labels:
+    appComponent: djm
 
   replicaCount: 1
 
@@ -244,7 +291,7 @@ djm:
     pullPolicy: IfNotPresent
 
   # -- Discovery job worker image
-  DJW_IMAGE: "ghcr.io/configure8inc/c8-djw:1.0.0"
+  DJW_IMAGE_REPO: "ghcr.io/configure8inc/c8-djw"
 
   # -- Discovery job worker NodeSelector key
   DJW_NODE_SELECTOR_KEY: ""
@@ -309,6 +356,10 @@ ssa:
 
   replicaCount: 1
 
+  # -- Backend labels
+  labels:
+    appComponent: ssa
+
   # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
@@ -317,13 +368,6 @@ ssa:
 
   # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
-
-  ingress:
-    enabled: true
-    ingressClassName: ""
-    annotations: {}
-    labels: {}
-    pathType: Prefix
 
   image:
     repository: "ghcr.io/configure8inc/c8-ssa"
@@ -396,6 +440,10 @@ ssa:
 
 pns:
   enabled: true
+
+  # -- Backend labels
+  labels:
+    appComponent: pns
 
   replicaCount: 1
 
@@ -477,13 +525,31 @@ pns:
     minAvailable: 50%
 
 variables:
+  ##### COMMON CONFIGMAP #########
+  # -- Application env
+  ENV: "prod"
+  # -- Logging level
+  LOGGING_LEVEL: "info"
+  # -- Maintenance mode
+  MAINTENANCE_MODE: "false"
+  # -- Node environment
+  NODE_ENV: "production"
+  # -- Node port
+  NODE_PORT: "5000"
+  # -- Application stage
+  STAGE: "prod"
+  # -- Application version
+  VERSION: "v1.0.0"
+  # -- Allow to retry write operations in case of failure
+  DB_WRITE_RETRIES: "true"
+  # -- DB aurh source
+  DB_AUTH_SOURCE: "c8"
+
   ##### C8 #########
   # -- The region what actually we use with AWS integration
   AWS_REGION: "us-east-1"
   # -- Url on which the application will be available. For example https://configure8.my-company.io
   DEEPLINK_URL: ""
-  # -- Url on which the application will be available. Usually should be the same as DEEPLINK_URLFor example https://configure8.my-company.io
-  HOOKS_CALLBACK_URL: ""
   # -- Enable or disable swagger documentation
   SWAGGER_ENABLED: "false"
   # -- Enable or disable analytics

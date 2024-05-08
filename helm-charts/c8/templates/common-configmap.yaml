@@ -7,11 +7,12 @@ metadata:
     "helm.sh/hook-weight": "-2"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded"
 data:
-  DB_WRITE_RETRIES: "true"
-  ENV: "prod"
-  LOGGING_LEVEL: "info"
-  MAINTENANCE_MODE: "false"
-  NODE_ENV: "production"
-  NODE_PORT: "5000"
-  STAGE: "prod"
-  VERSION: "v1.0.0"
+  DB_WRITE_RETRIES: {{ .Values.variables.DB_WRITE_RETRIES | quote }}
+  DB_AUTH_SOURCE: {{ .Values.variables.DB_AUTH_SOURCE | quote }}
+  ENV: {{ .Values.variables.ENV | quote }}
+  LOGGING_LEVEL: {{ .Values.variables.LOGGING_LEVEL | quote }}
+  MAINTENANCE_MODE: {{ .Values.variables.MAINTENANCE_MODE | quote }}
+  NODE_ENV: {{ .Values.variables.NODE_ENV | quote }}
+  NODE_PORT: {{ .Values.variables.NODE_PORT | quote }}
+  STAGE: {{ .Values.variables.STAGE | quote }}
+  VERSION: {{ .Values.variables.VERSION | quote }}

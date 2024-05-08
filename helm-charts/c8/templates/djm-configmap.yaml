@@ -15,11 +15,15 @@ data:
   DJW_TRACK_ENTITY_LINEAGE: "true"
   # -- Maximum hours for the job execution
   JOB_DEAD_TIMEOUT_HOURS: "3"
-  # -- list of the jobs that are going to be executed by discovery manager
-  JOB_TYPES: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
   # -- Determines the time when the schedule should be checked in MS
   LOOP_SLEEP_TIME: "10000"
   # -- Maximum simultaneously executed jobs
   MAX_JOB_LIMIT: "10"
   # -- For the production should be true, should be used only by qualified C8 developers
   USE_K8: "true"
+  # -- Job active lookback in minutes
+  JOB_ACTIVE_LOOKBACK_MIN: "15"
+  # -- Task group name for the discovery job
+  TASK_GROUP: "discovery-task-group"
+  # -- Worker trigger threshold in milliseconds
+  WORKER_TRIGGER_THRESHOLD: "120000"

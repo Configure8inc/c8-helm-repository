@@ -31,6 +31,52 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Generate deployment frontend pod labels
+*/}}
+{{- define "c8.frontendLabels" -}}
+{{- if .Values.frontend.labels }}
+{{- toYaml .Values.frontend.labels | nindent 4 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Generate deployment backend pod labels
+*/}}
+{{- define "c8.backendLabels" -}}
+{{- if .Values.backend.labels }}
+{{- toYaml .Values.backend.labels | nindent 4 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Generate deployment ssa pod labels
+*/}}
+{{- define "c8.ssaLabels" -}}
+{{- if .Values.ssa.labels }}
+{{- toYaml .Values.ssa.labels | nindent 4 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Generate deployment pns pod labels
+*/}}
+{{- define "c8.pnsLabels" -}}
+{{- if .Values.pns.labels }}
+{{- toYaml .Values.pns.labels | nindent 4 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Generate deployment djm pod labels
+*/}}
+{{- define "c8.djmLabels" -}}
+{{- if .Values.djm.labels }}
+{{- toYaml .Values.djm.labels | nindent 4 }}
+{{- end }}
+{{- end -}}
+
+
+{{/*
 Common labels
 */}}
 {{- define "c8.labels" -}}
