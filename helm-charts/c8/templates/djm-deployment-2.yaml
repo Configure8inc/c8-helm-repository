@@ -3,8 +3,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "c8.fullname" . }}-djm
+  name: {{ include "c8.fullname" . }}-djm-scorecard-notification
   labels:
+    {{- with .Values.djm.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
     {{- include "c8.labels" . | nindent 4 }}
     {{- with .Values.commonLabels }}
     {{- toYaml . | nindent 4 }}
@@ -18,7 +21,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      c8app: "djm"
+      c8app: "djm-scorecard-notification"
   template:
     metadata:
       {{- with .Values.djm.podAnnotations }}
@@ -26,7 +29,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        c8app: "djm"
+        {{- with .Values.djm.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        c8app: "djm-scorecard-notification"
     spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
@@ -52,6 +58,8 @@ spec:
           resources:
             {{- toYaml .Values.djm.resources | nindent 12 }}
           env:
+          - name: "JOB_TYPES"
+            value: "SCORECARD_NOTIFICATION, SERVICE_NOTIFICATION, CREDENTIALS_NOTIFICATION"
           - name: SERVICE
             value: "c8-discovery-job-manager-prod"
           - name: DJW_SERVICE
@@ -59,7 +67,7 @@ spec:
           - name: DJW_SERVICE_ACCOUNT_NAME
             value: {{ include "c8.serviceAccountNameDjw" . }}
           - name: DB_AUTH_SOURCE
-            value: {{ .Values.variables.DB_DATABASE | quote }}
+            value: {{ .Values.variables.DB_AUTH_SOURCE | quote }}
           - name: DB_AUTH_MECHANISM
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
           - name: DB_HOST
@@ -91,21 +99,27 @@ spec:
           - name: DJW_APP_URL
             value: {{ .Values.variables.DEEPLINK_URL | quote }}
           - name: DJW_IMAGE
-            value: {{ .Values.djm.DJW_IMAGE | quote }}
+            value: "{{ .Values.djm.DJW_IMAGE_REPO }}:{{ .Values.common.app_version }}"
           - name: IMAGE_PULL_SECRET
             value: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
           - name: SF_ACCOUNT
             value: {{ .Values.variables.SF_ACCOUNT | quote }}
           - name: SF_DATABASE
             value: {{ .Values.variables.SF_DATABASE | quote }}
-          - name: SF_WAREHOUSE
-            value: {{ .Values.variables.SF_WAREHOUSE | quote }}
+          - name: SF_READ_WAREHOUSE
+            value: {{ .Values.variables.SF_READ_WAREHOUSE | quote }}
+          - name: SF_WRITE_WAREHOUSE
+            value: {{ .Values.variables.SF_WRITE_WAREHOUSE | quote }}
           - name: SF_POOLSIZE
             value: {{ .Values.variables.SF_POOLSIZE | quote }}
           - name: OLAP_DB
             value: {{ .Values.variables.OLAP_DB | quote }}
           - name: DB_CONNECTION_ADDITIONAL_PARAMS
             value: {{ .Values.variables.DB_CONNECTION_ADDITIONAL_PARAMS | quote }}
+          - name: AZURE_DEVOPS_ALLOW_RETRIES
+            value: {{ .Values.variables.AZURE_DEVOPS_ALLOW_RETRIES | quote }}
+          - name: AZURE_DEVOPS_MAX_RETRIES
+            value: {{ .Values.variables.AZURE_DEVOPS_MAX_RETRIES | quote }}
           {{- if .Values.djm.DJW_NODE_SELECTOR_KEY }}
           - name: DJW_NODE_SELECTOR_KEY
             value: {{ .Values.djm.DJW_NODE_SELECTOR_KEY | quote }}

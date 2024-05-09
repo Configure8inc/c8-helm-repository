@@ -86,8 +86,16 @@ kubectl create secret generic c8-secret \
 | AWS_ACCESS_KEY_ID         | string | False    | `""`    | A unique identifier associated with an AWS User.                                                 |
 | AWS_SECRET_ACCESS_KEY     | string | False    | `""`    | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role.               |
 
-> **Warning**
-> You need to generate your own API_KEY, CRYPTO_IV, JWT_SECRET, and CRYPTO_SECRET which can be any cryptographically secure random string. Feel free to refer to Open Web Application Security Project (OWASP) for secure random number generation recommendations: https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#secure-random-number-generation
+<div style="background-color: #FF5146; border-left: 5px solid #2196F3; padding: 0.5em; color: black;">
+  <strong>Warning:</strong> You need to generate your own API_KEY, CRYPTO_IV, JWT_SECRET, and CRYPTO_SECRET which can be any cryptographically secure random string. For secure random number generation recommendations, refer to the Open Web Application Security Project (OWASP):
+  <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#secure-random-number-generation" target="_blank">OWASP Cryptographic Storage Cheat Sheet</a>
+</div>
+<div style="background-color: #60ABFF; border-left: 5px solid #2196F3; padding: 0.5em; color: black;">
+  <strong>CRYPTO_IV:</strong> The initialization vector (IV) should be 16 bytes. You can generate it using Node.js's crypto module's randomBytes function. Here's how you might do it:<br><br>
+  <code style="background-color: #f0f0f0; padding: 2px; color: black;">import crypto from 'crypto';</code><br>
+  <code style="background-color: #f0f0f0; padding: 2px; color: black;">const iv = crypto.randomBytes(16);</code><br><br>
+  This will generate a new, random 16-byte initialization vector each time it's run. Remember, each encryption operation should use a unique IV.
+</div>
 
 ## Step 4: Install the C8 Helm Chart
 
@@ -184,35 +192,44 @@ The table below lists the key application variables that can be configured durin
 
 | Key                                     | Type   | Required | Default                  | Description                                                                                                                                 |
 |-----------------------------------------|--------|----------|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| variables.AWS_REGION                    | string | Yes      | `"us-east-1"`            | The region that we actually use with AWS integration                                                                                        |
-| variables.DB_AUTH_MECHANISM             | string | Yes      | `"SCRAM-SHA-1"`          | The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by MongoDB                              |
-| variables.DB_DATABASE                   | string | Yes      | `"c8"`                   | Database name                                                                                                                               |
-| variables.DB_HOST                       | string | Yes      | `""`                     | Database host                                                                                                                               |
-| variables.DB_PORT                       | string | Yes      | `"27017"`                | Database port                                                                                                                               |
-| variables.DB_CONNECTION_ADDITIONAL_PARAMS | string | No       | `""`                     | Additional parameters for the database connection, should be provided in query params format like "key1=value&key2=value2". If no params provided should be an empty string.|
-| variables.DEEPLINK_URL                  | string | Yes      | `""`                     | Url on which the application will be available. For example https://configure8.my-company.io                                                |
-| variables.DEFAULT_SENDER                | string | Yes      | `""` | Default email for sending notifications.                                                                                                                        |
-| variables.DISABLE_ANALYTICS             | string | No       | `"true"`                | Enable or disable analytics                                                                                                                  |
-| variables.HOOKS_CALLBACK_URL            | string | Yes      | `""`                     | Url on which the application will be available. Usually should be the same as DEEPLINK_URL. For example https://configure8.my-company.io    |
-| variables.MONGO_DRIVER_TYPE             | string | Yes      | `"mongoDb"`              | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance                                                             |
-| variables.OLAP_DB                       | string | Yes      | `"snowflake"`           | Online analytical processing DB type                                                                                                         |
-| variables.OPENSEARCH_NODE               | string | Yes      | `""`                     | ElasticSearch url                                                                                                                           |
-| variables.OPENSEARCH_AWS_AUTHENTICATE   | string | Yes      | `"true"`                 | Enable or disable AWS authentication                                                                                                        |
-| variables.OPENSEARCH_AWS_SERVICE        | string | Yes      | `"es"`                   | Specify the AWS OpenSearch service type, either 'es' for OpenSearch or 'aoss' for serverless OpenSearch Service.                            |
-| variables.RABBITMQ_HOST                 | string | Yes      | `""`                     | RabbitMQ host                                                                                                                               |
-| variables.RABBITMQ_PORT                 | int    | Yes      | `5672`                   | RabbitMQ port                                                                                                                               |
-| variables.RABBITMQ_USE_SSL              | string | No       | `"false"`                | RabbitMQ SSL flag                                                                                                                           |
-| variables.SF_ACCOUNT                    | string | Yes      | `""`                     | Snowflake account name                                                                                                                      |
-| variables.SF_DATABASE                   | string | Yes      | `"C8"`                   | Snowflake DB name                                                                                                                           |
-| variables.SF_POOLSIZE                   | string | No       | `"5"`                    | Snowflake pool size                                                                                                                         |
-| variables.SF_SCHEMA                     | string | Yes      | `"PUBLIC"`               | Snowflake DB schema                                                                                                                         |
-| variables.SF_WAREHOUSE                  | string | Yes      | `""`                     | Snowflake warehouse name                                                                                                                    |
-| variables.SMTP_HOST                     | string | Yes      | `"smtp.sendgrid.net"`    | Address of the SMTP server (e.g., SendGrid's server).                                                                                       |
-| variables.SMTP_PORT                     | string | Yes      | `"587"`                  | Port for connecting to the SMTP server                                                                                                      |
-| variables.SSA_SWAGGER_ENABLED           | string | No       | `"false"`                | Enable or disable swagger documentation                                                                                                     |
-| variables.SWAGGER_ENABLED               | string | No       | `"false"`                | Enable or disable swagger documentation                                                                                                     |
-| variables.TZ                            | string | Yes      | `"America/New_York"`     | Application timezone                                                                                                                        |
-
+| variables.AWS_REGION | string | `"us-east-1"` | The region what actually we use with AWS integration |
+| variables.DB_AUTH_MECHANISM | string | `"SCRAM-SHA-1"` | The mechanism of how to authenticate with the database. Might be SCRAM-SHA-1 or any other supported by mongodb |
+| variables.DB_AUTH_SOURCE | string | `"c8"` | DB aurh source |
+| variables.DB_CONNECTION_ADDITIONAL_PARAMS | string | `""` | Additional parameters for the database connection, should be provided int query params format like "key1=value&key2=value2". If no params provided should be empty string. |
+| variables.DB_DATABASE | string | `"c8"` | Database name |
+| variables.DB_HOST | string | `""` | Database host |
+| variables.DB_PORT | string | `"27017"` | Database port |
+| variables.DB_WRITE_RETRIES | string | `"true"` | Allow to retry write operations in case of failure |
+| variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example <https://configure8.my-company.io> |
+| variables.DEFAULT_SENDER | string | `""` | Default email for sending notifications. |
+| variables.DISABLE_ANALYTICS | string | `"true"` | Enable or disable analytics |
+| variables.ENV | string | `"prod"` | Application env |
+| variables.LOGGING_LEVEL | string | `"info"` | Logging level |
+| variables.MAINTENANCE_MODE | string | `"false"` | Maintenance mode |
+| variables.MONGO_DRIVER_TYPE | string | `"mongoDb"` | Type of the driver. For atlas mongoDbAtlas and mongoDb for the regular instance |
+| variables.NODE_ENV | string | `"production"` | Node environment |
+| variables.NODE_PORT | string | `"5000"` | Node port |
+| variables.OLAP_DB | string | `"snowflake"` | Online analytical processing DB type |
+| variables.OPENSEARCH_AWS_AUTHENTICATE | string | `"true"` | Enable or disable AWS authentication |
+| variables.OPENSEARCH_AWS_SERVICE | string | `"es"` | Specify the AWS OpenSearch service type, either 'es' for OpenSearch or 'aoss' for serverless OpenSearch Service |
+| variables.OPENSEARCH_NODE | string | `""` | ElasticSearch url |
+| variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
+| variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
+| variables.RABBITMQ_USE_SSL | string | `"false"` | RabbitMQ ssl flag |
+| variables.SF_ACCOUNT | string | `""` | Snowflake account name |
+| variables.SF_DATABASE | string | `"C8"` | Snowflake db name |
+| variables.SF_POOLSIZE | string | `"5"` | Snowflake poolsize |
+| variables.SF_READ_WAREHOUSE | string | `""` | Snowflake RO warehouse name |
+| variables.SF_SCHEMA | string | `"PUBLIC"` | Snowflake db schema |
+| variables.SF_WRITE_WAREHOUSE | string | `""` | Snowflake RW warehouse name |
+| variables.SMTP_HOST | string | `"smtp.sendgrid.net"` | Address of the SMTP server (e.g., SendGrid's server). |
+| variables.SMTP_PORT | string | `"587"` | Port for connecting to the SMTP server |
+| variables.SSA_SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
+| variables.STAGE | string | `"prod"` | Application stage |
+| variables.SWAGGER_ENABLED | string | `"false"` | Enable or disable swagger documentation |
+| variables.TZ | string | `"America/New_York"` | Application timezone |
+| variables.USE_SMTP_STRATEGY | string | `"true"` | Flag to use SMTP for emails |
+| variables.VERSION | string | `"v1.0.0"` | Application version |
 
 ### The C8 Helm Chart Parameters
 
@@ -220,7 +237,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| backend.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
+| backend.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | backend.autoscaling.enabled | bool | `false` |  |
 | backend.autoscaling.maxReplicas | int | `10` |  |
 | backend.autoscaling.minReplicas | int | `1` |  |
@@ -229,12 +246,24 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.enabled | bool | `true` |  |
 | backend.image.pullPolicy | string | `"IfNotPresent"` |  |
 | backend.image.repository | string | `"ghcr.io/configure8inc/c8-backend"` |  |
+| backend.labels | object | `{"appComponent":"backend"}` | Backend labels |
 | backend.livenessProbe.failureThreshold | int | `3` |  |
 | backend.livenessProbe.httpGet.path | string | `"/api/v1/ping"` |  |
 | backend.livenessProbe.httpGet.port | int | `5000` |  |
 | backend.livenessProbe.periodSeconds | int | `10` |  |
 | backend.livenessProbe.timeoutSeconds | int | `10` |  |
-| backend.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
+| backend.nodeSelector | object | `{}` | Node labels for pod assignment <https://kubernetes.io/docs/user-guide/node-selection/> |
+| backend.persistence.accessModes | list | `["ReadWriteOne"]` | Access mode |
+| backend.persistence.annotations | object | `{}` | PVC annotations |
+| backend.persistence.enabled | bool | `false` | Enable persistence using Persistent Volume Claims |
+| backend.persistence.existingClaim | string | `""` | Use an existing PVC? If yes, set this to the name of the PVC |
+| backend.persistence.extraPvcLabels | object | `{}` | PVC extra PVC labels |
+| backend.persistence.finalizers | list | `["kubernetes.io/pvc-protection"]` | PVC finalizers |
+| backend.persistence.mountPath | string | `"/home/c8/app/packages/backend"` | Mount path |
+| backend.persistence.selectorLabels | object | `{}` | PVC selector labels |
+| backend.persistence.size | string | `"10Gi"` | Storage size |
+| backend.persistence.storageClassName | string | `"efs-sc"` | Storage class name |
+| backend.persistence.type | string | `"pvc"` | Persistence type |
 | backend.podAnnotations | object | `{}` |  |
 | backend.podDisruptionBudget.enabled | bool | `false` | Specifies whether pod disruption budget should be created |
 | backend.podDisruptionBudget.minAvailable | string | `"50%"` | Number or percentage of pods that must be available |
@@ -248,7 +277,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.readinessProbe.periodSeconds | int | `10` |  |
 | backend.readinessProbe.timeoutSeconds | int | `10` |  |
 | backend.replicaCount | int | `1` |  |
-| backend.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
+| backend.resources | object | `{"limits":{"cpu":2,"memory":"2Gi"},"requests":{"cpu":1,"memory":"2Gi"}}` | Define resources requests and limits for Pods. <https://kubernetes.io/docs/user-guide/compute-resources/> |
 | backend.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | backend.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | backend.securityContext.readOnlyRootFilesystem | bool | `true` |  |
@@ -262,9 +291,10 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.startupProbe.initialDelaySeconds | int | `20` |  |
 | backend.startupProbe.periodSeconds | int | `10` |  |
 | backend.startupProbe.timeoutSeconds | int | `10` |  |
-| backend.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| backend.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
 | common.C8_SECRET_NAME | string | `"c8-secret"` |  |
 | common.IMAGE_PULL_SECRET | string | `"c8-docker-registry-secret"` | image pull secrets |
+| common.app_version | string | `"1.0.0"` | Application version (used for deployment and image tags) |
 | common.ingress.annotations | object | `{}` |  |
 | common.ingress.enabled | bool | `true` | Enable ingress object for external access to the resources . Do not forget to add common.ingress.ingressClassName="" |
 | common.ingress.ingressClassName | string | `""` |  |
@@ -272,25 +302,25 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | common.ingress.pathType | string | `"Prefix"` |  |
 | common.revisionHistoryLimit | int | `3` |  |
 | common.ttlSecondsAfterFinished | int | `172800` |  |
-| common.app_version | string | `"1.0.0"` | `"Application version (used for deployment and image tags)"` |
 | commonLabels | object | `{}` | Labels to apply to all resources |
-| djm.DJW_IMAGE | string | `"ghcr.io/configure8inc/c8-djw:1.0.0"` | Discovery job worker image |
+| djm.DJW_IMAGE_REPO | string | `"ghcr.io/configure8inc/c8-djw"` | Discovery job worker image |
 | djm.DJW_NODE_SELECTOR_KEY | string | `""` | Discovery job worker NodeSelector key |
 | djm.DJW_NODE_SELECTOR_VALUE | string | `""` | Discovery job worker NodeSelector value |
 | djm.DJW_POD_SECURITY_CONTEXT | string | `"{\"runAsUser\": 1052, \"runAsGroup\": 1052, \"runAsNonRoot\": true}"` | Discovery job worker pod security context |
-| djm.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
+| djm.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | djm.container.port | string | `"5000"` |  |
 | djm.enabled | bool | `true` |  |
 | djm.image.pullPolicy | string | `"IfNotPresent"` |  |
 | djm.image.repository | string | `"ghcr.io/configure8inc/c8-djm"` | c8 docker image repository |
-| djm.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
+| djm.labels | object | `{"appComponent":"djm"}` | Backend labels |
+| djm.nodeSelector | object | `{}` | Node labels for pod assignment <https://kubernetes.io/docs/user-guide/node-selection/> |
 | djm.podAnnotations | object | `{}` |  |
 | djm.podSecurityContext.fsGroup | int | `1052` |  |
 | djm.podSecurityContext.runAsGroup | int | `1052` |  |
 | djm.podSecurityContext.runAsNonRoot | bool | `true` |  |
 | djm.podSecurityContext.runAsUser | int | `1052` |  |
 | djm.replicaCount | int | `1` |  |
-| djm.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
+| djm.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Define resources requests and limits for Pods. <https://kubernetes.io/docs/user-guide/compute-resources/> |
 | djm.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | djm.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | djm.securityContext.readOnlyRootFilesystem | bool | `true` |  |
@@ -300,8 +330,8 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | djm.serviceAccount.job_worker.create | bool | `true` | Specifies whether a service account should be created |
 | djm.serviceAccount.job_worker.name | string | `"c8-djw"` | The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template |
 | djm.serviceAccount.name | string | `"c8-djm"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| djm.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
-| frontend.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
+| djm.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
+| frontend.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | frontend.autoscaling.enabled | bool | `false` |  |
 | frontend.autoscaling.maxReplicas | int | `10` |  |
 | frontend.autoscaling.minReplicas | int | `1` |  |
@@ -310,11 +340,12 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | frontend.enabled | bool | `true` |  |
 | frontend.image.pullPolicy | string | `"IfNotPresent"` |  |
 | frontend.image.repository | string | `"ghcr.io/configure8inc/c8-frontend"` |  |
+| frontend.labels | object | `{"appComponent":"frontend"}` | Frontend labels |
 | frontend.livenessProbe.failureThreshold | int | `2` |  |
 | frontend.livenessProbe.httpGet.path | string | `"/"` |  |
 | frontend.livenessProbe.httpGet.port | int | `8080` |  |
 | frontend.livenessProbe.periodSeconds | int | `10` |  |
-| frontend.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
+| frontend.nodeSelector | object | `{}` | Node labels for pod assignment <https://kubernetes.io/docs/user-guide/node-selection/> |
 | frontend.podAnnotations | object | `{}` |  |
 | frontend.podDisruptionBudget.enabled | bool | `false` |  |
 | frontend.podDisruptionBudget.minAvailable | string | `"50%"` |  |
@@ -328,28 +359,29 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | frontend.readinessProbe.initialDelaySeconds | int | `20` |  |
 | frontend.readinessProbe.periodSeconds | int | `10` |  |
 | frontend.replicaCount | int | `1` |  |
-| frontend.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
+| frontend.resources | object | `{"limits":{"cpu":1,"memory":"256Mi"},"requests":{"cpu":0.2,"memory":"256Mi"}}` | Define resources requests and limits for Pods. <https://kubernetes.io/docs/user-guide/compute-resources/> |
 | frontend.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | frontend.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | frontend.service | object | `{"port":"8080","type":"ClusterIP"}` | Configuration for frontend service |
 | frontend.serviceAccount.annotations | object | `{}` |  |
 | frontend.serviceAccount.create | bool | `true` |  |
 | frontend.serviceAccount.name | string | `"c8-frontend"` |  |
-| frontend.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| frontend.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources |
-| migration.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
+| migration.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | migration.image.pullPolicy | string | `"IfNotPresent"` |  |
 | migration.image.repository | string | `"ghcr.io/configure8inc/c8-migrations"` |  |
-| migration.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
+| migration.labels | object | `{"appComponent":"migration"}` | Migration labels |
+| migration.nodeSelector | object | `{}` | Node labels for pod assignment <https://kubernetes.io/docs/user-guide/node-selection/> |
 | migration.podSecurityContext.fsGroup | int | `1051` |  |
 | migration.podSecurityContext.runAsGroup | int | `1051` |  |
 | migration.podSecurityContext.runAsNonRoot | bool | `true` |  |
 | migration.podSecurityContext.runAsUser | int | `1051` |  |
 | migration.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | migration.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| migration.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| migration.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
 | nameOverride | string | `""` | Provide a name in place of c8 for `app:` labels |
-| pns.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
+| pns.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | pns.autoscaling.enabled | bool | `false` |  |
 | pns.autoscaling.maxReplicas | int | `10` |  |
 | pns.autoscaling.minReplicas | int | `1` |  |
@@ -359,7 +391,8 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.enabled | bool | `true` |  |
 | pns.image.pullPolicy | string | `"IfNotPresent"` |  |
 | pns.image.repository | string | `"ghcr.io/configure8inc/c8-pns"` |  |
-| pns.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
+| pns.labels | object | `{"appComponent":"pns"}` | Backend labels |
+| pns.nodeSelector | object | `{}` | Node labels for pod assignment <https://kubernetes.io/docs/user-guide/node-selection/> |
 | pns.podAnnotations | object | `{}` |  |
 | pns.podDisruptionBudget.enabled | bool | `false` |  |
 | pns.podDisruptionBudget.minAvailable | string | `"50%"` |  |
@@ -368,7 +401,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.podSecurityContext.runAsNonRoot | bool | `true` |  |
 | pns.podSecurityContext.runAsUser | int | `1057` |  |
 | pns.replicaCount | int | `1` |  |
-| pns.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
+| pns.resources | object | `{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Define resources requests and limits for Pods. <https://kubernetes.io/docs/user-guide/compute-resources/> |
 | pns.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | pns.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | pns.securityContext.readOnlyRootFilesystem | bool | `true` |  |
@@ -376,8 +409,8 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | pns.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | pns.serviceAccount.name | string | `"c8-pns"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| pns.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
-| ssa.affinity | object | `{}` | Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
+| pns.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
+| ssa.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | ssa.container.port | string | `"5000"` |  |
 | ssa.enabled | bool | `true` |  |
 | ssa.image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -387,13 +420,14 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.ingress.ingressClassName | string | `""` |  |
 | ssa.ingress.labels | object | `{}` |  |
 | ssa.ingress.pathType | string | `"Prefix"` |  |
+| ssa.labels | object | `{"appComponent":"ssa"}` | Backend labels |
 | ssa.livenessProbe.failureThreshold | int | `3` |  |
 | ssa.livenessProbe.httpGet.path | string | `"/self-service/api/health"` |  |
 | ssa.livenessProbe.httpGet.port | int | `5000` |  |
 | ssa.livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
 | ssa.livenessProbe.periodSeconds | int | `10` |  |
 | ssa.livenessProbe.timeoutSeconds | int | `10` |  |
-| ssa.nodeSelector | object | `{}` | Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/ |
+| ssa.nodeSelector | object | `{}` | Node labels for pod assignment <https://kubernetes.io/docs/user-guide/node-selection/> |
 | ssa.podAnnotations | object | `{}` |  |
 | ssa.podDisruptionBudget.enabled | bool | `false` | Specifies whether pod disruption budget should be created |
 | ssa.podDisruptionBudget.minAvailable | string | `"50%"` | Number or percentage of pods that must be available |
@@ -408,7 +442,7 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.readinessProbe.periodSeconds | int | `10` |  |
 | ssa.readinessProbe.timeoutSeconds | int | `10` |  |
 | ssa.replicaCount | int | `1` |  |
-| ssa.resources | object | `{}` | Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/ |
+| ssa.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Define resources requests and limits for Pods. <https://kubernetes.io/docs/user-guide/compute-resources/> |
 | ssa.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | ssa.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | ssa.securityContext.readOnlyRootFilesystem | bool | `true` |  |
@@ -416,4 +450,4 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | ssa.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | ssa.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | ssa.serviceAccount.name | string | `"c8-ssa"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| ssa.tolerations | list | `[]` | Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| ssa.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |

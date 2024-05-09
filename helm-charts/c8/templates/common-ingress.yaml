@@ -4,9 +4,7 @@
 {{- $ingressSupportsPathType := eq (include "c8.ingress.supportsPathType" .) "true" -}}
 {{- $fullName := include "c8.fullname" . -}}
 {{- $servicePortFrontend := .Values.frontend.service.port -}}
-{{- $servicePortSsa := .Values.ssa.service.port -}}
 {{- $ingressPathType := .Values.common.ingress.pathType -}}
-{{- $ingressPathTypeSaa := .Values.ssa.ingress.pathType -}}
 apiVersion: {{ include "c8.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
@@ -51,18 +49,25 @@ spec:
               serviceName: {{ $fullName }}-frontend
               servicePort: {{ $servicePortFrontend }}
               {{- end }}
-          - path: /self-service/api
+  {{- range .Values.common.ingress.additionalHosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+        {{- range .paths }}
+          - path: {{ . }}
             {{- if $ingressSupportsPathType }}
-            pathType: {{ $ingressPathTypeSaa }}
+            pathType: {{ $ingressPathType }}
             {{- end }}
             backend:
               {{- if $ingressApiIsStable }}
               service:
-                name: {{ $fullName }}-ssa
+                name: {{ $fullName }}-frontend
                 port:
-                  number: {{ $servicePortSsa }}
+                  number: {{ $servicePortFrontend }}
               {{- else }}
-              serviceName: {{ $fullName }}-ssa
-              servicePort: {{ $servicePortSsa }}
+              serviceName: {{ $fullName }}-frontend
+              servicePort: {{ $servicePortFrontend }}
               {{- end }}
+        {{- end }}
+  {{- end }}
 {{- end }}
