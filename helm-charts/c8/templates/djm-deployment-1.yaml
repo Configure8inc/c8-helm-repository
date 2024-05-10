@@ -109,7 +109,9 @@ spec:
           - name: SF_READ_WAREHOUSE
             value: {{ .Values.variables.SF_READ_WAREHOUSE | quote }}
           - name: SF_WRITE_WAREHOUSE
-            value: {{ .Values.variables.SF_WRITE_WAREHOUSE | quote }}
+            value: {{ .Values.variables.SF_DISCOVERY_WRITE_WAREHOUSE | quote }}
+          - name: SF_SCHEMA
+            value: {{ .Values.variables.SF_SCHEMA | quote }}
           - name: SF_POOLSIZE
             value: {{ .Values.variables.SF_POOLSIZE | quote }}
           - name: OLAP_DB
