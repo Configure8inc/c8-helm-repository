@@ -105,7 +105,7 @@ common:
     additionalHosts: []
 
   # -- Application version (used for deployment and image tags)
-  app_version: "1.0.0"
+  app_version: "2.112.0"
 
   # -- image pull secrets
   IMAGE_PULL_SECRET: c8-docker-registry-secret
@@ -606,6 +606,8 @@ variables:
   SF_READ_WAREHOUSE: ""
   # -- Snowflake RW warehouse name
   SF_WRITE_WAREHOUSE: ""
+  # -- Snowflake Discovery warehouse name
+  SF_DISCOVERY_WRITE_WAREHOUSE: ""
   # -- Snowflake poolsize
   SF_POOLSIZE: "5"
   # -- Online analytical processing DB type

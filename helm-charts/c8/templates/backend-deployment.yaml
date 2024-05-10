@@ -107,6 +107,8 @@ spec:
             value: {{ .Values.variables.SF_WRITE_WAREHOUSE | quote }}
           - name: SF_POOLSIZE
             value: {{ .Values.variables.SF_POOLSIZE | quote }}
+          - name: SF_SCHEMA
+            value: {{ .Values.variables.SF_SCHEMA | quote }}
           - name: OLAP_DB
             value: {{ .Values.variables.OLAP_DB | quote }}
           - name: DB_CONNECTION_ADDITIONAL_PARAMS
