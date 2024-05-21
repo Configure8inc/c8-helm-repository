@@ -105,7 +105,7 @@ common:
     additionalHosts: []
 
   # -- Application version (used for deployment and image tags)
-  app_version: "2.114.0"
+  app_version: "2.114.1"
 
   # -- image pull secrets
   IMAGE_PULL_SECRET: c8-docker-registry-secret
