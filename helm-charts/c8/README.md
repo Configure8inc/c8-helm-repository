@@ -16,8 +16,9 @@ This guide delineates the steps to deploy the Configure8 (C8) application on a K
 6. A token provided by the C8 team is required for adding image pull secrets to the cluster.
 7. A __MongoDB__ version 6.0 or above must be set up and accessible by the Kubernetes cluster.
 8. A __RabbitMQ__ version 3.13 or above must be set up for managing message queues within the C8 application.
-9. An __OpenSearch__ cluster version 2.5 or above must be set up for robust search functionality and data analytics within the C8 app.
-10. A __Snowflake__ account must be set up to provide fast search capabilities and the ability to perform complex aggregations.
+9. A __Redis__ version 7.2 or above must be set up for caching data.
+10. An __OpenSearch__ cluster version 2.5 or above must be set up for robust search functionality and data analytics within the C8 app.
+11. A __Snowflake__ account must be set up to provide fast search capabilities and the ability to perform complex aggregations([you can use the script to configure all privileges for a Snowflake db using a script.](scripts/Snowflake/README.md)).
 
 ## Step 1: Creating a Namespace
 
@@ -54,6 +55,8 @@ kubectl create secret generic c8-secret \
     --from-literal=DB_PASSWORD='value' \
     --from-literal=RABBITMQ_USERNAME='value' \
     --from-literal=RABBITMQ_PASSWORD='value' \
+    --from-literal=REDIS_USERNAME='value' \
+    --from-literal=REDIS_PASSWORD='value' \
     --from-literal=SMTP_USERNAME='value' \
     --from-literal=SMTP_PASSWORD='value' \
     --from-literal=SF_USERNAME='value' \
@@ -65,6 +68,8 @@ kubectl create secret generic c8-secret \
 
 | Name                      | Type   | Required | Default | Description                                                                                      |
 |---------------------------|--------|----------|---------|--------------------------------------------------------------------------------------------------|
+| AWS_ACCESS_KEY_ID         | string | False    | `""`    | A unique identifier associated with an AWS User.                                                 |
+| AWS_SECRET_ACCESS_KEY     | string | False    | `""`    | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role.               |
 | API_KEY                   | string | True     | `""`    | Unique secret key                                                                                |
 | CRYPTO_IV                 | string | True     | `""`    | Crypto initialization vector                                                                     |
 | CRYPTO_SECRET             | string | True     | `""`    | Crypto password                                                                                  |
@@ -78,13 +83,14 @@ kubectl create secret generic c8-secret \
 | JWT_SECRET                | string | True     | `""`    | Unique secret used for sign user's JWT tokens                                                    |
 | RABBITMQ_PASSWORD         | string | True     | `""`    | RabbitMQ password                                                                                |
 | RABBITMQ_USERNAME         | string | True     | `""`    | RabbitMQ user                                                                                    |
+| REDIS_PASSWORD            | string | False    | `""`    | Redis password                                                                                   |
+| REDIS_USERNAME            | string | False    | `""`    | Redis user                                                                                       |
 | SMTP_USERNAME             | string | True     | `""`    | Username for SMTP server.                                                                        |
 | SMTP_PASSWORD             | string | True     | `""`    | Password or token for SMTP authentication.                                                       |
 | SF_USERNAME               | string | True     | `""`    | Username for Snowflake db access.                                                                |
 | SF_PASSWORD               | string | True     | `""`    | Password for Snowflake db access.                                                                |
 | SEGMENT_KEY               | string | False    | `""`    | Segment key for application analytics.                                                           |
-| AWS_ACCESS_KEY_ID         | string | False    | `""`    | A unique identifier associated with an AWS User.                                                 |
-| AWS_SECRET_ACCESS_KEY     | string | False    | `""`    | A secret string associated with the AWS_ACCESS_KEY_ID for an AWS IAM user or role.               |
+
 
 <div style="background-color: #FF5146; border-left: 5px solid #2196F3; padding: 0.5em; color: black;">
   <strong>Warning:</strong> You need to generate your own API_KEY, CRYPTO_IV, JWT_SECRET, and CRYPTO_SECRET which can be any cryptographically secure random string. For secure random number generation recommendations, refer to the Open Web Application Security Project (OWASP):
@@ -125,7 +131,8 @@ helm repo add c8 https://helm.configure8.io/store/
 helm repo update
 ```
 
-Install the Helm chart with the desired configurations. Replace the placeholders with your specific values:
+> **Note**
+> Please do not forget to add persistence configuration if you want to update the [application logo](https://docs.configure8.io/configure8-product-docs/fundamentals/settings/organization#theme); see the 'backend.persistence' environment variables for details.
 
 > **Note**
 > The example below the uses discovery access type [using GCP ServiceAccount (GKE) to access AWS](./AWS-GCP-SA.md)
@@ -140,6 +147,7 @@ helm upgrade -i c8 c8/c8 \
     --set variables.HOOKS_CALLBACK_URL='value' \
     --set variables.OPENSEARCH_NODE='value' \
     --set variables.RABBITMQ_HOST='value' \
+    --set variables.REDIS_HOST='value' \
     --set common.ingress.ingressClassName='value' \
     --set djm.serviceAccount.job_worker.annotations."iam\.gke\.io/gcp-service-account"="c8-backend@PROJECT_ID.iam.gserviceaccount.com" \
     --set backend.serviceAccount.annotations."iam\.gke\.io/gcp-service-account"="c8-djw@PROJECT_ID.iam.gserviceaccount.com"
@@ -158,6 +166,7 @@ helm upgrade -i c8 c8/c8 \
     --set variables.HOOKS_CALLBACK_URL='value' \
     --set variables.OPENSEARCH_NODE='value' \
     --set variables.RABBITMQ_HOST='value' \
+    --set variables.REDIS_HOST='value' \
     --set common.ingress.ingressClassName='value' \
     --set djm.serviceAccount.job_worker.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account' \
     --set backend.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"='The IAM role was created above for the service account'
@@ -176,6 +185,7 @@ helm upgrade -i c8 c8/c8 \
     --set variables.HOOKS_CALLBACK_URL='value' \
     --set variables.OPENSEARCH_NODE='value' \
     --set variables.RABBITMQ_HOST='value' \
+    --set variables.REDIS_HOST='value' \
     --set common.ingress.ingressClassName='value'
 ```
 
@@ -200,7 +210,7 @@ The table below lists the key application variables that can be configured durin
 | variables.DB_HOST | string | `""` | Database host |
 | variables.DB_PORT | string | `"27017"` | Database port |
 | variables.DB_WRITE_RETRIES | string | `"true"` | Allow to retry write operations in case of failure |
-| variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example <https://configure8.my-company.io> |
+| variables.DEEPLINK_URL | string | `""` | Url on which the application will be available. For example https://configure8.my-company.io |
 | variables.DEFAULT_SENDER | string | `""` | Default email for sending notifications. |
 | variables.DISABLE_ANALYTICS | string | `"true"` | Enable or disable analytics |
 | variables.ENV | string | `"prod"` | Application env |
@@ -216,6 +226,11 @@ The table below lists the key application variables that can be configured durin
 | variables.RABBITMQ_HOST | string | `""` | RabbitMQ host |
 | variables.RABBITMQ_PORT | int | `5672` | RabbitMQ port |
 | variables.RABBITMQ_USE_SSL | string | `"false"` | RabbitMQ ssl flag |
+| variables.REDIS_CACHE_TTL | string | `"900"` | Redis cache ttl |
+| variables.REDIS_CONNECT_TIMEOUT | string | `"5000"` | Redis connect timeout |
+| variables.REDIS_ENABLED | string | `"true"` | Enable or disable redis cache |
+| variables.REDIS_HOST | string | `""` | Redis host |
+| variables.REDIS_PORT | string | `"6379"` | Redis port |
 | variables.SF_ACCOUNT | string | `""` | Snowflake account name |
 | variables.SF_DATABASE | string | `"C8"` | Snowflake db name |
 | variables.SF_POOLSIZE | string | `"5"` | Snowflake poolsize |
@@ -234,6 +249,8 @@ The table below lists the key application variables that can be configured durin
 ### The C8 Helm Chart Parameters
 
 The table below shows configurable parameters when deploying the C8 Helm chart:
+
+#### Backend environment variables
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -292,6 +309,14 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | backend.startupProbe.periodSeconds | int | `10` |  |
 | backend.startupProbe.timeoutSeconds | int | `10` |  |
 | backend.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
+
+#### Common envs
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources |
+| nameOverride | string | `""` | Provide a name in place of c8 for `app:` labels |
+| commonLabels | object | `{}` | Labels to apply to all resources |
 | common.C8_SECRET_NAME | string | `"c8-secret"` |  |
 | common.IMAGE_PULL_SECRET | string | `"c8-docker-registry-secret"` | image pull secrets |
 | common.app_version | string | `"1.0.0"` | Application version (used for deployment and image tags) |
@@ -302,7 +327,11 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | common.ingress.pathType | string | `"Prefix"` |  |
 | common.revisionHistoryLimit | int | `3` |  |
 | common.ttlSecondsAfterFinished | int | `172800` |  |
-| commonLabels | object | `{}` | Labels to apply to all resources |
+
+#### Discovery job manager\worker environment variables
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | djm.DJW_IMAGE_REPO | string | `"ghcr.io/configure8inc/c8-djw"` | Discovery job worker image |
 | djm.DJW_NODE_SELECTOR_KEY | string | `""` | Discovery job worker NodeSelector key |
 | djm.DJW_NODE_SELECTOR_VALUE | string | `""` | Discovery job worker NodeSelector value |
@@ -331,6 +360,11 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | djm.serviceAccount.job_worker.name | string | `"c8-djw"` | The name of the djw service account to use. If not set and create is true, a name is generated using the fullname template |
 | djm.serviceAccount.name | string | `"c8-djm"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | djm.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
+
+#### Frontend environment variables
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | frontend.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | frontend.autoscaling.enabled | bool | `false` |  |
 | frontend.autoscaling.maxReplicas | int | `10` |  |
@@ -367,7 +401,11 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | frontend.serviceAccount.create | bool | `true` |  |
 | frontend.serviceAccount.name | string | `"c8-frontend"` |  |
 | frontend.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
-| fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources |
+
+#### Migration environment variables
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | migration.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | migration.image.pullPolicy | string | `"IfNotPresent"` |  |
 | migration.image.repository | string | `"ghcr.io/configure8inc/c8-migrations"` |  |
@@ -380,7 +418,11 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | migration.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | migration.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | migration.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
-| nameOverride | string | `""` | Provide a name in place of c8 for `app:` labels |
+
+#### Platform notification service environment variables
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | pns.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | pns.autoscaling.enabled | bool | `false` |  |
 | pns.autoscaling.maxReplicas | int | `10` |  |
@@ -410,6 +452,11 @@ The table below shows configurable parameters when deploying the C8 Helm chart:
 | pns.serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | pns.serviceAccount.name | string | `"c8-pns"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | pns.tolerations | list | `[]` | Tolerations for pod assignment <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/> |
+
+#### Self-service actions environment variables
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | ssa.affinity | object | `{}` | Affinity for pod assignment <https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity> |
 | ssa.container.port | string | `"5000"` |  |
 | ssa.enabled | bool | `true` |  |
