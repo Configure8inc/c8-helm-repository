@@ -1,0 +1,7 @@
+name: 'Package charts'
+
+on:
+  workflow_dispatch: 
+  pull_request:
+    branches: [main, production]
+    types: [opened]
