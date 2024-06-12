@@ -24,8 +24,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        persist-credentials: false # Checkout the PR branch
-        fetch-depth: 0  # Fetch all history for all branches and tags
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
     - name: Install Helm
       uses: ./.github/actions/install-helm
@@ -46,5 +46,4 @@ jobs:
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+        branch: ${{ github.head_ref }}
