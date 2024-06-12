@@ -24,7 +24,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.issue.pull_request.head.ref }} # Checkout the PR branch
+        persist-credentials: false # Checkout the PR branch
         fetch-depth: 0  # Fetch all history for all branches and tags
 
     - name: Install Helm
