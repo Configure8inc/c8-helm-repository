@@ -24,7 +24,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        fetch-depth: '0'
+        ref: ${{ github.event.issue.pull_request.head.ref }} # Checkout the PR branch
+        fetch-depth: 0  # Fetch all history for all branches and tags
 
     - name: Install Helm
       uses: ./.github/actions/install-helm
@@ -42,4 +43,4 @@ jobs:
         git config --global user.name "GitHub Actions"
         git add ./store/*
         git commit -m "Package charts" || echo "No changes to commit"
-        git push "${{ github.head_ref }}"
+        git push
