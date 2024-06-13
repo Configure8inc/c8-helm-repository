@@ -105,7 +105,7 @@ common:
     additionalHosts: []
 
   # -- Application version (used for deployment and image tags)
-  app_version: "2.119.0"
+  app_version: "2.120.0"
 
   # -- image pull secrets
   IMAGE_PULL_SECRET: c8-docker-registry-secret
@@ -218,7 +218,7 @@ backend:
 
   securityContext:
     allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
+    readOnlyRootFilesystem: false
     capabilities:
       drop:
         - ALL
@@ -298,7 +298,7 @@ djm:
   # -- Discovery job worker NodeSelector value
   DJW_NODE_SELECTOR_VALUE: ""
   # -- Discovery job worker pod security context
-  DJW_POD_SECURITY_CONTEXT: '{"runAsUser": 1052, "runAsGroup": 1052, "runAsNonRoot": true}'
+  DJW_POD_SECURITY_CONTEXT: '{"runAsUser": 1053, "runAsGroup": 1053, "runAsNonRoot": true}'
 
   container:
     port: "5000"
@@ -619,7 +619,7 @@ variables:
   # -- Redis port
   REDIS_PORT: "6379"
   # -- Redis cache ttl
-  REDIS_CACHE_TTL: "900"
+  REDIS_CACHE_TTL: "1800"
   # -- Redis connect timeout
   REDIS_CONNECT_TIMEOUT: "5000"
 

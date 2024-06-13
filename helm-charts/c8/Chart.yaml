@@ -3,5 +3,5 @@ name: c8
 description: A Helm chart for the C8 app
 type: application
 
-version: 0.0.21
-appVersion: "2.119.0"
+version: 0.0.22
+appVersion: "2.120.0"
