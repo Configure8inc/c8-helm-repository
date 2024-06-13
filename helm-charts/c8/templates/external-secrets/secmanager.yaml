@@ -1,0 +1,19 @@
+{{- if .Values.aws_secrets_manager.enabled -}}
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ include "c8.fullname" . }}-secrets-manager
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+spec:
+  refreshInterval: "{{ default "0" .Values.aws_secrets_manager.refreshInterval }}"
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: "{{ default "aws-secrets-manager" .Values.aws_secrets_manager.secretStoreRef }}"
+  target:
+    name: "{{ .Values.aws_secrets_manager.secret_name }}"
+    creationPolicy: Owner
+  data:
+{{- toYaml .Values.aws_secrets_manager.data | nindent 4 }}
+{{- end }}

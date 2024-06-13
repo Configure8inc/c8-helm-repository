@@ -119,6 +119,16 @@ spec:
             value: {{ .Values.variables.AZURE_DEVOPS_ALLOW_RETRIES | quote }}
           - name: AZURE_DEVOPS_MAX_RETRIES
             value: {{ .Values.variables.AZURE_DEVOPS_MAX_RETRIES | quote }}
+          - name: REDIS_ENABLED
+            value: {{ .Values.variables.REDIS_ENABLED | quote }}
+          - name: REDIS_HOST
+            value: {{ .Values.variables.REDIS_HOST | quote }}
+          - name: REDIS_PORT
+            value: {{ .Values.variables.REDIS_PORT | quote }}
+          - name: REDIS_CACHE_TTL
+            value: {{ .Values.variables.REDIS_CACHE_TTL | quote }}
+          - name: REDIS_CONNECT_TIMEOUT
+            value: {{ .Values.variables.REDIS_CONNECT_TIMEOUT | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params

@@ -1,0 +1,19 @@
+{{- if .Values.aws_parameter_store.enabled -}}
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ include "c8.fullname" . }}-parameter-store
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+spec:
+  refreshInterval: "{{ default "0" .Values.aws_parameter_store.refreshInterval }}"
+  secretStoreRef:
+    name: "{{ default "aws-parameter-store" .Values.aws_parameter_store.secretStoreRef }}"
+    kind: ClusterSecretStore
+  target:
+    name:  "{{ .Values.aws_parameter_store.secret_name }}"
+    creationPolicy: Owner
+  data:
+{{- toYaml .Values.aws_parameter_store.data | nindent 4 }}
+{{- end }}

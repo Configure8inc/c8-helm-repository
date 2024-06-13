@@ -32,17 +32,6 @@ jobs:
       with:
         helm_version: ${{ env.HELM_VERSION }}
 
-    - name: Change chart version
-      run: |
-        chart_file=./helm-charts/c8/Chart.yaml
-        current_version=$(grep 'version:' $chart_file | awk '{ print $2 }')
-        IFS='.' read -r major minor patch <<< "$current_version"
-        new_patch=$((patch + 1))
-        new_version="$major.$minor.$new_patch"
-        sed -i "s/version: $current_version/version: $new_version/" $chart_file
-        echo "New version: $new_version"
-        grep 'version:' $chart_file | awk '{ print $2 }'
-
     - name: Package helm charts
       run: |
         helm package ./helm-charts/c8 -d ./store
