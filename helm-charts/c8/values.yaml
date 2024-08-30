@@ -34,10 +34,10 @@ frontend:
 
   autoscaling:
     enabled: false
-    minReplicas: 1
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 80
-    targetMemoryUtilizationPercentage: 80
+    minReplicas:
+    maxReplicas:
+    targetCPUUtilizationPercentage:
+    targetMemoryUtilizationPercentage:
 
   # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
   resources:
@@ -112,6 +112,8 @@ common:
   C8_SECRET_NAME: c8-secret
 
 migration:
+  enabled: true
+  
   # -- Migration labels
   labels:
     appComponent: migration
@@ -161,11 +163,10 @@ backend:
 
   autoscaling:
     enabled: false
-    minReplicas: 1
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 80
-    targetMemoryUtilizationPercentage: 80
-
+    minReplicas:
+    maxReplicas:
+    targetCPUUtilizationPercentage:
+    targetMemoryUtilizationPercentage:
   image:
     repository: "ghcr.io/configure8inc/c8-backend"
     pullPolicy: IfNotPresent
@@ -298,7 +299,7 @@ djm:
   # -- Discovery job worker NodeSelector value
   DJW_NODE_SELECTOR_VALUE: ""
   # -- Discovery job worker pod security context
-  DJW_POD_SECURITY_CONTEXT: '{"runAsUser": 1052, "runAsGroup": 1052, "runAsNonRoot": true}'
+  DJW_POD_SECURITY_CONTEXT: '{"runAsUser": 1053, "runAsGroup": 1053, "runAsNonRoot": true}'
 
   container:
     port: "5000"
@@ -456,13 +457,6 @@ pns:
   # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
 
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 80
-    targetMemoryUtilizationPercentage: 80
-
   image:
     repository: "ghcr.io/configure8inc/c8-pns"
     pullPolicy: IfNotPresent
@@ -544,6 +538,10 @@ variables:
   DB_WRITE_RETRIES: "true"
   # -- DB aurh source
   DB_AUTH_SOURCE: "c8"
+  # -- Redis connect retries
+  REDIS_CONNECT_RETRIES: "20"
+  # -- Redis connect retry timeout
+  REDIS_CONNECT_RETRY_TIMEOUT: "1000"
 
   ##### C8 #########
   # -- The region what actually we use with AWS integration
@@ -619,9 +617,17 @@ variables:
   # -- Redis port
   REDIS_PORT: "6379"
   # -- Redis cache ttl
-  REDIS_CACHE_TTL: "1800"
+  REDIS_CACHE_TTL: "3600"
   # -- Redis connect timeout
   REDIS_CONNECT_TIMEOUT: "5000"
+  # -- GitHub custom rate limit
+  GITHUB_CUSTOM_RATE_LIMIT: ""
+  # -- Throttling enable or disable
+  THROTTLE_ENABLED: "true"
+  # -- Throttling ttl
+  THROTTLE_TTL: "60000"
+   # -- Throttling limit
+  THROTTLE_LIMIT: "10"
 
 
 

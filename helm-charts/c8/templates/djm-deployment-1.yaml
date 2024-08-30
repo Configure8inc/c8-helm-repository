@@ -59,7 +59,7 @@ spec:
             {{- toYaml .Values.djm.resources | nindent 12 }}
           env:
           - name: "JOB_TYPES"
-            value: "SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS"
+            value: "SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, CLEANUP_DF_RELATIONS"
           - name: SERVICE
             value: "c8-discovery-job-manager-prod"
           - name: DJW_SERVICE

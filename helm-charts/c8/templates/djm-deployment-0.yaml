@@ -59,7 +59,7 @@ spec:
             {{- toYaml .Values.djm.resources | nindent 12 }}
           env:
           - name: "JOB_TYPES"
-            value: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, COSTS_RECALCULATE, REMOVE_CREDENTIAL_RELATED_DATA"
+            value: "DISCOVERY, DISCOVERY_ON_DEMAND, AUTOMAPPING_BY_TAGS, REMOVE_CREDENTIAL_RELATED_DATA"
           - name: SERVICE
             value: "c8-discovery-job-manager-prod"
           - name: DJW_SERVICE
