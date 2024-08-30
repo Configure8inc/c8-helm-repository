@@ -16,3 +16,5 @@ data:
   NODE_PORT: {{ .Values.variables.NODE_PORT | quote }}
   STAGE: {{ .Values.variables.STAGE | quote }}
   VERSION: {{ .Values.variables.VERSION | quote }}
+  REDIS_CONNECT_RETRIES: {{ .Values.variables.REDIS_CONNECT_RETRIES | quote }}
+  REDIS_CONNECT_RETRY_TIMEOUT: {{ .Values.variables.REDIS_CONNECT_RETRY_TIMEOUT | quote }}

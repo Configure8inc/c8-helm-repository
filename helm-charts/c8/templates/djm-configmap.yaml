@@ -27,3 +27,5 @@ data:
   TASK_GROUP: "discovery-task-group"
   # -- Worker trigger threshold in milliseconds
   WORKER_TRIGGER_THRESHOLD: "120000"
+  # -- Github custom rate limit
+  GITHUB_CUSTOM_RATE_LIMIT: {{ .Values.variables.GITHUB_CUSTOM_RATE_LIMIT | quote }}

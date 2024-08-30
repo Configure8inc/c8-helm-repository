@@ -129,6 +129,12 @@ spec:
             value: {{ .Values.variables.REDIS_CACHE_TTL | quote }}
           - name: REDIS_CONNECT_TIMEOUT
             value: {{ .Values.variables.REDIS_CONNECT_TIMEOUT | quote }}
+          - name: THROTTLE_ENABLED
+            value: {{ .Values.variables.THROTTLE_ENABLED | quote }}
+          - name: THROTTLE_TTL
+            value: {{ .Values.variables.THROTTLE_TTL | quote }}
+          - name: THROTTLE_LIMIT
+            value: {{ .Values.variables.THROTTLE_LIMIT | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params
