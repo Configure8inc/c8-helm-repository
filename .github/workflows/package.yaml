@@ -4,8 +4,6 @@ on:
   workflow_dispatch: 
   pull_request:
     branches: [main, production]
-    types: [opened]
-
 
 env:
   HELM_VERSION    : "v3.12.0"
