@@ -130,6 +130,17 @@ Create the name of the djm service account to use
 {{- end }}
 
 {{/*
+Create the name of the crep service account to use
+*/}}
+{{- define "c8.serviceAccountNameCrep" -}}
+{{- if .Values.crep.serviceAccount.create }}
+{{- default (include "c8.fullname" .) .Values.crep.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.crep.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create the name of the djw service account to use
 */}}
 {{- define "c8.serviceAccountNameDjw" -}}

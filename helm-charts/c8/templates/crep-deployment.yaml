@@ -1,0 +1,173 @@
+{{- $ssaUrl := printf "%s%s" .Values.variables.DEEPLINK_URL "/self-service/api/v1/" -}}
+{{- if .Values.crep.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c8.fullname" . }}-crep
+  labels:
+    {{- with .Values.crep.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  revisionHistoryLimit: {{ .Values.common.revisionHistoryLimit }}
+  {{- if not .Values.crep.autoscaling.enabled }}
+  replicas: {{ .Values.crep.replicaCount }}
+  {{- end }}
+  {{- if .Values.common.updateStrategy }}
+  strategy:
+    {{ toYaml .Values.common.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      c8app: "crep"
+  template:
+    metadata:
+      {{- with .Values.crep.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- with .Values.crep.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        c8app: "crep"
+    spec:
+      {{- if .Values.common.IMAGE_PULL_SECRET }}
+      imagePullSecrets:
+        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
+      {{- end }}
+      serviceAccountName: {{ include "c8.serviceAccountNamecrep" . }}
+      securityContext:
+        {{- toYaml .Values.crep.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "c8.fullname" . }}-crep
+          {{- if .Values.crep.securityContext }}
+          securityContext:
+            {{- toYaml .Values.crep.securityContext | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.crep.image.repository }}:{{ .Values.common.app_version }}"
+          imagePullPolicy: {{ .Values.crep.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.crep.service.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.crep.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.crep.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.crep.resources | nindent 12 }}
+          env:
+          - name: SERVICE
+            value: "c8app"
+          - name: AWS_REGION
+            value: {{ .Values.variables.AWS_REGION | quote }}
+          - name: DB_AUTH_MECHANISM
+            value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
+          - name: DB_AUTH_SOURCE
+            value: {{ .Values.variables.DB_AUTH_SOURCE | quote }}
+          - name: DB_HOST
+            value: {{ .Values.variables.DB_HOST | quote }}
+          - name: DB_DATABASE
+            value: {{ .Values.variables.DB_DATABASE | quote }}
+          - name: DB_PORT
+            value: {{ .Values.variables.DB_PORT | quote }}
+          - name: MONGO_DRIVER_TYPE
+            value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
+          - name: DEEPLINK_URL
+            value: {{ .Values.variables.DEEPLINK_URL | quote }}
+          - name: HOOKS_CALLBACK_URL
+            value: {{ .Values.variables.DEEPLINK_URL | quote }}
+          - name: OPENSEARCH_NODE
+            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
+          - name: OPENSEARCH_AWS_AUTHENTICATE
+            value: {{ .Values.variables.OPENSEARCH_AWS_AUTHENTICATE | quote }}
+          - name: OPENSEARCH_AWS_SERVICE
+            value: {{ .Values.variables.OPENSEARCH_AWS_SERVICE | quote }}
+          - name: SSA_URL
+            value: {{ $ssaUrl }}
+          - name: SWAGGER_ENABLED
+            value: {{ .Values.variables.SWAGGER_ENABLED | quote }}
+          - name: RABBITMQ_HOST
+            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
+          - name: RABBITMQ_PORT
+            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          - name: RABBITMQ_USE_SSL
+            value: {{ .Values.variables.RABBITMQ_USE_SSL | quote }}
+          - name: SF_ACCOUNT
+            value: {{ .Values.variables.SF_ACCOUNT | quote }}
+          - name: SF_DATABASE
+            value: {{ .Values.variables.SF_DATABASE | quote }}
+          - name: SF_READ_WAREHOUSE
+            value: {{ .Values.variables.SF_READ_WAREHOUSE | quote }}
+          - name: SF_WRITE_WAREHOUSE
+            value: {{ .Values.variables.SF_WRITE_WAREHOUSE | quote }}
+          - name: SF_POOLSIZE
+            value: {{ .Values.variables.SF_POOLSIZE | quote }}
+          - name: SF_SCHEMA
+            value: {{ .Values.variables.SF_SCHEMA | quote }}
+          - name: OLAP_DB
+            value: {{ .Values.variables.OLAP_DB | quote }}
+          - name: DB_CONNECTION_ADDITIONAL_PARAMS
+            value: {{ .Values.variables.DB_CONNECTION_ADDITIONAL_PARAMS | quote }}
+          - name: DISABLE_ANALYTICS
+            value: {{ .Values.variables.DISABLE_ANALYTICS | quote }}
+          - name: AZURE_DEVOPS_ALLOW_RETRIES
+            value: {{ .Values.variables.AZURE_DEVOPS_ALLOW_RETRIES | quote }}
+          - name: AZURE_DEVOPS_MAX_RETRIES
+            value: {{ .Values.variables.AZURE_DEVOPS_MAX_RETRIES | quote }}
+          - name: REDIS_ENABLED
+            value: {{ .Values.variables.REDIS_ENABLED | quote }}
+          - name: REDIS_HOST
+            value: {{ .Values.variables.REDIS_HOST | quote }}
+          - name: REDIS_PORT
+            value: {{ .Values.variables.REDIS_PORT | quote }}
+          - name: REDIS_CACHE_TTL
+            value: {{ .Values.variables.REDIS_CACHE_TTL | quote }}
+          - name: REDIS_CONNECT_TIMEOUT
+            value: {{ .Values.variables.REDIS_CONNECT_TIMEOUT | quote }}
+          - name: THROTTLE_ENABLED
+            value: {{ .Values.variables.THROTTLE_ENABLED | quote }}
+          - name: THROTTLE_TTL
+            value: {{ .Values.variables.THROTTLE_TTL | quote }}
+          - name: THROTTLE_LIMIT
+            value: {{ .Values.variables.THROTTLE_LIMIT | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-common-params
+            - configMapRef:
+                name: {{ include "c8.fullname" . }}-crep-params
+            - secretRef:
+                name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
+          volumeMounts:
+          {{- if and .Values.crep.persistence.enabled (eq .Values.crep.persistence.type "pvc") }}
+          - name: c8
+            mountPath: {{ .Values.crep.persistence.mountPath }}{{ .Values.variables.STATIC_FILES_PATH  }}  
+          {{- end }}
+      volumes:
+      {{- if and .Values.crep.persistence.enabled (eq .Values.crep.persistence.type "pvc") }}
+      - name: c8
+        persistentVolumeClaim:
+        {{- if .Values.crep.persistence.existingClaim }}
+          claimName: {{ .Values.crep.persistence.existingClaim }}
+        {{- else }}
+          claimName: {{ include "c8.fullname" . }}-pvc
+        {{- end }}
+      {{- end }}
+      {{- with .Values.crep.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.crep.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.crep.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
