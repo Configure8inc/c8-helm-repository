@@ -62,9 +62,13 @@ spec:
             {{- toYaml .Values.crep.resources | nindent 12 }}
           env:
           - name: SERVICE
-            value: "c8app"
-          - name: AWS_REGION
-            value: {{ .Values.variables.AWS_REGION | quote }}
+            value: "c8crep"
+          - name: RABBITMQ_HOST
+            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
+          - name: RABBITMQ_PORT
+            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
+          - name: RABBITMQ_USE_SSL
+            value: {{ .Values.variables.RABBITMQ_USE_SSL | quote }}
           - name: DB_AUTH_MECHANISM
             value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
           - name: DB_AUTH_SOURCE
@@ -77,26 +81,6 @@ spec:
             value: {{ .Values.variables.DB_PORT | quote }}
           - name: MONGO_DRIVER_TYPE
             value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
-          - name: DEEPLINK_URL
-            value: {{ .Values.variables.DEEPLINK_URL | quote }}
-          - name: HOOKS_CALLBACK_URL
-            value: {{ .Values.variables.DEEPLINK_URL | quote }}
-          - name: OPENSEARCH_NODE
-            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
-          - name: OPENSEARCH_AWS_AUTHENTICATE
-            value: {{ .Values.variables.OPENSEARCH_AWS_AUTHENTICATE | quote }}
-          - name: OPENSEARCH_AWS_SERVICE
-            value: {{ .Values.variables.OPENSEARCH_AWS_SERVICE | quote }}
-          - name: SSA_URL
-            value: {{ $ssaUrl }}
-          - name: SWAGGER_ENABLED
-            value: {{ .Values.variables.SWAGGER_ENABLED | quote }}
-          - name: RABBITMQ_HOST
-            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
-          - name: RABBITMQ_PORT
-            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
-          - name: RABBITMQ_USE_SSL
-            value: {{ .Values.variables.RABBITMQ_USE_SSL | quote }}
           - name: SF_ACCOUNT
             value: {{ .Values.variables.SF_ACCOUNT | quote }}
           - name: SF_DATABASE
@@ -109,16 +93,14 @@ spec:
             value: {{ .Values.variables.SF_POOLSIZE | quote }}
           - name: SF_SCHEMA
             value: {{ .Values.variables.SF_SCHEMA | quote }}
+          - name: OPENSEARCH_NODE
+            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
+          - name: OPENSEARCH_AWS_AUTHENTICATE
+            value: {{ .Values.variables.OPENSEARCH_AWS_AUTHENTICATE | quote }}
+          - name: OPENSEARCH_AWS_SERVICE
+            value: {{ .Values.variables.OPENSEARCH_AWS_SERVICE | quote }}
           - name: OLAP_DB
             value: {{ .Values.variables.OLAP_DB | quote }}
-          - name: DB_CONNECTION_ADDITIONAL_PARAMS
-            value: {{ .Values.variables.DB_CONNECTION_ADDITIONAL_PARAMS | quote }}
-          - name: DISABLE_ANALYTICS
-            value: {{ .Values.variables.DISABLE_ANALYTICS | quote }}
-          - name: AZURE_DEVOPS_ALLOW_RETRIES
-            value: {{ .Values.variables.AZURE_DEVOPS_ALLOW_RETRIES | quote }}
-          - name: AZURE_DEVOPS_MAX_RETRIES
-            value: {{ .Values.variables.AZURE_DEVOPS_MAX_RETRIES | quote }}
           - name: REDIS_ENABLED
             value: {{ .Values.variables.REDIS_ENABLED | quote }}
           - name: REDIS_HOST
