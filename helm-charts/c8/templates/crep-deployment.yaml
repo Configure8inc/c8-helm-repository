@@ -39,7 +39,7 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
       {{- end }}
-      serviceAccountName: {{ include "c8.serviceAccountNamecrep" . }}
+      serviceAccountName: {{ include "c8.serviceAccountNameCrep" . }}
       securityContext:
         {{- toYaml .Values.crep.podSecurityContext | nindent 8 }}
       containers:
@@ -124,21 +124,6 @@ spec:
                 name: {{ include "c8.fullname" . }}-crep-params
             - secretRef:
                 name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
-          volumeMounts:
-          {{- if and .Values.crep.persistence.enabled (eq .Values.crep.persistence.type "pvc") }}
-          - name: c8
-            mountPath: {{ .Values.crep.persistence.mountPath }}{{ .Values.variables.STATIC_FILES_PATH  }}  
-          {{- end }}
-      volumes:
-      {{- if and .Values.crep.persistence.enabled (eq .Values.crep.persistence.type "pvc") }}
-      - name: c8
-        persistentVolumeClaim:
-        {{- if .Values.crep.persistence.existingClaim }}
-          claimName: {{ .Values.crep.persistence.existingClaim }}
-        {{- else }}
-          claimName: {{ include "c8.fullname" . }}-pvc
-        {{- end }}
-      {{- end }}
       {{- with .Values.crep.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

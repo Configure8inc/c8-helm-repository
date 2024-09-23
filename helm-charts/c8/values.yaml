@@ -448,6 +448,13 @@ crep:
 
   replicaCount: 1
 
+  autoscaling:
+    enabled: false
+    minReplicas:
+    maxReplicas:
+    targetCPUUtilizationPercentage:
+    targetMemoryUtilizationPercentage:
+
   # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
