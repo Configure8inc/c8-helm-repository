@@ -486,15 +486,23 @@ crep:
       cpu: 100m
       memory: 256Mi
 
-  # livenessProbe:
-  #   httpGet:
-  #     path: /
-  #     port: http
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 5000
+      scheme: HTTP
+    failureThreshold: 3
+    timeoutSeconds: 10
+    periodSeconds: 10
 
-  # readinessProbe:
-  #   httpGet:
-  #     path: /
-  #     port: http
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 5000
+      scheme: HTTP
+    failureThreshold: 3
+    timeoutSeconds: 10
+    periodSeconds: 10
 
   podAnnotations: {}
   podSecurityContext:
