@@ -705,6 +705,8 @@ variables:
   SF_POOLSIZE: "5"
   # -- Online analytical processing DB type
   OLAP_DB: "snowflake"
+  # -- Enable redis cache for public API
+  PUBLIC_API_REDIS_ENABLED: "true"
   # -- Enable or disable redis cache
   REDIS_ENABLED: "true"
   # -- Redis host
