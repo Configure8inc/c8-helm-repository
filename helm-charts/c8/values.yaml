@@ -440,7 +440,7 @@ ssa:
     minAvailable: 50%
 
 crep:
-  enabled: true
+  enabled: false
 
   # -- Backend labels
   labels:
