@@ -514,7 +514,8 @@ crep:
 
   securityContext:
     allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
+    # Required for the application to write temporary files
+    readOnlyRootFilesystem: false
     capabilities:
       drop:
         - ALL
