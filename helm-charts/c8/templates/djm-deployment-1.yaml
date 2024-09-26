@@ -122,6 +122,8 @@ spec:
             value: {{ .Values.variables.AZURE_DEVOPS_ALLOW_RETRIES | quote }}
           - name: AZURE_DEVOPS_MAX_RETRIES
             value: {{ .Values.variables.AZURE_DEVOPS_MAX_RETRIES | quote }}
+          - name: PUBLIC_API_REDIS_ENABLED
+            value: {{ .Values.variables.PUBLIC_API_REDIS_ENABLED | quote }}
           - name: REDIS_ENABLED
             value: {{ .Values.variables.REDIS_ENABLED | quote }}
           - name: REDIS_HOST
