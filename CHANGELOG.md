@@ -18,3 +18,9 @@ All notable changes to this Helm chart will be documented in this file.
 ### Fixed
 
 - Corrected the `matchLabels` selector in the Backend PodDisruptionBudget (PDB) to ensure proper matching of backend pods during disruptions.
+
+## [0.0.26] - 2024-10-04
+
+### Added
+
+- Added GITHUB_APP_INSTALL_URL variable

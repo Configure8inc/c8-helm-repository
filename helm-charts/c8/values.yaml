@@ -647,6 +647,8 @@ variables:
   SWAGGER_ENABLED: "false"
   # -- Enable or disable analytics
   DISABLE_ANALYTICS: "true"
+  # -- GitHub application installation url
+  GITHUB_APP_INSTALL_URL: ""
 
   ##### SSA #########
   # -- Enable or disable swagger documentation

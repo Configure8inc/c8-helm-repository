@@ -137,6 +137,8 @@ spec:
             value: {{ .Values.variables.THROTTLE_TTL | quote }}
           - name: THROTTLE_LIMIT
             value: {{ .Values.variables.THROTTLE_LIMIT | quote }}
+          - name: GITHUB_APP_INSTALL_URL
+            value: {{ .Values.variables.GITHUB_APP_INSTALL_URL | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "c8.fullname" . }}-common-params
