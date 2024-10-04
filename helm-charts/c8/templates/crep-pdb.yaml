@@ -1,4 +1,4 @@
-{{- if .Values.backend.enabled }}
+{{- if .Values.crep.enabled }}
 {{- if .Values.frontend.podDisruptionBudget.enabled }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -8,6 +8,6 @@ spec:
   minAvailable: "{{ default "50%" .Values.frontend.podDisruptionBudget.minAvailable }}"
   selector:
     matchLabels:
-      c8app: "backend"
+      c8app: "crep"
 {{- end }}
 {{- end }}

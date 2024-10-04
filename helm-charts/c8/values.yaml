@@ -439,6 +439,101 @@ ssa:
     # -- Number or percentage of pods that must be available
     minAvailable: 50%
 
+crep:
+  enabled: false
+
+  # -- Backend labels
+  labels:
+    appComponent: crep
+
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas:
+    maxReplicas:
+    targetCPUUtilizationPercentage:
+    targetMemoryUtilizationPercentage:
+
+  # -- Node labels for pod assignment https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  image:
+    repository: "ghcr.io/configure8inc/c8-crep"
+    pullPolicy: IfNotPresent
+
+  container:
+    port: "5000"
+
+  # -- Configuration for crep service
+  service:
+    enabled: true
+    type: ClusterIP
+    port: "5000"
+
+  # -- Define resources requests and limits for Pods. https://kubernetes.io/docs/user-guide/compute-resources/
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 5000
+      scheme: HTTP
+    failureThreshold: 3
+    timeoutSeconds: 10
+    periodSeconds: 10
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 5000
+      scheme: HTTP
+    failureThreshold: 3
+    timeoutSeconds: 10
+    periodSeconds: 10
+
+  podAnnotations: {}
+  podSecurityContext:
+    runAsUser: 1058
+    runAsGroup: 1058
+    fsGroup: 1058
+    runAsNonRoot: true
+  # fsGroup: 2000
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    # Required for the application to write temporary files
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    create: true
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+    name: "c8-crep"
+
+  podDisruptionBudget:
+    # Specifies whether pod disruption budget should be created
+    enabled: false
+    # Number or percentage of pods that must be available
+    minAvailable: 50%
+
 pns:
   enabled: true
 
