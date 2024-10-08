@@ -615,6 +615,8 @@ pns:
 
 variables:
   ##### COMMON CONFIGMAP #########
+  # -- Tenant name
+  TENANT: "prod"
   # -- Application env
   ENV: "prod"
   # -- Logging level
