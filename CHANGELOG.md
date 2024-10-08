@@ -24,3 +24,9 @@ All notable changes to this Helm chart will be documented in this file.
 ### Added
 
 - Added GITHUB_APP_INSTALL_URL variable
+
+## [0.0.27] - 2024-10-08
+
+### Added
+
+- Added TENANT variable
