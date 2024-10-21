@@ -44,9 +44,11 @@ frontend:
     limits:
       cpu: 1
       memory: 256Mi
+      ephemeral-storage: 1Gi
     requests:
       cpu: 0.2
       memory: 256Mi
+      ephemeral-storage: 1Gi
 
   livenessProbe:
     httpGet:
@@ -181,9 +183,11 @@ backend:
     limits:
       cpu: 2
       memory: 2Gi
+      ephemeral-storage: 4Gi
     requests:
       cpu: 1
       memory: 2Gi
+      ephemeral-storage: 4Gi
 
   livenessProbe:
     httpGet:
@@ -309,9 +313,11 @@ djm:
     limits:
       cpu: 500m
       memory: 512Mi
+      ephemeral-storage: 2Gi
     requests:
       cpu: 100m
       memory: 512Mi
+      ephemeral-storage: 2Gi
 
   # livenessProbe:
   #   httpGet:
@@ -388,9 +394,11 @@ ssa:
     limits:
       cpu: 500m
       memory: 512Mi
+      ephemeral-storage: 4Gi
     requests:
       cpu: 100m
       memory: 512Mi
+      ephemeral-storage: 4Gi
 
   livenessProbe:
     httpGet:
@@ -482,9 +490,11 @@ crep:
     limits:
       cpu: 500m
       memory: 256Mi
+      ephemeral-storage: 4Gi
     requests:
       cpu: 100m
       memory: 256Mi
+      ephemeral-storage: 4Gi
 
   livenessProbe:
     httpGet:
@@ -570,9 +580,11 @@ pns:
     limits:
       cpu: 500m
       memory: 256Mi
+      ephemeral-storage: 2Gi
     requests:
       cpu: 100m
       memory: 256Mi
+      ephemeral-storage: 2Gi
 
   # livenessProbe:
   #   httpGet:
