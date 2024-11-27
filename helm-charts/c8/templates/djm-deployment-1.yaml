@@ -1,9 +1,9 @@
-{{- if .Values.djm.enabled }}
-{{- $chartname := .Chart.Name }}
+{ { - if .Values.djm.enabled } }
+  { { - $chartname := .Chart.Name } }
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "c8.fullname" . }}-djm-scorecard-aggregation
+  name: { { include "c8.fullname" . } }-djm-scorecard-aggregation
   labels:
     {{- with .Values.djm.labels }}
     {{- toYaml . | nindent 4 }}
@@ -13,156 +13,156 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  revisionHistoryLimit: {{ .Values.common.revisionHistoryLimit }}
-  replicas: {{ default "1" .Values.djm.replicaCount }}
-  {{- if .Values.djm.updateStrategy }}
+  revisionHistoryLimit: { { .Values.common.revisionHistoryLimit } }
+  replicas: { { default "1" .Values.djm.replicaCount } }
+  { { - if .Values.djm.updateStrategy } }
   strategy:
-    {{ toYaml .Values.djm.updateStrategy | nindent 4 }}
-  {{- end }}
+    { { toYaml .Values.djm.updateStrategy | nindent 4 } }
+  { { - end } }
   selector:
     matchLabels:
       c8app: "djm-scorecard-aggregation"
   template:
     metadata:
-      {{- with .Values.djm.podAnnotations }}
+      { { - with .Values.djm.podAnnotations } }
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
       labels:
-        {{- with .Values.djm.labels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-        c8app: "djm-scorecard-aggregation"
+        { { - with .Values.djm.labels } }
+          { { - toYaml . | nindent 8 } }
+          { { - end } }
+          c8app: "djm-scorecard-aggregation"
     spec:
       imagePullSecrets:
-        - name: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-      serviceAccountName: {{ include "c8.serviceAccountNameDjm" . }}
+        - name: { { .Values.common.IMAGE_PULL_SECRET | quote } }
+      serviceAccountName: { { include "c8.serviceAccountNameDjm" . } }
       securityContext:
-        {{- toYaml .Values.djm.podSecurityContext | nindent 8 }}
+        { { - toYaml .Values.djm.podSecurityContext | nindent 8 } }
       containers:
-        - name: {{ include "c8.fullname" . }}-djm
+        - name: { { include "c8.fullname" . } }-djm
           {{- if .Values.djm.securityContext }}
           securityContext:
             {{- toYaml .Values.djm.securityContext | nindent 12 }}
-          {{- end }}
+          { { - end } }
           image: "{{ .Values.djm.image.repository }}:{{ .Values.common.app_version }}"
-          imagePullPolicy: {{ .Values.djm.image.pullPolicy }}
+          imagePullPolicy: { { .Values.djm.image.pullPolicy } }
           ports:
             - name: http
-              containerPort: {{ .Values.djm.container.port }}
+              containerPort: { { .Values.djm.container.port } }
               protocol: TCP
           livenessProbe:
-            {{- toYaml .Values.djm.livenessProbe | nindent 12 }}
+            { { - toYaml .Values.djm.livenessProbe | nindent 12 } }
           readinessProbe:
-            {{- toYaml .Values.djm.readinessProbe | nindent 12 }}
+            { { - toYaml .Values.djm.readinessProbe | nindent 12 } }
           resources:
-            {{- toYaml .Values.djm.resources | nindent 12 }}
+            { { - toYaml .Values.djm.resources | nindent 12 } }
           env:
-          - name: "JOB_TYPES"
-            value: "SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, CLEANUP_DF_RELATIONS"
-          - name: SERVICE
-            value: "c8-discovery-job-manager-prod"
-          - name: DJW_SERVICE
-            value: "discovery-job-worker"
-          - name: DJW_SERVICE_ACCOUNT_NAME
-            value: {{ include "c8.serviceAccountNameDjw" . }}
-          - name: DB_AUTH_SOURCE
-            value: {{ .Values.variables.DB_AUTH_SOURCE | quote }}
-          - name: DB_AUTH_MECHANISM
-            value: {{ .Values.variables.DB_AUTH_MECHANISM | quote }}
-          - name: DB_HOST
-            value: {{ .Values.variables.DB_HOST | quote }}
-          - name: DB_DATABASE
-            value: {{ .Values.variables.DB_DATABASE | quote }}
-          - name: DB_PORT
-            value: {{ .Values.variables.DB_PORT | quote }}
-          - name: MONGO_DRIVER_TYPE
-            value: {{ .Values.variables.MONGO_DRIVER_TYPE | quote }}
-          - name: DISCOVERY_CONTAINER_NAME
-            value: {{ .Values.variables.DISCOVERY_CONTAINER_NAME | quote }}
-          - name: AWS_REGION
-            value: {{ .Values.variables.AWS_REGION | quote }}
-          - name: DJW_K8_NAMESPACE
-            value: {{ .Release.Namespace }}
-          - name: OPENSEARCH_NODE
-            value: {{ .Values.variables.OPENSEARCH_NODE | quote }}
-          - name: OPENSEARCH_AWS_AUTHENTICATE
-            value: {{ .Values.variables.OPENSEARCH_AWS_AUTHENTICATE | quote }}
-          - name: OPENSEARCH_AWS_SERVICE
-            value: {{ .Values.variables.OPENSEARCH_AWS_SERVICE | quote }}
-          - name: RABBITMQ_HOST
-            value: {{ .Values.variables.RABBITMQ_HOST | quote }}
-          - name: RABBITMQ_PORT
-            value: {{ .Values.variables.RABBITMQ_PORT | quote }}
-          - name: RABBITMQ_USE_SSL
-            value: {{ .Values.variables.RABBITMQ_USE_SSL | quote }}
-          - name: DJW_APP_URL
-            value: {{ .Values.variables.DEEPLINK_URL | quote }}
-          - name: DJW_IMAGE
-            value: "{{ .Values.djm.DJW_IMAGE_REPO }}:{{ .Values.common.app_version }}"
-          - name: IMAGE_PULL_SECRET
-            value: {{ .Values.common.IMAGE_PULL_SECRET | quote }}
-          - name: SF_ACCOUNT
-            value: {{ .Values.variables.SF_ACCOUNT | quote }}
-          - name: SF_DATABASE
-            value: {{ .Values.variables.SF_DATABASE | quote }}
-          - name: SF_READ_WAREHOUSE
-            value: {{ .Values.variables.SF_READ_WAREHOUSE | quote }}
-          - name: SF_WRITE_WAREHOUSE
-            value: {{ .Values.variables.SF_DISCOVERY_WRITE_WAREHOUSE | quote }}
-          - name: SF_SCHEMA
-            value: {{ .Values.variables.SF_SCHEMA | quote }}
-          - name: SF_POOLSIZE
-            value: {{ .Values.variables.SF_POOLSIZE | quote }}
-          - name: OLAP_DB
-            value: {{ .Values.variables.OLAP_DB | quote }}
-          - name: DB_CONNECTION_ADDITIONAL_PARAMS
-            value: {{ .Values.variables.DB_CONNECTION_ADDITIONAL_PARAMS | quote }}
-          - name: AZURE_DEVOPS_ALLOW_RETRIES
-            value: {{ .Values.variables.AZURE_DEVOPS_ALLOW_RETRIES | quote }}
-          - name: AZURE_DEVOPS_MAX_RETRIES
-            value: {{ .Values.variables.AZURE_DEVOPS_MAX_RETRIES | quote }}
-          - name: PUBLIC_API_REDIS_ENABLED
-            value: {{ .Values.variables.PUBLIC_API_REDIS_ENABLED | quote }}
-          - name: REDIS_ENABLED
-            value: {{ .Values.variables.REDIS_ENABLED | quote }}
-          - name: REDIS_HOST
-            value: {{ .Values.variables.REDIS_HOST | quote }}
-          - name: REDIS_PORT
-            value: {{ .Values.variables.REDIS_PORT | quote }}
-          - name: REDIS_CACHE_TTL
-            value: {{ .Values.variables.REDIS_CACHE_TTL | quote }}
-          - name: REDIS_CONNECT_TIMEOUT
-            value: {{ .Values.variables.REDIS_CONNECT_TIMEOUT | quote }}
-          {{- if .Values.djm.DJW_NODE_SELECTOR_KEY }}
+            - name: "JOB_TYPES"
+              value: "SCORECARD_AGGREGATION, SCORECARD_AGGREGATION_ON_DEMAND, SSA_TERMINATION, CALCULATE_SERVICE_DETAILS, CLEANUP_DF_RELATIONS, CLEANUP_SCHEMA_ENTITIES"
+            - name: SERVICE
+              value: "c8-discovery-job-manager-prod"
+            - name: DJW_SERVICE
+              value: "discovery-job-worker"
+            - name: DJW_SERVICE_ACCOUNT_NAME
+              value: { { include "c8.serviceAccountNameDjw" . } }
+            - name: DB_AUTH_SOURCE
+              value: { { .Values.variables.DB_AUTH_SOURCE | quote } }
+            - name: DB_AUTH_MECHANISM
+              value: { { .Values.variables.DB_AUTH_MECHANISM | quote } }
+            - name: DB_HOST
+              value: { { .Values.variables.DB_HOST | quote } }
+            - name: DB_DATABASE
+              value: { { .Values.variables.DB_DATABASE | quote } }
+            - name: DB_PORT
+              value: { { .Values.variables.DB_PORT | quote } }
+            - name: MONGO_DRIVER_TYPE
+              value: { { .Values.variables.MONGO_DRIVER_TYPE | quote } }
+            - name: DISCOVERY_CONTAINER_NAME
+              value: { { .Values.variables.DISCOVERY_CONTAINER_NAME | quote } }
+            - name: AWS_REGION
+              value: { { .Values.variables.AWS_REGION | quote } }
+            - name: DJW_K8_NAMESPACE
+              value: { { .Release.Namespace } }
+            - name: OPENSEARCH_NODE
+              value: { { .Values.variables.OPENSEARCH_NODE | quote } }
+            - name: OPENSEARCH_AWS_AUTHENTICATE
+              value: { { .Values.variables.OPENSEARCH_AWS_AUTHENTICATE | quote } }
+            - name: OPENSEARCH_AWS_SERVICE
+              value: { { .Values.variables.OPENSEARCH_AWS_SERVICE | quote } }
+            - name: RABBITMQ_HOST
+              value: { { .Values.variables.RABBITMQ_HOST | quote } }
+            - name: RABBITMQ_PORT
+              value: { { .Values.variables.RABBITMQ_PORT | quote } }
+            - name: RABBITMQ_USE_SSL
+              value: { { .Values.variables.RABBITMQ_USE_SSL | quote } }
+            - name: DJW_APP_URL
+              value: { { .Values.variables.DEEPLINK_URL | quote } }
+            - name: DJW_IMAGE
+              value: "{{ .Values.djm.DJW_IMAGE_REPO }}:{{ .Values.common.app_version }}"
+            - name: IMAGE_PULL_SECRET
+              value: { { .Values.common.IMAGE_PULL_SECRET | quote } }
+            - name: SF_ACCOUNT
+              value: { { .Values.variables.SF_ACCOUNT | quote } }
+            - name: SF_DATABASE
+              value: { { .Values.variables.SF_DATABASE | quote } }
+            - name: SF_READ_WAREHOUSE
+              value: { { .Values.variables.SF_READ_WAREHOUSE | quote } }
+            - name: SF_WRITE_WAREHOUSE
+              value: { { .Values.variables.SF_DISCOVERY_WRITE_WAREHOUSE | quote } }
+            - name: SF_SCHEMA
+              value: { { .Values.variables.SF_SCHEMA | quote } }
+            - name: SF_POOLSIZE
+              value: { { .Values.variables.SF_POOLSIZE | quote } }
+            - name: OLAP_DB
+              value: { { .Values.variables.OLAP_DB | quote } }
+            - name: DB_CONNECTION_ADDITIONAL_PARAMS
+              value: { { .Values.variables.DB_CONNECTION_ADDITIONAL_PARAMS | quote } }
+            - name: AZURE_DEVOPS_ALLOW_RETRIES
+              value: { { .Values.variables.AZURE_DEVOPS_ALLOW_RETRIES | quote } }
+            - name: AZURE_DEVOPS_MAX_RETRIES
+              value: { { .Values.variables.AZURE_DEVOPS_MAX_RETRIES | quote } }
+            - name: PUBLIC_API_REDIS_ENABLED
+              value: { { .Values.variables.PUBLIC_API_REDIS_ENABLED | quote } }
+            - name: REDIS_ENABLED
+              value: { { .Values.variables.REDIS_ENABLED | quote } }
+            - name: REDIS_HOST
+              value: { { .Values.variables.REDIS_HOST | quote } }
+            - name: REDIS_PORT
+              value: { { .Values.variables.REDIS_PORT | quote } }
+            - name: REDIS_CACHE_TTL
+              value: { { .Values.variables.REDIS_CACHE_TTL | quote } }
+            - name: REDIS_CONNECT_TIMEOUT
+              value: { { .Values.variables.REDIS_CONNECT_TIMEOUT | quote } }
+          { { - if .Values.djm.DJW_NODE_SELECTOR_KEY } }
           - name: DJW_NODE_SELECTOR_KEY
-            value: {{ .Values.djm.DJW_NODE_SELECTOR_KEY | quote }}
-          {{- end }}
-          {{- if .Values.djm.DJW_NODE_SELECTOR_VALUE }}
+            value: { { .Values.djm.DJW_NODE_SELECTOR_KEY | quote } }
+          { { - end } }
+          { { - if .Values.djm.DJW_NODE_SELECTOR_VALUE } }
           - name: DJW_NODE_SELECTOR_VALUE
-            value: {{ .Values.djm.DJW_NODE_SELECTOR_VALUE | quote }}
-          {{- end }}
-          {{- if .Values.djm.DJW_POD_SECURITY_CONTEXT }}
+            value: { { .Values.djm.DJW_NODE_SELECTOR_VALUE | quote } }
+          { { - end } }
+          { { - if .Values.djm.DJW_POD_SECURITY_CONTEXT } }
           - name: DJW_POD_SECURITY_CONTEXT
-            value: {{ .Values.djm.DJW_POD_SECURITY_CONTEXT | quote }}
-          {{- end }}
+            value: { { .Values.djm.DJW_POD_SECURITY_CONTEXT | quote } }
+          { { - end } }
           envFrom:
             - configMapRef:
-                name: {{ include "c8.fullname" . }}-common-params
+                name: { { include "c8.fullname" . } }-common-params
             - configMapRef:
-                name: {{ include "c8.fullname" . }}-djm-params
+            name: { { include "c8.fullname" . } }-djm-params
             - secretRef:
-                name: {{ default "c8-secret" .Values.common.C8_SECRET_NAME | quote }}
-      {{- with .Values.djm.nodeSelector }}
+            name: { { default "c8-secret" .Values.common.C8_SECRET_NAME | quote } }
+      { { - with .Values.djm.nodeSelector } }
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.djm.affinity }}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      { { - with .Values.djm.affinity } }
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.djm.tolerations }}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      { { - with .Values.djm.tolerations } }
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-{{- end }}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+  { { - end } }

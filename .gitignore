@@ -5,3 +5,4 @@ ignore
 .AppleDouble
 .LSOverride
 ignore/**
+.idea
